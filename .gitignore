@@ -2,6 +2,14 @@
 *~
 .*.swp
 .DS_STORE
+
+#Eclipse / VS Code Java 工程元数据（IDE 自动重建，不入库）
+.project
+.classpath
+.settings/
+.factorypath
+.apt_generated/
+.vscode/
 robovm-build/
 project.xcworkspace/
 xcuserdata/
