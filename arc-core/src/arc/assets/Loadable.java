@@ -15,7 +15,7 @@ public interface Loadable{
         return getClass().getSimpleName();
     }
 
-    default Seq<AssetDescriptor> getDependencies(){
+    default Ar<AssetDescriptor> getDependencies(){
         return null;
     }
 }

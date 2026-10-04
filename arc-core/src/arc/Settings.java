@@ -134,7 +134,7 @@ public class Settings{
         }catch(Throwable e){
             Log.err("Failed to load base settings file, attempting to load backup.", e);
 
-            Seq<Fi> attempts = getBackupFolder().seq().add(getBackupSettingsFile());
+            Ar<Fi> attempts = getBackupFolder().seq().add(getBackupSettingsFile());
             //sort with latest modified file first
             attempts.sort(Structs.comparingLong(f -> -f.lastModified()));
 
@@ -253,7 +253,7 @@ public class Settings{
                 synchronized(this){
                     Fi backupFolder = getBackupFolder();
 
-                    Seq<Fi> previous = backupFolder.seq();
+                    Ar<Fi> previous = backupFolder.seq();
                     //make sure first file is most recent, last is oldest
                     previous.sort(Structs.comparingLong(f -> -f.lastModified()));
 

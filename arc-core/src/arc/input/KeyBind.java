@@ -6,7 +6,7 @@ import arc.util.*;
 import static arc.Core.*;
 
 public class KeyBind{
-    public static final Seq<KeyBind> all = new Seq<>();
+    public static final Ar<KeyBind> all = new Ar<>();
 
     public final String name;
     public final KeybindValue defaultValue;

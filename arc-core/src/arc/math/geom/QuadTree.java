@@ -20,13 +20,13 @@ public class QuadTree<T extends QuadTreeObject>{
     protected static final int maxObjectsPerNode = 5;
 
     public Rect bounds;
-    public Seq<T> objects = new Seq<>(false);
+    public Ar<T> objects = new Ar<>(false);
     public QuadTree<T> botLeft, botRight, topLeft, topRight;
     public boolean leaf = true;
     public int totalObjects;
 
     //scratch partitioning lists reused across fill() calls to avoid allocating every rebuild
-    private Seq<T> fillBL, fillBR, fillTL, fillTR;
+    private Ar<T> fillBL, fillBR, fillTL, fillTR;
 
     public QuadTree(Rect bounds){
         this.bounds = bounds;
@@ -107,7 +107,7 @@ public class QuadTree<T extends QuadTreeObject>{
     }
 
     /** Rebuilds this tree from scratch using the given list of objects. */
-    public void fill(Seq<T> list){
+    public void fill(Ar<T> list){
         clear();
         totalObjects = list.size;
 
@@ -127,10 +127,10 @@ public class QuadTree<T extends QuadTreeObject>{
         leaf = false;
 
         if(fillBL == null){
-            fillBL = new Seq<>(false);
-            fillBR = new Seq<>(false);
-            fillTL = new Seq<>(false);
-            fillTR = new Seq<>(false);
+            fillBL = new Ar<>(false);
+            fillBR = new Ar<>(false);
+            fillTL = new Ar<>(false);
+            fillTR = new Ar<>(false);
         }
         fillBL.clear();
         fillBR.clear();
@@ -241,7 +241,7 @@ public class QuadTree<T extends QuadTreeObject>{
             if(botRight.bounds.overlaps(x, y, width, height)) botRight.intersect(x, y, width, height, out);
         }
 
-        Seq<?> objects = this.objects;
+        Ar<?> objects = this.objects;
 
         for(int i = 0; i < objects.size; i++){
             T item = (T)objects.items[i];
@@ -265,7 +265,7 @@ public class QuadTree<T extends QuadTreeObject>{
             if(botRight.bounds.overlaps(x, y, width, height)&& botRight.intersect(x, y, width, height, out)) return true;
         }
 
-        Seq<?> objects = this.objects;
+        Ar<?> objects = this.objects;
 
         for(int i = 0; i < objects.size; i++){
             T item = (T)objects.items[i];
@@ -291,7 +291,7 @@ public class QuadTree<T extends QuadTreeObject>{
             if(botRight.bounds.overlaps(x, y, width, height)&& (result = botRight.find(x, y, width, height, out)) != null) return result;
         }
 
-        Seq<?> objects = this.objects;
+        Ar<?> objects = this.objects;
 
         for(int i = 0; i < objects.size; i++){
             T item = (T)objects.items[i];
@@ -315,7 +315,7 @@ public class QuadTree<T extends QuadTreeObject>{
             if(botRight.bounds.overlaps(x, y, width, height) && botRight.any(x, y, width, height))return true;
         }
 
-        Seq<?> objects = this.objects;
+        Ar<?> objects = this.objects;
 
         for(int i = 0; i < objects.size; i++){
             T item = (T)objects.items[i];
@@ -341,14 +341,14 @@ public class QuadTree<T extends QuadTreeObject>{
      * <p>
      * This will result in false positives, but never a false negative.
      */
-    public void intersect(Rect toCheck, Seq<T> out){
+    public void intersect(Rect toCheck, Ar<T> out){
         intersect(toCheck.x, toCheck.y, toCheck.width, toCheck.height, out);
     }
 
     /**
      * Fills the out parameter with any objects that may intersect the given rectangle.
      */
-    public void intersect(float x, float y, float width, float height, Seq<T> out){
+    public void intersect(float x, float y, float width, float height, Ar<T> out){
         if(!leaf){
             if(topLeft.bounds.overlaps(x, y, width, height)) topLeft.intersect(x, y, width, height, out);
             if(topRight.bounds.overlaps(x, y, width, height)) topRight.intersect(x, y, width, height, out);
@@ -356,7 +356,7 @@ public class QuadTree<T extends QuadTreeObject>{
             if(botRight.bounds.overlaps(x, y, width, height)) botRight.intersect(x, y, width, height, out);
         }
 
-        Seq<?> objects = this.objects;
+        Ar<?> objects = this.objects;
 
         for(int i = 0; i < objects.size; i++){
             T item = (T)objects.items[i];
@@ -367,8 +367,8 @@ public class QuadTree<T extends QuadTreeObject>{
         }
     }
 
-    /** Adds all quadtree objects to the specified Seq. */
-    public void getObjects(Seq<T> out){
+    /** Adds all quadtree objects to the specified Ar. */
+    public void getObjects(Ar<T> out){
         out.addAll(objects);
 
         if(!leaf){

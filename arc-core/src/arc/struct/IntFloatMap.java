@@ -706,15 +706,15 @@ public class IntFloatMap implements Iterable<IntFloatMap.Entry>{
         }
 
         /** Returns a new array containing the remaining values. */
-        public FloatSeq toSeq(){
-            FloatSeq array = new FloatSeq(true, map.size);
+        public FloatAr toSeq(){
+            FloatAr array = new FloatAr(true, map.size);
             while(hasNext)
                 array.add(next());
             return array;
         }
 
         /** Adds the remaining values to the specified array. */
-        public FloatSeq toSeq(FloatSeq array){
+        public FloatAr toSeq(FloatAr array){
             while(hasNext)
                 array.add(next());
             return array;
@@ -736,15 +736,15 @@ public class IntFloatMap implements Iterable<IntFloatMap.Entry>{
         }
 
         /** Returns a new array containing the remaining keys. */
-        public IntSeq toArray(){
-            IntSeq array = new IntSeq(true, map.size);
+        public IntAr toArray(){
+            IntAr array = new IntAr(true, map.size);
             while(hasNext)
                 array.add(next());
             return array;
         }
 
         /** Adds the remaining values to the specified array. */
-        public IntSeq toArray(IntSeq array){
+        public IntAr toArray(IntAr array){
             while(hasNext)
                 array.add(next());
             return array;

@@ -672,8 +672,8 @@ public class LongMap<V> implements Iterable<LongMap.Entry<V>>{
         }
 
         /** Returns a new array containing the remaining values. */
-        public Seq<V> toSeq(){
-            Seq array = new Seq(true, map.size);
+        public Ar<V> toSeq(){
+            Ar array = new Ar(true, map.size);
             while(hasNext)
                 array.add(next());
             return array;
@@ -695,15 +695,15 @@ public class LongMap<V> implements Iterable<LongMap.Entry<V>>{
         }
 
         /** Returns a new array containing the remaining keys. */
-        public LongSeq toSeq(){
-            LongSeq array = new LongSeq(true, map.size);
+        public LongAr toSeq(){
+            LongAr array = new LongAr(true, map.size);
             while(hasNext)
                 array.add(next());
             return array;
         }
 
         /** Adds the remaining values to the specified array. */
-        public LongSeq toSeq(LongSeq array){
+        public LongAr toSeq(LongAr array){
             while(hasNext)
                 array.add(next());
             return array;

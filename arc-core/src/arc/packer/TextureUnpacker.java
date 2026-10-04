@@ -66,7 +66,7 @@ public class TextureUnpacker{
             Pixmap img = new Pixmap(new Fi(file));
 
             // regions are independent of each other, so they are extracted and written in parallel
-            Seq<FutureTask<Void>> tasks = new Seq<>();
+            Ar<FutureTask<Void>> tasks = new Ar<>();
             try{
                 for(Region region : atlas.regions){
                     // only regions on this page are of interest

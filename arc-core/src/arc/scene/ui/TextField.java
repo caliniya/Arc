@@ -49,7 +49,7 @@ public class TextField extends Element implements Disableable{
     public Object imeData;
 
     protected final GlyphLayout layout = new GlyphLayout(true);
-    protected final FloatSeq glyphPositions = new FloatSeq();
+    protected final FloatAr glyphPositions = new FloatAr();
     protected String text;
     protected int cursor, selectionStart;
     protected boolean hasSelection;
@@ -445,7 +445,7 @@ public class TextField extends Element implements Disableable{
         float x = 0;
         if(layout.runs.size > 0){
             GlyphRun run = layout.runs.first();
-            FloatSeq xAdvances = run.xAdvances;
+            FloatAr xAdvances = run.xAdvances;
             fontOffset = xAdvances.first();
             for(int i = 1, n = xAdvances.size; i < n; i++){
                 glyphPositions.add(x);
@@ -572,7 +572,7 @@ public class TextField extends Element implements Disableable{
         }
     }
 
-    private TextField findNextTextField(Seq<Element> elements, TextField best, Vec2 bestCoords, Vec2 currentCoords, boolean up){
+    private TextField findNextTextField(Ar<Element> elements, TextField best, Vec2 bestCoords, Vec2 currentCoords, boolean up){
         for(int i = 0, n = elements.size; i < n; i++){
             Element element = elements.get(i);
             if(element == this || !element.visible) continue;

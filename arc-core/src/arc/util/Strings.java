@@ -94,8 +94,8 @@ public class Strings{
         return s.length() <= length ? s : s.substring(0, length) + ellipsis;
     }
 
-    public static Seq<Throwable> getCauses(Throwable e){
-        Seq<Throwable> arr = new Seq<>();
+    public static Ar<Throwable> getCauses(Throwable e){
+        Ar<Throwable> arr = new Ar<>();
         while(e != null){
             arr.add(e);
             e = e.getCause();

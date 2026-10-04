@@ -589,8 +589,8 @@ public class Fi implements Comparable<Fi>{
 
     /** Recursively iterates through all files in this directory and adds them to an array.
      * Directories are not handled. */
-    public Seq<Fi> findAll(Boolf<Fi> test){
-        Seq<Fi> out = new Seq<>();
+    public Ar<Fi> findAll(Boolf<Fi> test){
+        Ar<Fi> out = new Ar<>();
         walk(f -> {
             if(test.get(f)){
                 out.add(f);
@@ -600,15 +600,15 @@ public class Fi implements Comparable<Fi>{
     }
 
     /** Recursively iterates through all files in this directory and adds them to a newly allocated array.*/
-    public Seq<Fi> findAll(){
-        Seq<Fi> out = new Seq<>();
+    public Ar<Fi> findAll(){
+        Ar<Fi> out = new Ar<>();
         walk(out::add);
         return out;
     }
 
-    /** Equivalent to {@link #list()}, but returns a Seq. */
-    public Seq<Fi> seq(){
-        return Seq.with(list());
+    /** Equivalent to {@link #list()}, but returns a Ar. */
+    public Ar<Fi> seq(){
+        return Ar.with(list());
     }
 
     /**
@@ -737,7 +737,7 @@ public class Fi implements Comparable<Fi>{
         if(parent == null){
             if(OS.isWindows){
                 return new Fi("", type){
-                    Fi[] children = Seq.with(File.listRoots()).map(Fi::new).toArray(Fi.class);
+                    Fi[] children = Ar.with(File.listRoots()).map(Fi::new).toArray(Fi.class);
 
                     @Override
                     public Fi parent(){
@@ -766,7 +766,7 @@ public class Fi implements Comparable<Fi>{
 
                     @Override
                     public Fi[] list(FileFilter filter){
-                        return Seq.select(list(), f -> filter.accept(f.file)).toArray(Fi.class);
+                        return Ar.select(list(), f -> filter.accept(f.file)).toArray(Fi.class);
                     }
                 };
             }else{

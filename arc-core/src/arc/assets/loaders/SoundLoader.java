@@ -45,7 +45,7 @@ public class SoundLoader extends AsynchronousAssetLoader<Sound, SoundLoader.Soun
     }
 
     @Override
-    public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, SoundParameter parameter){
+    public Ar<AssetDescriptor> getDependencies(String fileName, Fi file, SoundParameter parameter){
         return null;
     }
 

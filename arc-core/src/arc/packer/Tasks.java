@@ -50,7 +50,7 @@ final class Tasks{
     }
 
     /** Joins every task, so nothing is still running when this returns, then rethrows the first failure (in order), if any. */
-    static void joinAll(Seq<? extends FutureTask<?>> tasks){
+    static void joinAll(Ar<? extends FutureTask<?>> tasks){
         RuntimeException first = null;
         for(FutureTask<?> task : tasks){
             try{
@@ -63,7 +63,7 @@ final class Tasks{
     }
 
     /** Waits until every task is finished, one way or another, ignoring failures. */
-    static void awaitAll(Seq<? extends FutureTask<?>> tasks){
+    static void awaitAll(Ar<? extends FutureTask<?>> tasks){
         for(FutureTask<?> task : tasks){
             try{
                 task.run(); //no-op unless it never started, in which case it was cancelled and this does nothing either
@@ -74,7 +74,7 @@ final class Tasks{
     }
 
     /** Prevents tasks that have not started yet from running. */
-    static void cancelAll(Seq<? extends FutureTask<?>> tasks){
+    static void cancelAll(Ar<? extends FutureTask<?>> tasks){
         for(FutureTask<?> task : tasks){
             task.cancel(false);
         }

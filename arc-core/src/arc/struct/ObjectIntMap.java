@@ -595,8 +595,8 @@ public class ObjectIntMap<K> implements Iterable<ObjectIntMap.Entry<K>>{
             return this;
         }
 
-        public Seq<Entry<K>> toSeq(){
-            Seq<Entry<K>> out = new Seq<>(map.size);
+        public Ar<Entry<K>> toSeq(){
+            Ar<Entry<K>> out = new Ar<>(map.size);
             while(hasNext()){
                 Entry<K> entry = next();
                 Entry<K> e = new Entry<>();
@@ -632,15 +632,15 @@ public class ObjectIntMap<K> implements Iterable<ObjectIntMap.Entry<K>>{
         }
 
         /** Returns a new array containing the remaining values. */
-        public IntSeq toSeq(){
-            IntSeq array = new IntSeq(true, map.size);
+        public IntAr toSeq(){
+            IntAr array = new IntAr(true, map.size);
             while(hasNext)
                 array.add(next());
             return array;
         }
 
         /** Adds the remaining values to the specified array. */
-        public IntSeq toSeq(IntSeq array){
+        public IntAr toSeq(IntAr array){
             while(hasNext)
                 array.add(next());
             return array;
@@ -674,12 +674,12 @@ public class ObjectIntMap<K> implements Iterable<ObjectIntMap.Entry<K>>{
         }
 
         /** Returns a new array containing the remaining keys. */
-        public Seq<K> toSeq(){
-            return toSeq(new Seq<K>(true, map.size));
+        public Ar<K> toSeq(){
+            return toSeq(new Ar<K>(true, map.size));
         }
 
         /** Adds the remaining keys to the array. */
-        public Seq<K> toSeq(Seq<K> array){
+        public Ar<K> toSeq(Ar<K> array){
             while(hasNext)
                 array.add(next());
             return array;

@@ -4,7 +4,7 @@ import arc.assets.AssetDescriptor;
 import arc.assets.AssetLoaderParameters;
 import arc.assets.AssetManager;
 import arc.assets.loaders.FontLoader.*;
-import arc.struct.Seq;
+import arc.struct.Ar;
 import arc.files.Fi;
 import arc.graphics.Texture;
 import arc.graphics.TextureFilter;
@@ -29,8 +29,8 @@ public class FontLoader extends AsynchronousAssetLoader<Font, FontParameter>{
     }
 
     @Override
-    public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, FontParameter parameter){
-        Seq<AssetDescriptor> deps = new Seq();
+    public Ar<AssetDescriptor> getDependencies(String fileName, Fi file, FontParameter parameter){
+        Ar<AssetDescriptor> deps = new Ar();
         if(parameter != null && parameter.fontData != null){
             data = parameter.fontData;
             return deps;
@@ -76,7 +76,7 @@ public class FontLoader extends AsynchronousAssetLoader<Font, FontParameter>{
             return new Font(file, region);
         }else{
             int n = data.getImagePaths().length;
-            Seq<TextureRegion> regs = new Seq(n);
+            Ar<TextureRegion> regs = new Ar(n);
             for(int i = 0; i < n; i++){
                 regs.add(new TextureRegion(manager.get(data.getImagePath(i), Texture.class)));
             }

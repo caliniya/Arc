@@ -17,7 +17,7 @@ public class Time{
 
     public static final long nanosPerMilli = 1000000;
 
-    private static LongSeq marks = new LongSeq();
+    private static LongAr marks = new LongAr();
     private static Floatp deltaimpl = () -> Math.min(Core.graphics.getDeltaTime() * 60f, 3f);
 
     /** Runs a task with a delay of several ticks. Unless the application is closed, this task will always complete. */

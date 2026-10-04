@@ -158,7 +158,7 @@ public class IOSGraphics extends Graphics{
         if(!appPaused) return;
         appPaused = false;
 
-        Seq<ApplicationListener> listeners = app.listeners;
+        Ar<ApplicationListener> listeners = app.listeners;
         synchronized(listeners){
             for(ApplicationListener listener : listeners){
                 listener.resume();
@@ -171,7 +171,7 @@ public class IOSGraphics extends Graphics{
         if(appPaused) return;
         appPaused = true;
 
-        Seq<ApplicationListener> listeners = app.listeners;
+        Ar<ApplicationListener> listeners = app.listeners;
         synchronized(listeners){
             for(ApplicationListener listener : listeners){
                 listener.pause();

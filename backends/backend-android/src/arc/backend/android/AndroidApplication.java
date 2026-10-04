@@ -27,9 +27,9 @@ import java.net.*;
 public class AndroidApplication extends Activity implements Application{
     public static final int MINIMUM_SDK = 21;
 
-    protected final Seq<ApplicationListener> listeners = new Seq<>();
-    protected final Seq<Runnable> runnables = new Seq<>();
-    protected final Seq<Runnable> executedRunnables = new Seq<>();
+    protected final Ar<ApplicationListener> listeners = new Ar<>();
+    protected final Ar<Runnable> runnables = new Ar<>();
+    protected final Ar<Runnable> executedRunnables = new Ar<>();
     private final IntMap<AndroidEventListener> eventListeners = new IntMap<>();
     private int lastEventNumber = 43;
     public Handler handler;
@@ -175,7 +175,7 @@ public class AndroidApplication extends Activity implements Application{
     }
 
     @Override
-    public void getDnsServers(Seq<InetSocketAddress> out){
+    public void getDnsServers(Ar<InetSocketAddress> out){
         if(getVersion() < 23) return; //needs API level 21
 
         try{
@@ -363,7 +363,7 @@ public class AndroidApplication extends Activity implements Application{
     }
 
     @Override
-    public Seq<ApplicationListener> getListeners(){
+    public Ar<ApplicationListener> getListeners(){
         return listeners;
     }
 

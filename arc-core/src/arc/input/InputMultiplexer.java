@@ -8,7 +8,7 @@ import arc.struct.*;
  * @author Nathan Sweet
  */
 public class InputMultiplexer implements InputProcessor{
-    private SnapshotSeq<InputProcessor> processors = new SnapshotSeq<>(4);
+    private SnapshotAr<InputProcessor> processors = new SnapshotAr<>(4);
 
     public InputMultiplexer(){
     }
@@ -44,7 +44,7 @@ public class InputMultiplexer implements InputProcessor{
         processors.clear();
     }
 
-    public SnapshotSeq<InputProcessor> getProcessors(){
+    public SnapshotAr<InputProcessor> getProcessors(){
         return processors;
     }
 
@@ -53,7 +53,7 @@ public class InputMultiplexer implements InputProcessor{
         this.processors.addAll(processors);
     }
 
-    public void setProcessors(Seq<InputProcessor> processors){
+    public void setProcessors(Ar<InputProcessor> processors){
         this.processors.clear();
         this.processors.addAll(processors);
     }

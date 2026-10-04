@@ -222,7 +222,7 @@ class FParser{
 
     /** Returns the replacement string intended to be used on {RESET} tokens. */
     private static String getResetReplacement(){
-        Seq<String> tokens = new Seq<>();
+        Ar<String> tokens = new Ar<>();
         FConfig.effects.keys().toSeq(tokens);
         tokens.replace(m -> "/" + m);
         tokens.add("clear");

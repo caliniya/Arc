@@ -139,7 +139,7 @@ public class I18NBundle{
         Locale targetLocale = locale;
         do{
             // Create the candidate locales
-            Seq<Locale> candidateLocales = getCandidateLocales(targetLocale);
+            Ar<Locale> candidateLocales = getCandidateLocales(targetLocale);
 
             // Load the bundle and its parents recursively
             bundle = loadBundleChain(baseFileHandle, encoding, candidateLocales, 0, baseBundle);
@@ -230,12 +230,12 @@ public class I18NBundle{
      * @return a <code>List</code> of candidate <code>Locale</code>s for the given <code>locale</code>
      * @throws NullPointerException if <code>locale</code> is <code>null</code>
      */
-    private static Seq<Locale> getCandidateLocales(Locale locale){
+    private static Ar<Locale> getCandidateLocales(Locale locale){
         String language = locale.getLanguage();
         String country = locale.getCountry();
         String variant = locale.getVariant();
 
-        Seq<Locale> locales = new Seq<>(4);
+        Ar<Locale> locales = new Ar<>(4);
         if(variant.length() > 0){
             locales.add(locale);
         }
@@ -268,7 +268,7 @@ public class I18NBundle{
         return locale.equals(defaultLocale) ? null : defaultLocale;
     }
 
-    private static I18NBundle loadBundleChain(Fi baseFileHandle, String encoding, Seq<Locale> candidateLocales,
+    private static I18NBundle loadBundleChain(Fi baseFileHandle, String encoding, Ar<Locale> candidateLocales,
                                               int candidateIndex, I18NBundle baseBundle){
         Locale targetLocale = candidateLocales.get(candidateIndex);
         I18NBundle parent = null;

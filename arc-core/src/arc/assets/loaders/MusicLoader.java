@@ -49,7 +49,7 @@ public class MusicLoader extends AsynchronousAssetLoader<Music, MusicLoader.Musi
     }
 
     @Override
-    public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, MusicParameter parameter){
+    public Ar<AssetDescriptor> getDependencies(String fileName, Fi file, MusicParameter parameter){
         return null;
     }
 

@@ -3,7 +3,7 @@ package arc.assets.loaders;
 import arc.assets.AssetDescriptor;
 import arc.assets.AssetLoaderParameters;
 import arc.assets.AssetManager;
-import arc.struct.Seq;
+import arc.struct.Ar;
 import arc.files.Fi;
 import arc.util.I18NBundle;
 
@@ -63,7 +63,7 @@ public class I18NBundleLoader extends AsynchronousAssetLoader<I18NBundle, I18NBu
     }
 
     @Override
-    public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, I18NBundleParameter parameter){
+    public Ar<AssetDescriptor> getDependencies(String fileName, Fi file, I18NBundleParameter parameter){
         return null;
     }
 

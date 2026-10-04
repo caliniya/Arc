@@ -14,7 +14,7 @@ public class ZipFi extends Fi{
     private @Nullable ZipFi parent;
     private String path;
 
-    private Seq<ZipFi> allFiles, allDirectories;
+    private Ar<ZipFi> allFiles, allDirectories;
 
     private final @Nullable ZipEntry entry;
     private final ZipFile zip;
@@ -27,11 +27,11 @@ public class ZipFi extends Fi{
             zip = new ZipFile(zipFileLoc.file());
             path = "";
 
-            Seq<ZipEntry> entries = (Seq<ZipEntry>)Seq.with(Collections.list(zip.entries()));
+            Ar<ZipEntry> entries = (Ar<ZipEntry>)Ar.with(Collections.list(zip.entries()));
             ObjectMap<String, ZipEntry> byName = new ObjectMap<>();
             entries.each(e -> byName.put(e.getName(), e));
 
-            Seq<String> names = entries.map(z -> z.getName().replace('\\', '/'));
+            Ar<String> names = entries.map(z -> z.getName().replace('\\', '/'));
             ObjectSet<String> paths = new ObjectSet<>();
 
             for(String path : names){
@@ -48,8 +48,8 @@ public class ZipFi extends Fi{
                 paths.remove("/");
             }
 
-            allFiles = new Seq<>();
-            allDirectories = new Seq<>();
+            allFiles = new Ar<>();
+            allDirectories = new Ar<>();
 
             for(String s : paths){
                 ZipEntry entry = byName.get(s);
@@ -79,7 +79,7 @@ public class ZipFi extends Fi{
         return sum;
     }
 
-    private ZipFi(ZipEntry entry, ZipFile file, Seq<ZipFi> allFiles, Seq<ZipFi> allDirectories){
+    private ZipFi(ZipEntry entry, ZipFile file, Ar<ZipFi> allFiles, Ar<ZipFi> allDirectories){
         super(new File(entry.getName()), FileType.absolute);
         this.allDirectories = allDirectories;
         this.allFiles = allFiles;
@@ -88,7 +88,7 @@ public class ZipFi extends Fi{
         this.zip = file;
     }
 
-    private ZipFi(String path, ZipFile file, Seq<ZipFi> allFiles, Seq<ZipFi> allDirectories){
+    private ZipFi(String path, ZipFile file, Ar<ZipFi> allFiles, Ar<ZipFi> allDirectories){
         super(new File(path), FileType.absolute);
         this.allDirectories = allDirectories;
         this.allFiles = allFiles;

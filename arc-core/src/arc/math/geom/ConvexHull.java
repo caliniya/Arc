@@ -1,27 +1,27 @@
 package arc.math.geom;
 
-import arc.struct.FloatSeq;
-import arc.struct.IntSeq;
-import arc.struct.ShortSeq;
+import arc.struct.FloatAr;
+import arc.struct.IntAr;
+import arc.struct.ShortAr;
 
 /**
  * Computes the convex hull of a set of points using the monotone chain convex hull algorithm (aka Andrew's algorithm).
  * @author Nathan Sweet
  */
 public class ConvexHull{
-    private final IntSeq quicksortStack = new IntSeq();
-    private final FloatSeq hull = new FloatSeq();
-    private final IntSeq indices = new IntSeq();
-    private final ShortSeq originalIndices = new ShortSeq(false, 0);
+    private final IntAr quicksortStack = new IntAr();
+    private final FloatAr hull = new FloatAr();
+    private final IntAr indices = new IntAr();
+    private final ShortAr originalIndices = new ShortAr(false, 0);
     private float[] sortedPoints;
 
     /** @see #computePolygon(float[], int, int, boolean) */
-    public FloatSeq computePolygon(FloatSeq points, boolean sorted){
+    public FloatAr computePolygon(FloatAr points, boolean sorted){
         return computePolygon(points.items, 0, points.size, sorted);
     }
 
     /** @see #computePolygon(float[], int, int, boolean) */
-    public FloatSeq computePolygon(float[] polygon, boolean sorted){
+    public FloatAr computePolygon(float[] polygon, boolean sorted){
         return computePolygon(polygon, 0, polygon.length, sorted);
     }
 
@@ -35,7 +35,7 @@ public class ConvexHull{
      * @return pairs of coordinates that describe the convex hull polygon in counterclockwise order. Note the returned array is
      * reused for later calls to the same method.
      */
-    public FloatSeq computePolygon(float[] points, int offset, int count, boolean sorted){
+    public FloatAr computePolygon(float[] points, int offset, int count, boolean sorted){
         int end = offset + count;
 
         if(!sorted){
@@ -46,7 +46,7 @@ public class ConvexHull{
             sort(points, count);
         }
 
-        FloatSeq hull = this.hull;
+        FloatAr hull = this.hull;
         hull.clear();
 
         // Lower hull.
@@ -73,17 +73,17 @@ public class ConvexHull{
     }
 
     /** @see #computeIndices(float[], int, int, boolean, boolean) */
-    public IntSeq computeIndices(FloatSeq points, boolean sorted, boolean yDown){
+    public IntAr computeIndices(FloatAr points, boolean sorted, boolean yDown){
         return computeIndices(points.items, 0, points.size, sorted, yDown);
     }
 
     /** @see #computeIndices(float[], int, int, boolean, boolean) */
-    public IntSeq computeIndices(float[] polygon, boolean sorted, boolean yDown){
+    public IntAr computeIndices(float[] polygon, boolean sorted, boolean yDown){
         return computeIndices(polygon, 0, polygon.length, sorted, yDown);
     }
 
     /** Computes a hull the same as {@link #computePolygon(float[], int, int, boolean)} but returns indices of the specified points. */
-    public IntSeq computeIndices(float[] points, int offset, int count, boolean sorted, boolean yDown){
+    public IntAr computeIndices(float[] points, int offset, int count, boolean sorted, boolean yDown){
         int end = offset + count;
 
         if(!sorted){
@@ -94,10 +94,10 @@ public class ConvexHull{
             sortWithIndices(points, count, yDown);
         }
 
-        IntSeq indices = this.indices;
+        IntAr indices = this.indices;
         indices.clear();
 
-        FloatSeq hull = this.hull;
+        FloatAr hull = this.hull;
         hull.clear();
 
         // Lower hull.
@@ -139,7 +139,7 @@ public class ConvexHull{
 
     /** Returns > 0 if the points are a counterclockwise turn, < 0 if clockwise, and 0 if colinear. */
     private float ccw(float p3x, float p3y){
-        FloatSeq hull = this.hull;
+        FloatAr hull = this.hull;
         int size = hull.size;
         float p1x = hull.get(size - 4);
         float p1y = hull.get(size - 3);
@@ -155,7 +155,7 @@ public class ConvexHull{
     private void sort(float[] values, int count){
         int lower = 0;
         int upper = count - 1;
-        IntSeq stack = quicksortStack;
+        IntAr stack = quicksortStack;
         stack.add(lower);
         stack.add(upper - 1);
         while(stack.size > 0){
@@ -221,7 +221,7 @@ public class ConvexHull{
 
         int lower = 0;
         int upper = count - 1;
-        IntSeq stack = quicksortStack;
+        IntAr stack = quicksortStack;
         stack.add(lower);
         stack.add(upper - 1);
         while(stack.size > 0){

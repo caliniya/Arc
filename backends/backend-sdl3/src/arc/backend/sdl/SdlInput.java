@@ -15,7 +15,7 @@ public class SdlInput extends Input{
     private int mouseX, mouseY;
     private int deltaX, deltaY;
     private int mousePressed;
-    private Seq<EditEvent> stringEditEvents = new Seq<>();
+    private Ar<EditEvent> stringEditEvents = new Ar<>();
 
     //handle encoded input data
     void handleInput(SDL_Event event){

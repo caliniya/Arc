@@ -395,7 +395,7 @@ public class Intersector3D{
      * @param intersection The nearest intersection point (optional)
      * @return Whether the ray and the triangles intersect.
      */
-    public static boolean intersectRayTriangles(Ray ray, Seq<Vec3> triangles, Vec3 intersection){
+    public static boolean intersectRayTriangles(Ray ray, Ar<Vec3> triangles, Vec3 intersection){
         float min_dist = Float.MAX_VALUE;
         boolean hit = false;
 

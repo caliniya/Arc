@@ -11,7 +11,7 @@ import static arc.Core.*;
 public class Fill{
     private static float[] vertices = new float[SpriteBatch.spriteSize];
     private static TextureRegion circleRegion;
-    private static FloatSeq polyFloats = new FloatSeq();
+    private static FloatAr polyFloats = new FloatAr();
 
     public static void quad(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4){
         float color = Core.batch.getPackedColor();
@@ -236,7 +236,7 @@ public class Fill{
         poly(p.getTransformedVertices(), p.getTransformedVertices().length);
     }
 
-    public static void poly(FloatSeq vertices){
+    public static void poly(FloatAr vertices){
         poly(vertices.items, vertices.size);
     }
 

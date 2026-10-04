@@ -10,7 +10,7 @@ import java.net.*;
 
 public interface NameserverProvider{
     /** Returns all located servers, which may be empty. */
-    Seq<InetSocketAddress> getNameservers();
+    Ar<InetSocketAddress> getNameservers();
 
     /** Determines if this provider is enabled. */
     default boolean isEnabled(){

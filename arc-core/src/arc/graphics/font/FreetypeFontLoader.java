@@ -31,8 +31,8 @@ public class FreetypeFontLoader extends AsynchronousAssetLoader<Font, FreetypeFo
     }
 
     @Override
-    public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
-        Seq<AssetDescriptor> deps = new Seq<>();
+    public Ar<AssetDescriptor> getDependencies(String fileName, Fi file, FreeTypeFontLoaderParameter parameter){
+        Ar<AssetDescriptor> deps = new Ar<>();
         deps.add(new AssetDescriptor<>(parameter.fontFileName + ".gen", FreeTypeFontGenerator.class));
         return deps;
     }

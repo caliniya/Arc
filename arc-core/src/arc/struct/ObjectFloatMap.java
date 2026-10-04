@@ -643,15 +643,15 @@ public class ObjectFloatMap<K> implements Iterable<ObjectFloatMap.Entry<K>>{
         }
 
         /** Returns a new array containing the remaining values. */
-        public FloatSeq toSeq(){
-            FloatSeq array = new FloatSeq(true, map.size);
+        public FloatAr toSeq(){
+            FloatAr array = new FloatAr(true, map.size);
             while(hasNext)
                 array.add(next());
             return array;
         }
 
         /** Adds the remaining values to the specified array. */
-        public FloatSeq toSeq(FloatSeq array){
+        public FloatAr toSeq(FloatAr array){
             while(hasNext)
                 array.add(next());
             return array;
@@ -682,12 +682,12 @@ public class ObjectFloatMap<K> implements Iterable<ObjectFloatMap.Entry<K>>{
         }
 
         /** Returns a new array containing the remaining keys. */
-        public Seq<K> toSeq(){
-            return toSeq(new Seq<K>(true, map.size));
+        public Ar<K> toSeq(){
+            return toSeq(new Ar<K>(true, map.size));
         }
 
         /** Adds the remaining keys to the array. */
-        public Seq<K> toSeq(Seq<K> array){
+        public Ar<K> toSeq(Ar<K> array){
             while(hasNext)
                 array.add(next());
             return array;

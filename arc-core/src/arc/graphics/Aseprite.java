@@ -42,9 +42,9 @@ public class Aseprite{
 
         in.skipFully(84); //header padding
 
-        Seq<AseLayer> layers = new Seq<>(), rootLayers = new Seq<>(), groupStack = new Seq<>();
-        Seq<AseTag> tags = new Seq<>();
-        Seq<AseFrame> frames = new Seq<>();
+        Ar<AseLayer> layers = new Ar<>(), rootLayers = new Ar<>(), groupStack = new Ar<>();
+        Ar<AseTag> tags = new Ar<>();
+        Ar<AseFrame> frames = new Ar<>();
         boolean justReadTags = false;
         int readTagIndex = 0, lastDepth = 0;
 
@@ -385,7 +385,7 @@ public class Aseprite{
     /** One animation frame, containing the cel (image) data for every layer that has one in this frame. */
     public static class AseFrame{
         public int duration;
-        public Seq<AseCel> layers = new Seq<>();
+        public Ar<AseCel> layers = new Ar<>();
     }
 
     /** A single layer's image data within one frame. */
@@ -411,13 +411,13 @@ public class Aseprite{
         public String userData = "";
         /** RGBA8888 */
         public int userColor;
-        public Seq<AseLayer> children = new Seq<>();
+        public Ar<AseLayer> children = new Ar<>();
     }
 
     public static class AseImage{
-        public Seq<AseLayer> layers, rootLayers;
-        public Seq<AseTag> tags;
-        public Seq<AseFrame> frames;
+        public Ar<AseLayer> layers, rootLayers;
+        public Ar<AseTag> tags;
+        public Ar<AseFrame> frames;
         public int width, height;
         public int colorDepth;
         /** Only populated for indexed (8bpp) sprites; packed as RGBA8888. Unused for RGBA sprites. */

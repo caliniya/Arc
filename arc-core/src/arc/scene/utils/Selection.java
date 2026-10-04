@@ -1,7 +1,7 @@
 package arc.scene.utils;
 
 import arc.Core;
-import arc.struct.Seq;
+import arc.struct.Ar;
 import arc.struct.OrderedSet;
 import arc.scene.Element;
 import arc.scene.event.ChangeListener.ChangeEvent;
@@ -113,7 +113,7 @@ public class Selection<T> implements Disableable, Iterable<T>{
         cleanup();
     }
 
-    public void setAll(Seq<T> items){
+    public void setAll(Ar<T> items){
         boolean added = false;
         snapshot();
         lastSelected = null;
@@ -146,7 +146,7 @@ public class Selection<T> implements Disableable, Iterable<T>{
         }
     }
 
-    public void addAll(Seq<T> items){
+    public void addAll(Ar<T> items){
         boolean added = false;
         snapshot();
         for(int i = 0, n = items.size; i < n; i++){
@@ -176,7 +176,7 @@ public class Selection<T> implements Disableable, Iterable<T>{
         }
     }
 
-    public void removeAll(Seq<T> items){
+    public void removeAll(Ar<T> items){
         boolean removed = false;
         snapshot();
         for(int i = 0, n = items.size; i < n; i++){
@@ -246,11 +246,11 @@ public class Selection<T> implements Disableable, Iterable<T>{
         return selected.iterator();
     }
 
-    public Seq<T> toSeq(){
+    public Ar<T> toSeq(){
         return selected.iterator().toSeq();
     }
 
-    public Seq<T> toSeq(Seq<T> array){
+    public Ar<T> toSeq(Ar<T> array){
         return selected.iterator().toSeq(array);
     }
 

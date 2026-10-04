@@ -1,9 +1,9 @@
 package arc.math;
 
-import arc.struct.BoolSeq;
-import arc.struct.FloatSeq;
-import arc.struct.IntSeq;
-import arc.struct.ShortSeq;
+import arc.struct.BoolAr;
+import arc.struct.FloatAr;
+import arc.struct.IntAr;
+import arc.struct.ShortAr;
 import arc.math.geom.Geometry;
 import arc.math.geom.Intersector;
 import arc.math.geom.Vec2;
@@ -18,22 +18,22 @@ public class DelaunayTriangulator{
     private static final int COMPLETE = 1;
     private static final int INCOMPLETE = 2;
 
-    private final IntSeq quicksortStack = new IntSeq();
-    private final ShortSeq triangles = new ShortSeq(false, 16);
-    private final ShortSeq originalIndices = new ShortSeq(false, 0);
-    private final IntSeq edges = new IntSeq();
-    private final BoolSeq complete = new BoolSeq(false, 16);
+    private final IntAr quicksortStack = new IntAr();
+    private final ShortAr triangles = new ShortAr(false, 16);
+    private final ShortAr originalIndices = new ShortAr(false, 0);
+    private final IntAr edges = new IntAr();
+    private final BoolAr complete = new BoolAr(false, 16);
     private final float[] superTriangle = new float[6];
     private final Vec2 centroid = new Vec2();
     private float[] sortedPoints;
 
     /** @see #computeTriangles(float[], int, int, boolean) */
-    public ShortSeq computeTriangles(FloatSeq points, boolean sorted){
+    public ShortAr computeTriangles(FloatAr points, boolean sorted){
         return computeTriangles(points.items, 0, points.size, sorted);
     }
 
     /** @see #computeTriangles(float[], int, int, boolean) */
-    public ShortSeq computeTriangles(float[] polygon, boolean sorted){
+    public ShortAr computeTriangles(float[] polygon, boolean sorted){
         return computeTriangles(polygon, 0, polygon.length, sorted);
     }
 
@@ -46,8 +46,8 @@ public class DelaunayTriangulator{
      * @return triples of indices into the points that describe the triangles in clockwise order. Note the returned array is reused
      * for later calls to the same method.
      */
-    public ShortSeq computeTriangles(float[] points, int offset, int count, boolean sorted){
-        ShortSeq triangles = this.triangles;
+    public ShortAr computeTriangles(float[] points, int offset, int count, boolean sorted){
+        ShortAr triangles = this.triangles;
         triangles.clear();
         if(count < 6) return triangles;
         triangles.ensureCapacity(count);
@@ -87,10 +87,10 @@ public class DelaunayTriangulator{
         superTriangle[4] = xmid + dmax;
         superTriangle[5] = ymid - dmax;
 
-        IntSeq edges = this.edges;
+        IntAr edges = this.edges;
         edges.ensureCapacity(count / 2);
 
-        BoolSeq complete = this.complete;
+        BoolAr complete = this.complete;
         complete.clear();
         complete.ensureCapacity(count);
 
@@ -268,7 +268,7 @@ public class DelaunayTriangulator{
 
         int lower = 0;
         int upper = count - 1;
-        IntSeq stack = quicksortStack;
+        IntAr stack = quicksortStack;
         stack.add(lower);
         stack.add(upper - 1);
         while(stack.size > 0){
@@ -331,7 +331,7 @@ public class DelaunayTriangulator{
      * Removes all triangles with a centroid outside the specified hull, which may be concave. Note some triangulations may have
      * triangles whose centroid is inside the hull but a portion is outside.
      */
-    public void trim(ShortSeq triangles, float[] points, float[] hull, int offset, int count){
+    public void trim(ShortAr triangles, float[] points, float[] hull, int offset, int count){
         short[] trianglesArray = triangles.items;
         for(int i = triangles.size - 1; i >= 0; i -= 3){
             int p1 = trianglesArray[i - 2] * 2;

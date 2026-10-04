@@ -19,7 +19,7 @@ public class TexturePacker{
     private final Settings settings;
     private final Packer packer;
     private final ImageProcessor imageProcessor;
-    private final Seq<InputImage> inputImages = new Seq<>();
+    private final Ar<InputImage> inputImages = new Ar<>();
 
     /** Page image names claimed by this packer, or by every packer taking part in the same batch. Page rendering is asynchronous, so a claimed file may not exist on disk yet. */
     private Set<File> claimedFiles = Collections.synchronizedSet(new HashSet<File>());
@@ -121,8 +121,8 @@ public class TexturePacker{
     public void pack(File outputDir, String packFileName){
         outputDir.mkdirs();
 
-        Seq<Seq<Page>> scaled = packScales();
-        Seq<FutureTask<Void>> renders = write(outputDir, packFileName, scaled);
+        Ar<Ar<Page>> scaled = packScales();
+        Ar<FutureTask<Void>> renders = write(outputDir, packFileName, scaled);
         Tasks.joinAll(renders);
     }
 
@@ -130,9 +130,9 @@ public class TexturePacker{
      * Loads and packs the images for every scale. No files are written, so this can run concurrently with other packers.
      * @return the pages for each scale, in the order of {@link Settings#scale}.
      */
-    Seq<Seq<Page>> packScales(){
+    Ar<Ar<Page>> packScales(){
         int n = settings.scale.length;
-        Seq<Seq<Page>> result = new Seq<>(n);
+        Ar<Ar<Page>> result = new Ar<>(n);
         for(int i = 0; i < n; i++){
 
             imageProcessor.setScale(settings.scale[i]);
@@ -152,15 +152,15 @@ public class TexturePacker{
      * it must be called for each of them in the same order every time. Rendering does not depend on any shared state.
      * @return the running page renders. Wait for all of them before using the output.
      */
-    Seq<FutureTask<Void>> write(File outputDir, String packFileName, Seq<Seq<Page>> scaled){
+    Ar<FutureTask<Void>> write(File outputDir, String packFileName, Ar<Ar<Page>> scaled){
         if(packFileName.endsWith(settings.atlasExtension))
             packFileName = packFileName.substring(0, packFileName.length() - settings.atlasExtension.length());
         outputDir.mkdirs();
 
-        Seq<FutureTask<Void>> renders = new Seq<>();
+        Ar<FutureTask<Void>> renders = new Ar<>();
         try{
             for(int i = 0, n = scaled.size; i < n; i++){
-                Seq<Page> pages = scaled.get(i);
+                Ar<Page> pages = scaled.get(i);
                 String scaledPackFileName = settings.getScaledPackFileName(packFileName, i);
                 writeImages(outputDir, scaledPackFileName, pages, renders);
                 try{
@@ -177,7 +177,7 @@ public class TexturePacker{
     }
 
     /** Computes page sizes and names, then queues rendering of each page into the list. */
-    private void writeImages(File outputDir, String scaledPackFileName, Seq<Page> pages, Seq<FutureTask<Void>> renders){
+    private void writeImages(File outputDir, String scaledPackFileName, Ar<Page> pages, Ar<FutureTask<Void>> renders){
         File packFileNoExt = new File(outputDir, scaledPackFileName);
         File packDir = packFileNoExt.getParentFile();
         String imageName = packFileNoExt.getName();
@@ -228,7 +228,7 @@ public class TexturePacker{
             if(!settings.silent) log().println("| Writing " + width + "x" + height + ": " + outputFile);
 
             //take a snapshot of the draw order, as writing the pack file re-sorts the page's rects
-            final Seq<Rect> drawOrder = new Seq<>(page.outputRects);
+            final Ar<Rect> drawOrder = new Ar<>(page.outputRects);
             final int canvasWidth = width, canvasHeight = height;
             renders.add(Tasks.submit(() -> {
                 renderPage(page, drawOrder, outputFile, canvasWidth, canvasHeight);
@@ -238,7 +238,7 @@ public class TexturePacker{
     }
 
     /** Draws all rects onto a canvas and saves it. Must be safe to run on any thread, at the same time as other pages. */
-    private void renderPage(Page page, Seq<Rect> drawOrder, File outputFile, int width, int height){
+    private void renderPage(Page page, Ar<Rect> drawOrder, File outputFile, int width, int height){
         Pixmap canvas = new Pixmap(width, height);
         try{
             for(int r = 0, rn = drawOrder.size; r < rn; r++){
@@ -320,7 +320,7 @@ public class TexturePacker{
         }
     }
 
-    private void writePackFile(File outputDir, String scaledPackFileName, Seq<Page> pages) throws IOException{
+    private void writePackFile(File outputDir, String scaledPackFileName, Ar<Page> pages) throws IOException{
         Fi packFile = new Fi(outputDir).child(scaledPackFileName + settings.atlasExtension);
         Fi packDir = packFile.parent();
         packDir.mkdirs();
@@ -355,7 +355,7 @@ public class TexturePacker{
                 page.outputRects.sort();
                 for(Rect rect : page.outputRects){
                     writeRect(write, page, rect, rect.name);
-                    Seq<Alias> aliases = new Seq<>(rect.aliases.toArray(new Alias[0]));
+                    Ar<Alias> aliases = new Ar<>(rect.aliases.toArray(new Alias[0]));
                     aliases.sort();
                     for(Alias alias : aliases){
                         Rect aliasRect = new Rect();
@@ -410,7 +410,7 @@ public class TexturePacker{
     /** @author Nathan Sweet */
     public static class Page{
         public String imageName;
-        public Seq<Rect> outputRects, remainingRects;
+        public Ar<Rect> outputRects, remainingRects;
         public float occupancy;
         public int x, y, width, height, imageWidth, imageHeight;
     }
@@ -643,7 +643,7 @@ public class TexturePacker{
     }
 
     public interface Packer{
-        Seq<Page> pack(Seq<Rect> inputRects);
+        Ar<Page> pack(Ar<Rect> inputRects);
     }
 
     static final class InputImage{

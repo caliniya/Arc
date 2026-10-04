@@ -21,11 +21,11 @@ import static arc.net.dns.ArcDns.dnsResolverPort;
 public final class JndiContextNameserverProvider implements NameserverProvider{
 
     @Override
-    public Seq<InetSocketAddress> getNameservers(){
+    public Ar<InetSocketAddress> getNameservers(){
         try{
             return new Inner().getNameservers();
         }catch(Throwable t){
-            return new Seq<>();
+            return new Ar<>();
         }
     }
 
@@ -38,8 +38,8 @@ public final class JndiContextNameserverProvider implements NameserverProvider{
     static class Inner implements NameserverProvider{
 
         @Override
-        public Seq<InetSocketAddress> getNameservers(){
-            Seq<InetSocketAddress> result = new Seq<>();
+        public Ar<InetSocketAddress> getNameservers(){
+            Ar<InetSocketAddress> result = new Ar<>();
 
             Hashtable<String, String> env = new Hashtable<>();
             env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.dns.DnsContextFactory");

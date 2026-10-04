@@ -33,7 +33,7 @@ public class VertexBufferObject implements Disposable{
     boolean isDirty = false;
     boolean isBound = false;
     int vaoHandle = -1;
-    IntSeq cachedLocations = new IntSeq();
+    IntAr cachedLocations = new IntAr();
     boolean created;
 
     /**

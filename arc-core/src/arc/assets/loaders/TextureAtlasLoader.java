@@ -20,7 +20,7 @@ import java.util.concurrent.*;
  */
 public class TextureAtlasLoader extends AsynchronousAssetLoader<TextureAtlas, TextureAtlasLoader.TextureAtlasParameter>{
     TextureAtlasData data;
-    Seq<Future<AsyncResult>> textureLoaders = new Seq<>();
+    Ar<Future<AsyncResult>> textureLoaders = new Ar<>();
 
     public TextureAtlasLoader(FileHandleResolver resolver){
         super(resolver);
@@ -66,7 +66,7 @@ public class TextureAtlasLoader extends AsynchronousAssetLoader<TextureAtlas, Te
     }
 
     @Override
-    public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, TextureAtlasParameter parameter){
+    public Ar<AssetDescriptor> getDependencies(String fileName, Fi file, TextureAtlasParameter parameter){
         return null;
     }
 

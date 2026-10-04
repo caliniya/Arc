@@ -17,7 +17,7 @@ public class ImageProcessor{
 
     private final Settings settings;
     private final HashMap<String, Rect> crcs = new HashMap<>();
-    private final Seq<Rect> rects = new Seq<>();
+    private final Ar<Rect> rects = new Ar<>();
     private float scale = 1;
     private boolean resampling;
     /** Where messages are printed. Null means System.out. */
@@ -47,8 +47,8 @@ public class ImageProcessor{
     }
 
     /** Loads, processes and hashes all inputs in parallel, then adds them in the order given. */
-    void addAll(Seq<InputImage> inputs){
-        Seq<FutureTask<Prepared>> tasks = new Seq<>(inputs.size);
+    void addAll(Ar<InputImage> inputs){
+        Ar<FutureTask<Prepared>> tasks = new Ar<>(inputs.size);
         try{
             for(int i = 0; i < inputs.size; i++){
                 final InputImage input = inputs.get(i);
@@ -146,7 +146,7 @@ public class ImageProcessor{
         this.resampling = resampling;
     }
 
-    public Seq<Rect> getImages(){
+    public Ar<Rect> getImages(){
         return rects;
     }
 

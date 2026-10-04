@@ -221,7 +221,7 @@ public class AndroidGraphics extends Graphics implements Renderer{
                 running = true;
                 resumed = true;
                 Gl.reset();
-                Seq<ApplicationListener> listeners = app.getListeners();
+                Ar<ApplicationListener> listeners = app.getListeners();
                 synchronized(listeners){
                     for(int i = 0, n = listeners.size; i < n; ++i){
                         listeners.get(i).resume();
@@ -238,7 +238,7 @@ public class AndroidGraphics extends Graphics implements Renderer{
 
     void pause(){
         view.queueEvent(() -> {
-            Seq<ApplicationListener> listeners = app.getListeners();
+            Ar<ApplicationListener> listeners = app.getListeners();
             synchronized(listeners){
                 for(int i = 0, n = listeners.size; i < n; ++i){
                     listeners.get(i).pause();
@@ -255,7 +255,7 @@ public class AndroidGraphics extends Graphics implements Renderer{
         view.queueEvent(() -> {
             running = false;
 
-            Seq<ApplicationListener> listeners = app.getListeners();
+            Ar<ApplicationListener> listeners = app.getListeners();
             synchronized(listeners){
                 //call pause first
                 for(int i = 0, n = listeners.size; i < n; ++i){
@@ -308,7 +308,7 @@ public class AndroidGraphics extends Graphics implements Renderer{
             frameId++;
             app.defaultUpdate();
 
-            Seq<ApplicationListener> listeners = app.getListeners();
+            Ar<ApplicationListener> listeners = app.getListeners();
             synchronized(listeners){
                 for(int i = 0, n = listeners.size; i < n; ++i){
                     listeners.get(i).update();

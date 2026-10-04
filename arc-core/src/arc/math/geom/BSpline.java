@@ -1,13 +1,13 @@
 package arc.math.geom;
 
-import arc.struct.Seq;
+import arc.struct.Ar;
 import arc.math.Mathf;
 
 /** @author Xoppa */
 public class BSpline<T extends Vector<T>> implements Path<T>{
     private static final float d6 = 1f / 6f;
     public T[] controlPoints;
-    public Seq<T> knots;
+    public Ar<T> knots;
     public int degree;
     public boolean continuous;
     public int spanCount;
@@ -189,7 +189,7 @@ public class BSpline<T extends Vector<T>> implements Path<T>{
         this.continuous = continuous;
         this.spanCount = continuous ? controlPoints.length : controlPoints.length - degree;
         if(knots == null)
-            knots = new Seq<>(spanCount);
+            knots = new Ar<>(spanCount);
         else{
             knots.clear();
             knots.ensureCapacity(spanCount);

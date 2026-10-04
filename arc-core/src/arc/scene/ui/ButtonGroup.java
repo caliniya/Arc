@@ -1,6 +1,6 @@
 package arc.scene.ui;
 
-import arc.struct.Seq;
+import arc.struct.Ar;
 
 /**
  * Manages a group of buttons to enforce a minimum and maximum number of checked buttons. This enables "radio button"
@@ -10,8 +10,8 @@ import arc.struct.Seq;
  * @author Nathan Sweet
  */
 public class ButtonGroup<T extends Button>{
-    private final Seq<T> buttons = new Seq<>();
-    private Seq<T> checkedButtons = new Seq<>(1);
+    private final Ar<T> buttons = new Ar<>();
+    private Ar<T> checkedButtons = new Ar<>(1);
     private int minCheckCount, maxCheckCount = 1;
     private boolean uncheckLast = true;
     private T lastChecked;
@@ -125,11 +125,11 @@ public class ButtonGroup<T extends Button>{
         return -1;
     }
 
-    public Seq<T> getAllChecked(){
+    public Ar<T> getAllChecked(){
         return checkedButtons;
     }
 
-    public Seq<T> getButtons(){
+    public Ar<T> getButtons(){
         return buttons;
     }
 

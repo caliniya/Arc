@@ -1,8 +1,8 @@
 package arc.math;
 
-import arc.struct.FloatSeq;
-import arc.struct.IntSeq;
-import arc.struct.ShortSeq;
+import arc.struct.FloatAr;
+import arc.struct.IntAr;
+import arc.struct.ShortAr;
 
 /**
  * A simple implementation of the ear cutting algorithm to triangulate simple polygons without holes. For more information:
@@ -25,9 +25,9 @@ public class EarClippingTriangulator{
     private static final int CONCAVE = -1;
     private static final int CONVEX = 1;
 
-    private final ShortSeq indicesArray = new ShortSeq();
-    private final IntSeq vertexTypes = new IntSeq();
-    private final ShortSeq triangles = new ShortSeq();
+    private final ShortAr indicesArray = new ShortAr();
+    private final IntAr vertexTypes = new IntAr();
+    private final ShortAr triangles = new ShortAr();
     private short[] indices;
     private float[] vertices;
     private int vertexCount;
@@ -57,12 +57,12 @@ public class EarClippingTriangulator{
     }
 
     /** @see #computeTriangles(float[], int, int) */
-    public ShortSeq computeTriangles(FloatSeq vertices){
+    public ShortAr computeTriangles(FloatAr vertices){
         return computeTriangles(vertices.items, 0, vertices.size);
     }
 
     /** @see #computeTriangles(float[], int, int) */
-    public ShortSeq computeTriangles(float[] vertices){
+    public ShortAr computeTriangles(float[] vertices){
         return computeTriangles(vertices, 0, vertices.length);
     }
 
@@ -72,12 +72,12 @@ public class EarClippingTriangulator{
      * @return triples of triangle indices in clockwise order. Note the returned array is reused for later calls to the same
      * method.
      */
-    public ShortSeq computeTriangles(float[] vertices, int offset, int count){
+    public ShortAr computeTriangles(float[] vertices, int offset, int count){
         this.vertices = vertices;
         int vertexCount = this.vertexCount = count / 2;
         int vertexOffset = offset / 2;
 
-        ShortSeq indicesArray = this.indicesArray;
+        ShortAr indicesArray = this.indicesArray;
         indicesArray.clear();
         indicesArray.ensureCapacity(vertexCount);
         indicesArray.size = vertexCount;
@@ -90,14 +90,14 @@ public class EarClippingTriangulator{
                 indices[i] = (short)(vertexOffset + n - i); // Reversed.
         }
 
-        IntSeq vertexTypes = this.vertexTypes;
+        IntAr vertexTypes = this.vertexTypes;
         vertexTypes.clear();
         vertexTypes.ensureCapacity(vertexCount);
         for(int i = 0; i < vertexCount; ++i)
             vertexTypes.add(classifyVertex(i));
 
         // A polygon with n vertices has a triangulation of n-2 triangles.
-        ShortSeq triangles = this.triangles;
+        ShortAr triangles = this.triangles;
         triangles.clear();
         triangles.ensureCapacity(Math.max(0, vertexCount - 2) * 3);
         triangulate();
@@ -119,7 +119,7 @@ public class EarClippingTriangulator{
         }
 
         if(vertexCount == 3){
-            ShortSeq triangles = this.triangles;
+            ShortAr triangles = this.triangles;
             short[] indices = this.indices;
             triangles.add(indices[0]);
             triangles.add(indices[1]);
@@ -195,7 +195,7 @@ public class EarClippingTriangulator{
 
     private void cutEarTip(int earTipIndex){
         short[] indices = this.indices;
-        ShortSeq triangles = this.triangles;
+        ShortAr triangles = this.triangles;
 
         triangles.add(indices[previousIndex(earTipIndex)]);
         triangles.add(indices[earTipIndex]);

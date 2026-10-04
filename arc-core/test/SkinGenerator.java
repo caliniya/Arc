@@ -15,8 +15,8 @@ public class SkinGenerator{
         String pack = path.child("core").child("src").list()[0].name() + ".ui";
 
         {
-            Seq<String> regions = ui.findAll(f -> f.extEquals("png") && !f.name().endsWith(".9.png")).map(Fi::nameWithoutExtension).map(Strings::kebabToCamel);
-            Seq<String> patches = ui.findAll(f -> f.extEquals("png") && f.name().endsWith(".9.png")).map(f -> f.name().replace(".9.png", "")).map(Strings::kebabToCamel);
+            Ar<String> regions = ui.findAll(f -> f.extEquals("png") && !f.name().endsWith(".9.png")).map(Fi::nameWithoutExtension).map(Strings::kebabToCamel);
+            Ar<String> patches = ui.findAll(f -> f.extEquals("png") && f.name().endsWith(".9.png")).map(f -> f.name().replace(".9.png", "")).map(Strings::kebabToCamel);
 
             StringBuilder loading = new StringBuilder();
             for(Fi fi : ui.findAll(f -> f.extEquals("png"))){
@@ -36,7 +36,7 @@ public class SkinGenerator{
         }
 
         {
-            Seq<String> iconfs = icons.findAll(f -> f.extEquals("png") && f.name().startsWith("icon-")).map(f -> Strings.kebabToCamel(f.nameWithoutExtension().replace("icon-", "")));
+            Ar<String> iconfs = icons.findAll(f -> f.extEquals("png") && f.name().startsWith("icon-")).map(f -> Strings.kebabToCamel(f.nameWithoutExtension().replace("icon-", "")));
 
             StringBuilder loading = new StringBuilder();
             for(Fi fi : icons.findAll(f -> f.extEquals("png"))){

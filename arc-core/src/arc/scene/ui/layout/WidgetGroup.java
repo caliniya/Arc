@@ -56,7 +56,7 @@ public class WidgetGroup extends Group{
     }
 
     private void setLayoutEnabled(Group parent, boolean enabled){
-        SnapshotSeq<Element> children = parent.getChildren();
+        SnapshotAr<Element> children = parent.getChildren();
         for(int i = 0, n = children.size; i < n; i++){
             children.get(i).setLayoutEnabled(enabled);
         }

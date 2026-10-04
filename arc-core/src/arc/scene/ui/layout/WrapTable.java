@@ -7,8 +7,8 @@ import arc.util.*;
 
 /** A table that autowraps instead of using standard table layout. */
 public class WrapTable extends Table{
-    private static FloatSeq rowHeights = new FloatSeq();
-    private static IntSeq cellRow = new IntSeq();
+    private static FloatAr rowHeights = new FloatAr();
+    private static IntAr cellRow = new IntAr();
     private float lastComputeWidth = -1;
 
     public WrapTable(){
@@ -30,7 +30,7 @@ public class WrapTable extends Table{
     protected void computeSize(){
         sizeInvalid = false;
 
-        Seq<Cell> cells = this.cells;
+        Ar<Cell> cells = this.cells;
         int cellCount = cells.size;
 
         float maxCellWidth = 0, totalWidth = 0;
@@ -77,7 +77,7 @@ public class WrapTable extends Table{
     }
 
     float wrapHeight(float maxRowWidth){
-        Seq<Cell> cells = this.cells;
+        Ar<Cell> cells = this.cells;
         int cellCount = cells.size;
 
         float currentX = 0, currentY = 0, rowHeight = 0;
@@ -100,7 +100,7 @@ public class WrapTable extends Table{
 
      @Override
     protected void layout(float layoutX, float layoutY, float layoutWidth, float layoutHeight){
-         Seq<Cell> cells = this.cells;
+         Ar<Cell> cells = this.cells;
          int cellCount = cells.size;
 
          if(sizeInvalid) computeSize();

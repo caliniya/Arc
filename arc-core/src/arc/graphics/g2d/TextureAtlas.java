@@ -19,10 +19,10 @@ import java.io.*;
  * @author Nathan Sweet
  */
 public class TextureAtlas implements Disposable{
-    private final Seq<AtlasRegion> regions = new Seq<>(false);
+    private final Ar<AtlasRegion> regions = new Ar<>(false);
     private final ObjectMap<String, Drawable> drawables = new ObjectMap<>();
     private final ObjectMap<String, AtlasRegion> regionMap = new ObjectMap<>();
-    private final Seq<AtlasPage> pages = new Seq<>();
+    private final Ar<AtlasPage> pages = new Ar<>();
     private TextureArray textureArray;
     protected AtlasRegion error, white;
     protected float drawableScale = 1f;
@@ -119,7 +119,7 @@ public class TextureAtlas implements Disposable{
         this.textureArray = textureArray;
     }
 
-    public Seq<AtlasPage> getPages(){
+    public Ar<AtlasPage> getPages(){
         return pages;
     }
 
@@ -128,7 +128,7 @@ public class TextureAtlas implements Disposable{
     }
 
     /** Returns all regions in the atlas. */
-    public Seq<AtlasRegion> getRegions(){
+    public Ar<AtlasRegion> getRegions(){
         return regions;
     }
 
@@ -234,8 +234,8 @@ public class TextureAtlas implements Disposable{
         public static final byte[] formatHeader = new byte[]{'A', 'A', 'T', 'L', 'S'};
 
         public @Nullable TextureArray texture;
-        public final Seq<AtlasPage> pages = new Seq<>();
-        public final Seq<Region> regions = new Seq<>();
+        public final Ar<AtlasPage> pages = new Ar<>();
+        public final Ar<Region> regions = new Ar<>();
 
         public TextureAtlasData(Fi packFile, Fi imagesDir, boolean flip){
             try(Reads read = packFile.reads()){

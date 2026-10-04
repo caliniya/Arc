@@ -30,7 +30,7 @@ import static org.lwjgl.sdl.SDLVersion.*;
 import static org.lwjgl.sdl.SDLVideo.*;
 
 public class SdlApplication implements Application{
-    private final Seq<ApplicationListener> listeners = new Seq<>();
+    private final Ar<ApplicationListener> listeners = new Ar<>();
     private final TaskQueue runnables = new TaskQueue();
 
     final SdlGraphics graphics;
@@ -369,7 +369,7 @@ public class SdlApplication implements Application{
     }
 
     @Override
-    public Seq<ApplicationListener> getListeners(){
+    public Ar<ApplicationListener> getListeners(){
         return listeners;
     }
 
@@ -463,7 +463,7 @@ public class SdlApplication implements Application{
                     "java";
                 try{
                     Fi jar = Fi.get(SdlApplication.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-                    Seq<String> launchOptions = Seq.with(javaPath);
+                    Ar<String> launchOptions = Ar.with(javaPath);
                     launchOptions.addAll((List<String>)beanClass.getMethod("getInputArguments").invoke(bean));
                     launchOptions.addAll(System.getProperties().entrySet().stream().map(it -> "-D" + it).toArray(String[]::new));
                     launchOptions.addAll("-XstartOnFirstThread", "-jar", jar.absolutePath(), "-firstThread");

@@ -12,7 +12,7 @@ import arc.util.*;
  */
 public class HeadlessApplication implements Application{
     protected final MockGraphics graphics;
-    protected final Seq<ApplicationListener> listeners = new Seq<>();
+    protected final Ar<ApplicationListener> listeners = new Ar<>();
     protected final TaskQueue runnables = new TaskQueue();
     protected final Cons<Throwable> exceptionHandler;
     protected long renderInterval;
@@ -124,7 +124,7 @@ public class HeadlessApplication implements Application{
     }
 
     @Override
-    public Seq<ApplicationListener> getListeners(){
+    public Ar<ApplicationListener> getListeners(){
         return listeners;
     }
 

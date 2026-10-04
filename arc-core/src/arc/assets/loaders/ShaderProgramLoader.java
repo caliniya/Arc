@@ -33,7 +33,7 @@ public class ShaderProgramLoader extends AsynchronousAssetLoader<Shader, ShaderP
     }
 
     @Override
-    public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, ShaderProgramParameter parameter){
+    public Ar<AssetDescriptor> getDependencies(String fileName, Fi file, ShaderProgramParameter parameter){
         return null;
     }
 

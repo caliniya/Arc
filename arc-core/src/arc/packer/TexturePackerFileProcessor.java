@@ -18,7 +18,7 @@ public class TexturePackerFileProcessor extends FileProcessor{
     private Json json = new Json();
     private String packFileName;
     private File root;
-    Seq<File> ignoreDirs = new Seq<>();
+    Ar<File> ignoreDirs = new Ar<>();
     boolean countOnly;
     int packCount;
     /** Runs the packing of directories in the background. Only exists while the actual processing pass is running. */
@@ -43,11 +43,11 @@ public class TexturePackerFileProcessor extends FileProcessor{
     }
 
     @Override
-    public Seq<Entry> process(File inputFile, File outputRoot) throws Exception{
+    public Ar<Entry> process(File inputFile, File outputRoot) throws Exception{
         root = inputFile;
 
         // Collect pack.json setting files.
-        final Seq<File> settingsFiles = new Seq<>();
+        final Ar<File> settingsFiles = new Ar<>();
         FileProcessor settingsProcessor = new FileProcessor(){
             @Override
             protected void processFile(Entry inputFile){
@@ -95,7 +95,7 @@ public class TexturePackerFileProcessor extends FileProcessor{
     }
 
     @Override
-    public Seq<Entry> process(File[] files, File outputRoot) throws Exception{
+    public Ar<Entry> process(File[] files, File outputRoot) throws Exception{
         // Delete pack file and images.
         if(countOnly && outputRoot.exists()) deleteOutput(outputRoot);
         if(countOnly) return super.process(files, outputRoot);
@@ -103,7 +103,7 @@ public class TexturePackerFileProcessor extends FileProcessor{
         //directories are packed in the background as they are found, and the results are written out in order once they're ready
         PackQueue queue = this.queue = new PackQueue();
         try{
-            Seq<Entry> result = super.process(files, outputRoot);
+            Ar<Entry> result = super.process(files, outputRoot);
             queue.finish();
             return result;
         }finally{
@@ -152,7 +152,7 @@ public class TexturePackerFileProcessor extends FileProcessor{
     }
 
     @Override
-    protected void processDir(final Entry inputDir, Seq<Entry> files) throws Exception{
+    protected void processDir(final Entry inputDir, Ar<Entry> files) throws Exception{
         if(ignoreDirs.contains(inputDir.inputFile)) return;
 
         // Find first parent with settings, or use defaults.
@@ -172,7 +172,7 @@ public class TexturePackerFileProcessor extends FileProcessor{
             // Collect all files under subdirectories and ignore subdirectories without pack.json files.
             files = new FileProcessor(this){
                 @Override
-                protected void processDir(Entry entryDir, Seq<Entry> files){
+                protected void processDir(Entry entryDir, Ar<Entry> files){
                     if(!entryDir.inputFile.equals(inputDir.inputFile) && (new File(entryDir.inputFile, "pack.json").exists() || new File(entryDir.inputFile, "pack.hjson").exists())){
                         files.clear();
                         return;
@@ -198,7 +198,7 @@ public class TexturePackerFileProcessor extends FileProcessor{
 
         // Sort by name using numeric suffix, then alpha.
         // The name and number are worked out once per file, rather than on every comparison.
-        Seq<SortKey> keys = new Seq<>(files.size);
+        Ar<SortKey> keys = new Ar<>(files.size);
         for(Entry entry : files){
             keys.add(new SortKey(entry, digitSuffix));
         }
@@ -231,7 +231,7 @@ public class TexturePackerFileProcessor extends FileProcessor{
         queue.add(inputDir, packer, inputDir.outputDir, packFileName);
     }
 
-    /** Sort key for an input file, see {@link #processDir(Entry, Seq)}. */
+    /** Sort key for an input file, see {@link #processDir(Entry, Ar)}. */
     private static class SortKey{
         final Entry entry;
         final String name;
@@ -265,7 +265,7 @@ public class TexturePackerFileProcessor extends FileProcessor{
         //Mostly waits on Core.executor, which does the real work, so this doesn't need many threads. It's kept small as every
         //directory in progress keeps all of its images in memory.
         final ExecutorService pool = Threads.executor("Packer Directories", Math.max(1, Math.min(OS.cores, 4)));
-        final Seq<Job> jobs = new Seq<>();
+        final Ar<Job> jobs = new Ar<>();
         /** Page images claimed so far, shared by all jobs, as rendering doesn't create the files immediately. */
         final Set<File> claimed = Collections.synchronizedSet(new HashSet<File>());
         volatile boolean failed;
@@ -282,12 +282,12 @@ public class TexturePackerFileProcessor extends FileProcessor{
         }
 
         void run(Job job, Job previous){
-            Seq<FutureTask<Void>> renders = null;
+            Ar<FutureTask<Void>> renders = null;
             try{
                 if(failed) return;
 
                 //the slow part: loading and packing, independent of anything else
-                Seq<Seq<Page>> pages = job.packer.packScales();
+                Ar<Ar<Page>> pages = job.packer.packScales();
 
                 //wait for our turn to touch the output directory
                 if(previous != null) previous.named.join();

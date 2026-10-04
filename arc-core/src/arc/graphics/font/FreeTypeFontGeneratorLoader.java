@@ -33,7 +33,7 @@ public class FreeTypeFontGeneratorLoader extends SynchronousAssetLoader<FreeType
     }
 
     @Override
-    public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, FreeTypeFontGeneratorParameters parameter){
+    public Ar<AssetDescriptor> getDependencies(String fileName, Fi file, FreeTypeFontGeneratorParameters parameter){
         return null;
     }
 

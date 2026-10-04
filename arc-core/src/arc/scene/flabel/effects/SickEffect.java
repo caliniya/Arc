@@ -12,7 +12,7 @@ public class SickEffect extends FEffect{
     public float distance = 1; // How far the glyphs should move
     public float intensity = 1; // How fast the glyphs should move
 
-    private IntSeq indices = new IntSeq();
+    private IntAr indices = new IntAr();
 
     @Override
     public void applyParams(String[] params){

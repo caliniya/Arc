@@ -143,13 +143,13 @@ public class Http{
          * Returns a Map of the headers. The keys are Strings that represent the header name. Each values is a List of Strings that
          * represent the corresponding header values.
          */
-        public ObjectMap<String, Seq<String>> getHeaders(){
+        public ObjectMap<String, Ar<String>> getHeaders(){
             //convert between the struct types
-            ObjectMap<String, Seq<String>> out = new ObjectMap<>();
+            ObjectMap<String, Ar<String>> out = new ObjectMap<>();
             Map<String, List<String>> fields = connection.getHeaderFields();
             for(String key : fields.keySet()){
                 if(key != null){
-                    out.put(key, Seq.with(fields.get(key).toArray(new String[0])));
+                    out.put(key, Ar.with(fields.get(key).toArray(new String[0])));
                 }
             }
             return out;

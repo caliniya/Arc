@@ -31,8 +31,8 @@ public class Element{
     public Prov<Touchable> touchablility;
     public boolean cullable = true;
 
-    private final DelayedRemovalSeq<EventListener> listeners = new DelayedRemovalSeq<>(0), captureListeners = new DelayedRemovalSeq<>(0);
-    private final Seq<Action> actions = new Seq<>(0);
+    private final DelayedRemovalAr<EventListener> listeners = new DelayedRemovalAr<>(0), captureListeners = new DelayedRemovalAr<>(0);
+    private final Ar<Action> actions = new Ar<>(0);
 
     public float x, y;
 
@@ -58,7 +58,7 @@ public class Element{
      * @param delta Time in seconds since the last frame.
      */
     public void act(float delta){
-        Seq<Action> actions = this.actions;
+        Ar<Action> actions = this.actions;
         if(actions.size > 0){
             if(stage != null && stage.getActionsRequestRendering()) Core.graphics.requestRendering();
             for(int i = 0; i < actions.size; i++){
@@ -109,7 +109,7 @@ public class Element{
         event.targetActor = this;
 
         // Collect ancestors so event propagation is unaffected by hierarchy changes.
-        Seq<Group> ancestors = Pools.obtain(Seq.class, Seq::new);
+        Ar<Group> ancestors = Pools.obtain(Ar.class, Ar::new);
         Group parent = this.parent;
         while(parent != null){
             ancestors.add(parent);
@@ -150,7 +150,7 @@ public class Element{
     public boolean notify(SceneEvent event, boolean capture){
         if(event.targetActor == null) throw new IllegalArgumentException("The event target cannot be null.");
 
-        DelayedRemovalSeq<EventListener> listeners = capture ? captureListeners : this.listeners;
+        DelayedRemovalAr<EventListener> listeners = capture ? captureListeners : this.listeners;
         if(listeners.size == 0) return event.cancelled;
 
         event.listenerActor = this;
@@ -257,7 +257,7 @@ public class Element{
         return listeners.remove(listener, true);
     }
 
-    public Seq<EventListener> getListeners(){
+    public Ar<EventListener> getListeners(){
         return listeners;
     }
 
@@ -276,7 +276,7 @@ public class Element{
         return captureListeners.remove(listener, true);
     }
 
-    public Seq<EventListener> getCaptureListeners(){
+    public Ar<EventListener> getCaptureListeners(){
         return captureListeners;
     }
 
@@ -295,7 +295,7 @@ public class Element{
         if(actions.remove(action, true)) action.setActor(null);
     }
 
-    public Seq<Action> getActions(){
+    public Ar<Action> getActions(){
         return actions;
     }
 
@@ -629,7 +629,7 @@ public class Element{
         if(index < 0) throw new IllegalArgumentException("ZIndex cannot be < 0.");
         Group parent = this.parent;
         if(parent == null) return;
-        Seq<Element> children = parent.children;
+        Ar<Element> children = parent.children;
         if(children.size == 1) return;
         index = Math.min(index, children.size - 1);
         if(children.get(index) == this) return;

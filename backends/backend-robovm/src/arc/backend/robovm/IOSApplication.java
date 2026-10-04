@@ -29,8 +29,8 @@ public class IOSApplication implements Application{
 
     private IOSScreenBounds lastScreenBounds = null;
 
-    final Seq<ApplicationListener> listeners = new Seq<>();
-    final Seq<Runnable> runnables = new Seq<>(), executedRunnables = new Seq<>();
+    final Ar<ApplicationListener> listeners = new Ar<>();
+    final Ar<Runnable> runnables = new Ar<>(), executedRunnables = new Ar<>();
 
     public IOSApplication(ApplicationListener listener, IOSApplicationConfiguration config){
         addListener(listener);
@@ -167,7 +167,7 @@ public class IOSApplication implements Application{
         // willTerminate can be called before a scene is connected and graphics initialized
         if(graphics != null) graphics.makeCurrent();
         input.disposeAccelerometer();
-        Seq<ApplicationListener> listeners = this.listeners;
+        Ar<ApplicationListener> listeners = this.listeners;
         synchronized(listeners){
             for(ApplicationListener listener : listeners){
                 listener.pause();
@@ -254,7 +254,7 @@ public class IOSApplication implements Application{
     }
 
     @Override
-    public Seq<ApplicationListener> getListeners(){
+    public Ar<ApplicationListener> getListeners(){
         return listeners;
     }
 

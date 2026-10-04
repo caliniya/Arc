@@ -19,9 +19,9 @@ import arc.util.*;
 public final class FxProcessor implements Disposable{
     private final ObjectIntMap<FxFilter> priorities = new ObjectIntMap<>();
     /** All effects ever added. */
-    private final Seq<FxFilter> effectsAll = new Seq<>();
+    private final Ar<FxFilter> effectsAll = new Ar<>();
     /** Maintains a per-frame updated list of enabled effects */
-    private final Seq<FxFilter> effectsEnabled = new Seq<>();
+    private final Ar<FxFilter> effectsEnabled = new Ar<>();
 
     /** A mesh that is shared among basic filters to draw to full screen. */
     private final FxBufferRenderer bufferRenderer = new FxBufferRenderer();
@@ -263,7 +263,7 @@ public final class FxProcessor implements Disposable{
 
         effectsAll.each(FxFilter::update);
 
-        Seq<FxFilter> effectChain = effectsEnabled.selectFrom(effectsAll, e -> !e.isDisabled());
+        Ar<FxFilter> effectChain = effectsEnabled.selectFrom(effectsAll, e -> !e.isDisabled());
 
         applyingEffects = true;
         int count = effectChain.size;

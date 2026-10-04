@@ -329,7 +329,7 @@ public abstract class Input{
     }
 
     /** @return the currently set {@link InputProcessor} or null. */
-    public Seq<InputProcessor> getInputProcessors(){
+    public Ar<InputProcessor> getInputProcessors(){
         return inputMultiplexer.getProcessors();
     }
 

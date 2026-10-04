@@ -1,7 +1,7 @@
 package arc.util;
 
 
-import arc.struct.Seq;
+import arc.struct.Ar;
 import arc.struct.ObjectMap;
 import arc.func.Cons;
 
@@ -10,7 +10,7 @@ public class CommandHandler{
     public String prefix = "";
 
     private final ObjectMap<String, Command> commands = new ObjectMap<>();
-    private final Seq<Command> orderedCommands = new Seq<>();
+    private final Ar<Command> orderedCommands = new Ar<>();
 
     /** Creates a command handler with a specific command prefix.*/
     public CommandHandler(String prefix){
@@ -41,7 +41,7 @@ public class CommandHandler{
         String commandstr = message.contains(" ") ? message.substring(0, message.indexOf(" ")) : message;
         String argstr = message.contains(" ") ? message.substring(commandstr.length() + 1) : "";
 
-        Seq<String> result = new Seq<>();
+        Ar<String> result = new Ar<>();
 
         Command command = commands.get(commandstr);
 
@@ -129,7 +129,7 @@ public class CommandHandler{
         return register(text, params, description, (args, p) -> runner.get(args));
     }
 
-    public Seq<Command> getCommandList(){
+    public Ar<Command> getCommandList(){
         return orderedCommands;
     }
 

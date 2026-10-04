@@ -13,7 +13,7 @@ import java.util.*;
 public class Pixmaps{
     private static final int[] offsets = {1, 0, 1, 1, 0, 1, -1, 1, -1, 0, -1, -1, 0, -1, 1, -1};
     private static Pixmap drawPixmap;
-    private static IntSeq tmpArray = new IntSeq();
+    private static IntAr tmpArray = new IntAr();
 
     public static Pixmap noise(int w, int h){
         Pixmap out = new Pixmap(w, h);
@@ -64,7 +64,7 @@ public class Pixmaps{
         return median(input, radius, percentile, tmpArray);
     }
 
-    public static Pixmap median(Pixmap input, int radius, double percentile, IntSeq tmp){
+    public static Pixmap median(Pixmap input, int radius, double percentile, IntAr tmp){
         Pixmap pixmap = new Pixmap(input.width, input.height);
         input.each((x, y) -> {
             tmp.clear();

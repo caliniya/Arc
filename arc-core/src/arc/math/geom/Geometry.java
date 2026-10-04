@@ -80,8 +80,8 @@ public final class Geometry{
         }
     }
 
-    public static FloatSeq vectorsToFloats(Seq<Vec2> result){
-        FloatSeq out = new FloatSeq(result.size * 2);
+    public static FloatAr vectorsToFloats(Ar<Vec2> result){
+        FloatAr out = new FloatAr(result.size * 2);
         result.each(v -> out.add(v.x, v.y));
         return out;
     }
@@ -159,7 +159,7 @@ public final class Geometry{
 
     public static Vec2[] pixelCircle(float index, SolidChecker checker){
         int size = (int)(index * 2);
-        IntSeq ints = new IntSeq();
+        IntAr ints = new IntAr();
 
         //add edges (bottom left corner)
         for(int x = -1; x < size + 1; x++){
@@ -171,12 +171,12 @@ public final class Geometry{
             }
         }
 
-        Seq<Vec2> path = new Seq<>();
+        Ar<Vec2> path = new Ar<>();
 
         //size = 3 needs special sorting due to conflicts
         if(size == 3){
             //int arrays don't support sorting with custom comparators, so box them.
-            Seq<Integer> boxed = new Seq<>();
+            Ar<Integer> boxed = new Ar<>();
             ints.each(boxed::add);
             boxed.sort(i -> Angles.angle(i % (size + 1), i / (size + 1), index, index));
             ints.clear();

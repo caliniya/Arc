@@ -129,7 +129,7 @@ public class Structs{
     }
 
     public static <T> T[] filter(Class<T> type, T[] array, Boolf<T> value){
-        Seq<T> out = new Seq<>(true, array.length, type);
+        Ar<T> out = new Ar<>(true, array.length, type);
         for(T t : array){
             if(value.get(t)) out.add(t);
         }

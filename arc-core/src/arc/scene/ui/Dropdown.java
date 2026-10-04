@@ -38,7 +38,7 @@ public class Dropdown<T> extends Table implements Disableable{
     public float itemHeight = 40f;
 
     DropdownStyle style;
-    final Seq<T> items = new Seq<>();
+    final Ar<T> items = new Ar<>();
     @Nullable T selected;
     Func<T, String> stringifier = String::valueOf;
     Cons<T> listener = t -> {};
@@ -85,7 +85,7 @@ public class Dropdown<T> extends Table implements Disableable{
         addListener(new HandCursorListener());
     }
 
-    public Dropdown(Seq<T> items, @Nullable T selected, Cons<T> listener){
+    public Dropdown(Ar<T> items, @Nullable T selected, Cons<T> listener){
         this();
         setItems(items);
         setSelected(selected);
@@ -93,7 +93,7 @@ public class Dropdown<T> extends Table implements Disableable{
     }
 
     public Dropdown(T[] items, @Nullable T selected, Cons<T> listener){
-        this(Seq.with(items), selected, listener);
+        this(Ar.with(items), selected, listener);
     }
 
     public void setStyle(DropdownStyle style){
@@ -116,7 +116,7 @@ public class Dropdown<T> extends Table implements Disableable{
     }
 
     /** Sets the items, keeping the selection if it is still present and selecting the first item otherwise. */
-    public void setItems(Seq<T> newItems){
+    public void setItems(Ar<T> newItems){
         if(newItems != items){
             items.clear();
             items.addAll(newItems);
@@ -128,11 +128,11 @@ public class Dropdown<T> extends Table implements Disableable{
 
     @SafeVarargs
     public final void setItems(T... newItems){
-        setItems(Seq.with(newItems));
+        setItems(Ar.with(newItems));
     }
 
-    /** Returns the backing item list. Call {@link #setItems(Seq)} with it after modifying it. */
-    public Seq<T> getItems(){
+    /** Returns the backing item list. Call {@link #setItems(Ar)} with it after modifying it. */
+    public Ar<T> getItems(){
         return items;
     }
 

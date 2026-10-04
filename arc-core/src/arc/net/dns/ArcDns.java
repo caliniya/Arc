@@ -14,8 +14,8 @@ public final class ArcDns{
     /** Default dns server port. */
     public static final int dnsResolverPort = 53;
 
-    private static final Seq<InetSocketAddress> nameservers = new Seq<>(3);
-    private static final Seq<NameserverProvider> nameserverProviders = Seq.with(
+    private static final Ar<InetSocketAddress> nameservers = new Ar<>(3);
+    private static final Ar<NameserverProvider> nameserverProviders = Ar.with(
     new JndiContextNameserverProvider(),    // Simple JRE installation
     new ResolvConfNameserverProvider(),     // Unix/Linux
     new WellKnownNameserverProvider()       // Others
@@ -25,19 +25,19 @@ public final class ArcDns{
         refreshNameservers();
     }
 
-    public static Seq<NameserverProvider> getNameserverProviders(){
+    public static Ar<NameserverProvider> getNameserverProviders(){
         return nameserverProviders;
     }
 
     /** Set a new ordered list of resolver config providers. */
-    public static void setNameserverProviders(Seq<NameserverProvider> providers){
+    public static void setNameserverProviders(Ar<NameserverProvider> providers){
         nameserverProviders.clear();
         nameserverProviders.addAll(providers);
         refreshNameservers();
     }
 
     /** Returns all located servers */
-    public static Seq<InetSocketAddress> getNameservers(){
+    public static Ar<InetSocketAddress> getNameservers(){
         return nameservers;
     }
 
@@ -72,22 +72,22 @@ public final class ArcDns{
      * Lookup the SRV record of a domain in the format {@code _service._protocol.name}
      * with the list of nameservers from {@link #getNameservers()}.
      */
-    public static Seq<SRVRecord> getSrvRecords(String domain){
+    public static Ar<SRVRecord> getSrvRecords(String domain){
         for(InetSocketAddress nameserver : nameservers){
             try{
                 return getSrvRecords(domain, nameserver);
             }catch(IOException ignored){
             }
         }
-        return new Seq<>(1);
+        return new Ar<>(1);
     }
 
     /**
      * Lookup the SRV record of a domain in the format {@code _service._protocol.name}.
      * The results are sorted by priority, then by weight.
      */
-    public static Seq<SRVRecord> getSrvRecords(String domain, InetSocketAddress nameserver) throws IOException{
-        Seq<SRVRecord> records = new Seq<>();
+    public static Ar<SRVRecord> getSrvRecords(String domain, InetSocketAddress nameserver) throws IOException{
+        Ar<SRVRecord> records = new Ar<>();
 
         try(DatagramSocket socket = new DatagramSocket()){
             socket.setSoTimeout(2000);

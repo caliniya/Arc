@@ -138,11 +138,11 @@ public class IntSet{
         return true;
     }
 
-    public void addAll(IntSeq array){
+    public void addAll(IntAr array){
         addAll(array.items, 0, array.size);
     }
 
-    public void addAll(IntSeq array, int offset, int length){
+    public void addAll(IntAr array, int offset, int length){
         if(offset + length > array.size)
             throw new IllegalArgumentException("offset + length must be <= size: " + offset + " + " + length + " <= " + array.size);
         addAll(array.items, offset, length);
@@ -429,8 +429,8 @@ public class IntSet{
         }
 
         /** Returns a new array containing the remaining keys. */
-        public IntSeq toSeq(){
-            IntSeq array = new IntSeq(true, set.size);
+        public IntAr toSeq(){
+            IntAr array = new IntAr(true, set.size);
             while(hasNext)
                 array.add(next());
             return array;

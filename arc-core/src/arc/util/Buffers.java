@@ -9,7 +9,7 @@ import java.nio.*;
  * @author mzechner, xoppa
  */
 public final class Buffers{
-    static final Seq<ByteBuffer> unsafeBuffers = new Seq<>();
+    static final Ar<ByteBuffer> unsafeBuffers = new Ar<>();
     static int allocatedUnsafe = 0;
 
     /**

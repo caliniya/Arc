@@ -39,7 +39,7 @@ public class GifRecorder{
     public boolean recording, open, saving;
 
     private float offsetx, offsety;
-    private Seq<byte[]> frames = new Seq<>();
+    private Ar<byte[]> frames = new Ar<>();
     private float frametime, saveprogress;
 
     public static void record(){

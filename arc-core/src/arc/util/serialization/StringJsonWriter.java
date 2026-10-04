@@ -8,7 +8,7 @@ import java.io.*;
 /** Builder-style JSON writer: writes directly to a stream instead of building an in-memory tree (unlike {@link Jval}). */
 public class StringJsonWriter extends Writer implements JsonWriter{
     final Writer writer;
-    private final Seq<JsonObject> stack = new Seq<>();
+    private final Ar<JsonObject> stack = new Ar<>();
     private JsonObject current;
     private boolean named;
     private Jformat format = Jformat.minimal;

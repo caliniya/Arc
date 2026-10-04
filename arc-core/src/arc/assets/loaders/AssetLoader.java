@@ -2,7 +2,7 @@ package arc.assets.loaders;
 
 import arc.assets.AssetDescriptor;
 import arc.assets.AssetLoaderParameters;
-import arc.struct.Seq;
+import arc.struct.Ar;
 import arc.files.Fi;
 
 /**
@@ -37,7 +37,7 @@ public abstract class AssetLoader<T, P extends AssetLoaderParameters<T>>{
      * @param parameter parameters for loading the asset
      * @return other assets that the asset depends on and need to be loaded first or null if there are no dependencies.
      */
-    public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, P parameter){
+    public Ar<AssetDescriptor> getDependencies(String fileName, Fi file, P parameter){
         return null;
     }
 }

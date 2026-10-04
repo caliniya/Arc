@@ -16,7 +16,7 @@ public class GridPacker implements Packer{
     }
 
     @Override
-    public Seq<Page> pack(Seq<Rect> inputRects){
+    public Ar<Page> pack(Ar<Rect> inputRects){
         if(!settings.silent) (log == null ? System.out : log).print("| Packing");
 
         // Rects are packed with right and top padding, so the max size is increased to match. After packing the padding is
@@ -46,7 +46,7 @@ public class GridPacker implements Packer{
 
         inputRects.reverse();
 
-        Seq<Page> pages = new Seq<>();
+        Ar<Page> pages = new Ar<>();
         while(inputRects.size > 0){
             Page page = packPage(inputRects, cellWidth, cellHeight, maxWidth, maxHeight);
             page.width -= paddingX;
@@ -56,9 +56,9 @@ public class GridPacker implements Packer{
         return pages;
     }
 
-    private Page packPage(Seq<Rect> inputRects, int cellWidth, int cellHeight, int maxWidth, int maxHeight){
+    private Page packPage(Ar<Rect> inputRects, int cellWidth, int cellHeight, int maxWidth, int maxHeight){
         Page page = new Page();
-        page.outputRects = new Seq<>();
+        page.outputRects = new Ar<>();
 
         int n = inputRects.size;
         int x = 0, y = 0;

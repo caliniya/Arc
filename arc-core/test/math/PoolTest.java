@@ -13,7 +13,7 @@ public class PoolTest{
         long start = 0;
 
         int objects = 100000;
-        Seq<Object> list = new Seq<>(objects);
+        Ar<Object> list = new Ar<>(objects);
         Pools.get(Object.class, Object::new, objects);
 
         for(int i = 0; i < objects; i++){

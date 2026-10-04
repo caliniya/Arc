@@ -38,7 +38,7 @@ import arc.struct.*;
 public class DistanceFieldFont extends Font{
     private float distanceFieldSmoothing;
 
-    public DistanceFieldFont(FontData data, Seq<TextureRegion> pageRegions, boolean integer){
+    public DistanceFieldFont(FontData data, Ar<TextureRegion> pageRegions, boolean integer){
         super(data, pageRegions, integer);
     }
 
@@ -113,7 +113,7 @@ public class DistanceFieldFont extends Font{
         super.load(data);
 
         // Distance field font rendering requires font texture to be filtered Linear.
-        final Seq<TextureRegion> regions = getRegions();
+        final Ar<TextureRegion> regions = getRegions();
         for(TextureRegion region : regions)
             region.texture.setFilter(TextureFilter.linear, TextureFilter.linear);
     }

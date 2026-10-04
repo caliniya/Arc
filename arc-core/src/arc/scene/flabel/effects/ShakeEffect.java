@@ -9,7 +9,7 @@ import arc.util.*;
 public class ShakeEffect extends FEffect{
     private static final float defaultDistance = 0.12f, defaultIntensity = 0.5f;
 
-    private final FloatSeq lastOffsets = new FloatSeq();
+    private final FloatAr lastOffsets = new FloatAr();
 
     public float distance = 1; // How far the glyphs should move
     public float intensity = 1; // How fast the glyphs should move

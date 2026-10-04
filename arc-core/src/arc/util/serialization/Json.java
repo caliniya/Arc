@@ -94,13 +94,13 @@ public class Json{
         OrderedMap<String, FieldMetadata> fields = typeToFields.get(type);
         if(fields != null) return fields;
 
-        Seq<Class> classHierarchy = new Seq();
+        Ar<Class> classHierarchy = new Ar();
         Class nextClass = type;
         while(nextClass != Object.class){
             classHierarchy.add(nextClass);
             nextClass = nextClass.getSuperclass();
         }
-        Seq<Field> allFields = new Seq<>();
+        Ar<Field> allFields = new Ar<>();
         for(int i = classHierarchy.size - 1; i >= 0; i--)
             allFields.addAll(classHierarchy.get(i).getDeclaredFields());
 
@@ -427,12 +427,12 @@ public class Json{
         }
 
         // JSON array special cases.
-        if(value instanceof Seq){
-            if(knownType != null && actualType != knownType && actualType != Seq.class)
+        if(value instanceof Ar){
+            if(knownType != null && actualType != knownType && actualType != Ar.class)
                 throw new SerializationException("Serialization of an Array other than the known type is not supported.\n"
                 + "Known type: " + knownType + "\nActual type: " + actualType);
             writer.writeArrayStart();
-            Seq array = (Seq)value;
+            Ar array = (Ar)value;
             for(int i = 0, n = array.size; i < n; i++)
                 writeValue(writer, array.get(i), elementType, null);
             writer.writeArrayEnd();
@@ -460,9 +460,9 @@ public class Json{
             writeObjectEnd(writer);
             return;
         }
-        if(value instanceof IntSeq){
+        if(value instanceof IntAr){
             writer.writeArrayStart();
-            IntSeq array = (IntSeq)value;
+            IntAr array = (IntAr)value;
             for(int i = 0, n = array.size; i < n; i++)
                 writeValue(writer, array.get(i), Integer.class, null);
             writer.writeArrayEnd();
@@ -944,8 +944,8 @@ public class Json{
                         result.add(child.asInt());
                     return (T)result;
                 }
-                if(object instanceof IntSeq){
-                    IntSeq result = (IntSeq)object;
+                if(object instanceof IntAr){
+                    IntAr result = (IntAr)object;
                     for(ObjectMap.Entry<String, Jval> entry : jsonData.asObject())
                         result.add(entry.value.asInt());
                     return (T)result;
@@ -987,15 +987,15 @@ public class Json{
 
         if(jsonData.isArray()){
             // JSON array special cases.
-            if(type == null || type == Object.class) type = (Class<T>)Seq.class;
-            if(Seq.class.isAssignableFrom(type)){
-                Seq result = type == Seq.class ? new Seq() : (Seq)newInstance(type);
+            if(type == null || type == Object.class) type = (Class<T>)Ar.class;
+            if(Ar.class.isAssignableFrom(type)){
+                Ar result = type == Ar.class ? new Ar() : (Ar)newInstance(type);
                 for(Jval child : jsonData.asArray())
                     result.add(readValue(elementType, null, child));
                 return (T)result;
             }
-            if(IntSeq.class.isAssignableFrom(type)){
-                IntSeq result = type == IntSeq.class ? new IntSeq() : (IntSeq)newInstance(type);
+            if(IntAr.class.isAssignableFrom(type)){
+                IntAr result = type == IntAr.class ? new IntAr() : (IntAr)newInstance(type);
                 for(Jval child : jsonData.asArray())
                     result.add(child.asInt());
                 return (T)result;

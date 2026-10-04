@@ -45,7 +45,7 @@ public class MaxRectsPacker implements Packer{
     }
 
     @Override
-    public Seq<Page> pack(Seq<Rect> inputRects){
+    public Ar<Page> pack(Ar<Rect> inputRects){
         int n = inputRects.size;
         for(int i = 0; i < n; i++){
             Rect rect = inputRects.get(i);
@@ -67,7 +67,7 @@ public class MaxRectsPacker implements Packer{
             }
         }
 
-        Seq<Page> pages = new Seq<>();
+        Ar<Page> pages = new Ar<>();
         while(inputRects.size > 0){
             Page result = packPage(inputRects);
             pages.add(result);
@@ -77,7 +77,7 @@ public class MaxRectsPacker implements Packer{
 
     }
 
-    private Page packPage(Seq<Rect> inputRects){
+    private Page packPage(Ar<Rect> inputRects){
         int paddingX = settings.paddingX, paddingY = settings.paddingY;
         float maxWidth = settings.maxWidth, maxHeight = settings.maxHeight;
         boolean edgePadX = false, edgePadY = false;
@@ -200,8 +200,8 @@ public class MaxRectsPacker implements Packer{
         }
     }
 
-    /** Same as {@link #packAtSize(boolean, int, int, Seq)} with fully = true, but remembers results per size. */
-    private Page packAtSizeCached(Map<Long, Page> cache, int width, int height, Seq<Rect> inputRects){
+    /** Same as {@link #packAtSize(boolean, int, int, Ar)} with fully = true, but remembers results per size. */
+    private Page packAtSizeCached(Map<Long, Page> cache, int width, int height, Ar<Rect> inputRects){
         Long key = ((long)width << 32) | (height & 0xffffffffL);
         Page result = cache.get(key);
         if(result == null && !cache.containsKey(key)){
@@ -215,13 +215,13 @@ public class MaxRectsPacker implements Packer{
      * @param fully If true, the only results that pack all rects will be considered. If false, all results are considered, not
      * all rects may be packed.
      */
-    private Page packAtSize(boolean fully, int width, int height, Seq<Rect> inputRects){
+    private Page packAtSize(boolean fully, int width, int height, Ar<Rect> inputRects){
         int count = methods.length;
         Page[] results = new Page[count];
 
         if(Tasks.parallel() && inputRects.size >= parallelThreshold){
             //each heuristic is independent and only reads the input rects
-            Seq<FutureTask<Page>> tasks = new Seq<>(count);
+            Ar<FutureTask<Page>> tasks = new Ar<>(count);
             for(int i = 0; i < count; i++){
                 final int index = i;
                 tasks.add(Tasks.submit(() -> packWithMethod(index, fully, width, height, inputRects)));
@@ -244,7 +244,7 @@ public class MaxRectsPacker implements Packer{
     }
 
     /** @return the page produced by a single heuristic, or null if it doesn't qualify. */
-    private Page packWithMethod(int index, boolean fully, int width, int height, Seq<Rect> inputRects){
+    private Page packWithMethod(int index, boolean fully, int width, int height, Ar<Rect> inputRects){
         FreeRectChoiceHeuristic method = methods[index];
         MaxRects maxRects = this.maxRects[index];
         maxRects.init(width, height, method == FreeRectChoiceHeuristic.ContactPointRule);
@@ -262,13 +262,13 @@ public class MaxRectsPacker implements Packer{
                 //a rect didn't fit
                 if(fully) return null;
 
-                Seq<Rect> remaining = new Seq<>(nn - ii);
+                Ar<Rect> remaining = new Ar<>(nn - ii);
                 while(ii < nn) remaining.add(inputRects.get(ii++));
                 result = maxRects.getResult();
                 result.remainingRects = remaining;
             }else{
                 result = maxRects.getResult();
-                result.remainingRects = new Seq<>();
+                result.remainingRects = new Ar<>();
             }
         }
         if(fully && result.remainingRects.size > 0) return null;
@@ -334,9 +334,9 @@ public class MaxRectsPacker implements Packer{
      */
     class MaxRects{
         private int binWidth, binHeight;
-        private final Seq<Rect> usedRectangles = new Seq<>();
-        private final Seq<Rect> freeRectangles = new Seq<>();
-        private final Seq<Rect> rectanglesToCheckWhenPruning = new Seq<>();
+        private final Ar<Rect> usedRectangles = new Ar<>();
+        private final Ar<Rect> freeRectangles = new Ar<>();
+        private final Ar<Rect> rectanglesToCheckWhenPruning = new Ar<>();
         /** Scratch space for pruneFreeList, indexed like freeRectangles. */
         private boolean[] pruneMarks = new boolean[64];
 
@@ -345,7 +345,7 @@ public class MaxRectsPacker implements Packer{
          * the contact score look at just the rects that can touch a candidate instead of scanning all of them.
          */
         private boolean trackEdges;
-        private Seq<Rect>[] byLeft, byRight, byBottom, byTop;
+        private Ar<Rect>[] byLeft, byRight, byBottom, byTop;
 
         /** @param trackEdges must be true if the contact point heuristic is going to be used. */
         @SuppressWarnings("unchecked")
@@ -366,15 +366,15 @@ public class MaxRectsPacker implements Packer{
             this.trackEdges = trackEdges;
             if(trackEdges){
                 if(byLeft == null || byLeft.length < width + 1){
-                    byLeft = new Seq[width + 1];
-                    byRight = new Seq[width + 1];
+                    byLeft = new Ar[width + 1];
+                    byRight = new Ar[width + 1];
                 }else{
                     Arrays.fill(byLeft, null);
                     Arrays.fill(byRight, null);
                 }
                 if(byBottom == null || byBottom.length < height + 1){
-                    byBottom = new Seq[height + 1];
-                    byTop = new Seq[height + 1];
+                    byBottom = new Ar[height + 1];
+                    byTop = new Ar[height + 1];
                 }else{
                     Arrays.fill(byBottom, null);
                     Arrays.fill(byTop, null);
@@ -392,10 +392,10 @@ public class MaxRectsPacker implements Packer{
             }
         }
 
-        private void index(Seq<Rect>[] edges, int coordinate, Rect rect){
+        private void index(Ar<Rect>[] edges, int coordinate, Rect rect){
             if(coordinate < 0 || coordinate >= edges.length) return; //can't touch anything inside the bin
-            Seq<Rect> list = edges[coordinate];
-            if(list == null) list = edges[coordinate] = new Seq<>(4);
+            Ar<Rect> list = edges[coordinate];
+            if(list == null) list = edges[coordinate] = new Ar<>(4);
             list.add(rect);
         }
 
@@ -430,8 +430,8 @@ public class MaxRectsPacker implements Packer{
         }
 
         /** For each rectangle, packs each one then chooses the best and packs that. Slow! */
-        public Page pack(Seq<Rect> rects, FreeRectChoiceHeuristic method){
-            rects = new Seq<>(rects);
+        public Page pack(Ar<Rect> rects, FreeRectChoiceHeuristic method){
+            rects = new Ar<>(rects);
             while(rects.size > 0){
                 int bestRectIndex = -1;
                 Rect bestNode = new Rect();
@@ -473,7 +473,7 @@ public class MaxRectsPacker implements Packer{
                 h = Math.max(h, rect.y + rect.height);
             }
             Page result = new Page();
-            result.outputRects = new Seq<>(usedRectangles);
+            result.outputRects = new Ar<>(usedRectangles);
             result.occupancy = getOccupancy();
             result.width = w;
             result.height = h;
@@ -739,12 +739,12 @@ public class MaxRectsPacker implements Packer{
             return score;
         }
 
-        private Seq<Rect> edge(Seq<Rect>[] edges, int coordinate){
+        private Ar<Rect> edge(Ar<Rect>[] edges, int coordinate){
             return coordinate < 0 || coordinate >= edges.length ? null : edges[coordinate];
         }
 
         /** Overlap of the rects' y ranges with [y1, y2], skipping rects whose x is skipX. */
-        private int touchingY(Seq<Rect> rects, int y1, int y2, int skipX){
+        private int touchingY(Ar<Rect> rects, int y1, int y2, int skipX){
             if(rects == null) return 0;
             int score = 0;
             for(int i = 0, n = rects.size; i < n; i++){
@@ -756,7 +756,7 @@ public class MaxRectsPacker implements Packer{
         }
 
         /** Overlap of the rects' x ranges with [x1, x2], skipping rects whose y is skipY. */
-        private int touchingX(Seq<Rect> rects, int x1, int x2, int skipY){
+        private int touchingX(Ar<Rect> rects, int x1, int x2, int skipY){
             if(rects == null) return 0;
             int score = 0;
             for(int i = 0, n = rects.size; i < n; i++){
@@ -773,7 +773,7 @@ public class MaxRectsPacker implements Packer{
             Rect bestNode = new Rect();
             bestNode.score1 = -1; // best contact score
 
-            Seq<Rect> freeRectangles = this.freeRectangles;
+            Ar<Rect> freeRectangles = this.freeRectangles;
             for(int i = 0, n = freeRectangles.size; i < n; i++){
                 // Try to place the rectangle in upright (non-rotated) orientation.
                 Rect free = freeRectangles.get(i);
@@ -850,10 +850,10 @@ public class MaxRectsPacker implements Packer{
         }
 
         private void pruneFreeList(){
-            Seq<Rect> toCheck = rectanglesToCheckWhenPruning;
+            Ar<Rect> toCheck = rectanglesToCheckWhenPruning;
             if(toCheck.size == 0) return;
 
-            Seq<Rect> free = freeRectangles;
+            Ar<Rect> free = freeRectangles;
             int freeSize = free.size;
             if(pruneMarks.length < freeSize) pruneMarks = new boolean[Math.max(freeSize, pruneMarks.length * 2)];
             boolean[] marks = pruneMarks;

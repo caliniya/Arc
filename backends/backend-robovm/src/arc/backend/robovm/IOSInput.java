@@ -26,7 +26,7 @@ public class IOSInput extends Input{
             return new KeyEvent();
         }
     };
-    private final Seq<KeyEvent> keyEvents = new Seq<>();
+    private final Ar<KeyEvent> keyEvents = new Ar<>();
     protected CMMotionManager motionManager;
     IOSApplication app;
     IOSApplicationConfiguration config;
@@ -46,7 +46,7 @@ public class IOSInput extends Input{
             return new TouchEvent();
         }
     };
-    Seq<TouchEvent> touchEvents = new Seq<>();
+    Ar<TouchEvent> touchEvents = new Ar<>();
     TouchEvent currentEvent = null;
     float[] rotation = new float[3];
     Vec3 accel = new Vec3();

@@ -16,7 +16,7 @@ import arc.util.pooling.*;
 public class TextArea extends TextField{
 
     /** Array storing starting and ending positions of each line. **/
-    protected IntSeq linesBreak;
+    protected IntAr linesBreak;
     /** Current line for the cursor **/
     protected int cursorLine;
     /** Index of the first line showed by the text area **/
@@ -41,7 +41,7 @@ public class TextArea extends TextField{
     protected void initialize(){
         super.initialize();
         writeEnters = true;
-        linesBreak = new IntSeq();
+        linesBreak = new IntAr();
         cursorLine = 0;
         firstLineShowing = 0;
         moveOffset = -1;

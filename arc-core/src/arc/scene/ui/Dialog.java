@@ -292,7 +292,7 @@ public class Dialog extends Table{
         if(stage.getKeyboardFocus() == null){
             //get top dialog in the scene and focus keyboard on that
             int highestDialog = -1;
-            Seq<Element> children = scene.root.getChildren();
+            Ar<Element> children = scene.root.getChildren();
             for(int i = children.size - 1; i >= 0; i--){
                 if(children.get(i) instanceof Dialog){
                     highestDialog = i;

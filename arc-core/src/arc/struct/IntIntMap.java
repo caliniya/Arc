@@ -669,15 +669,15 @@ public class IntIntMap implements Iterable<IntIntMap.Entry>{
         }
 
         /** Returns a new array containing the remaining values. */
-        public IntSeq toArray(){
-            IntSeq array = new IntSeq(true, map.size);
+        public IntAr toArray(){
+            IntAr array = new IntAr(true, map.size);
             while(hasNext)
                 array.add(next());
             return array;
         }
 
         /** Adds the remaining values to the specified array. */
-        public IntSeq toArray(IntSeq array){
+        public IntAr toArray(IntAr array){
             while(hasNext)
                 array.add(next());
             return array;
@@ -699,15 +699,15 @@ public class IntIntMap implements Iterable<IntIntMap.Entry>{
         }
 
         /** Returns a new array containing the remaining keys. */
-        public IntSeq toArray(){
-            IntSeq array = new IntSeq(true, map.size);
+        public IntAr toArray(){
+            IntAr array = new IntAr(true, map.size);
             while(hasNext)
                 array.add(next());
             return array;
         }
 
         /** Adds the remaining values to the specified array. */
-        public IntSeq toArray(IntSeq array){
+        public IntAr toArray(IntAr array){
             while(hasNext)
                 array.add(next());
             return array;

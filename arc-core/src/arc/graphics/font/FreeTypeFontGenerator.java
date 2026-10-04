@@ -194,7 +194,7 @@ public class FreeTypeFontGenerator implements Disposable{
      */
     public Font generateFont(FreeTypeFontParameter parameter, FreeTypeFontData data){
         boolean updateTextureRegions = data.regions == null && parameter.packer != null;
-        if(updateTextureRegions) data.regions = new Seq<>();
+        if(updateTextureRegions) data.regions = new Ar<>();
         generateData(parameter, data);
         if(updateTextureRegions)
             parameter.packer.updateTextureRegions(data.regions, parameter.minFilter, parameter.magFilter, parameter.genMipMaps);
@@ -413,7 +413,7 @@ public class FreeTypeFontGenerator implements Disposable{
             }
         }
 
-        if(incremental) data.glyphs = new Seq<>(charactersLength + 32);
+        if(incremental) data.glyphs = new Ar<>(charactersLength + 32);
 
         Stroker stroker = null;
         if(parameter.borderWidth > 0){
@@ -501,7 +501,7 @@ public class FreeTypeFontGenerator implements Disposable{
 
         // Generate texture regions.
         if(ownsAtlas){
-            data.regions = new Seq();
+            data.regions = new Ar();
             packer.updateTextureRegions(data.regions, parameter.minFilter, parameter.magFilter, parameter.genMipMaps);
         }
 
@@ -687,16 +687,16 @@ public class FreeTypeFontGenerator implements Disposable{
         /** Set to true to disable font caching. Only use if you know what you're doing. */
         public static boolean ignoreDirty = false;
 
-        Seq<TextureRegion> regions;
+        Ar<TextureRegion> regions;
 
         // Fields for incremental glyph generation.
         FreeTypeFontGenerator generator;
         FreeTypeFontParameter parameter;
         Stroker stroker;
         PixmapPacker packer;
-        Seq<Glyph> glyphs;
+        Ar<Glyph> glyphs;
         private boolean dirty, flushQueued;
-        Seq<FontData> fallback = new Seq<>();
+        Ar<FontData> fallback = new Ar<>();
         @Nullable FontData override;
         /** Characters that neither this font, its override nor its fallbacks can provide. */
         private final Bits missed = new Bits();
@@ -938,7 +938,7 @@ public class FreeTypeFontGenerator implements Disposable{
          */
         public boolean incremental;
         /** Fallback fonts to use. Since these fonts may only be loaded at a future time, they are providers. */
-        public Seq<Prov<Font>> fallback = new Seq<>();
+        public Ar<Prov<Font>> fallback = new Ar<>();
     }
 
     public class GlyphAndBitmap{

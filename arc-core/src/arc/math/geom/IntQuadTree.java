@@ -9,7 +9,7 @@ public class IntQuadTree{
 
     public IntQuadTreeProvider prov;
     public Rect bounds;
-    public IntSeq objects = new IntSeq(false, 10);
+    public IntAr objects = new IntAr(false, 10);
     public IntQuadTree botLeft, botRight, topLeft, topRight;
     public boolean leaf = true;
     public int totalObjects;
@@ -171,7 +171,7 @@ public class IntQuadTree{
             if(botRight.bounds.overlaps(x, y, width, height)) botRight.intersect(x, y, width, height, out);
         }
 
-        IntSeq objects = this.objects;
+        IntAr objects = this.objects;
 
         for(int i = 0; i < objects.size; i++){
             int item = objects.items[i];
@@ -194,7 +194,7 @@ public class IntQuadTree{
             if(botRight.bounds.overlaps(x, y, width, height) && botRight.any(x, y, width, height))return true;
         }
 
-        IntSeq objects = this.objects;
+        IntAr objects = this.objects;
 
         for(int i = 0; i < objects.size; i++){
             int item = objects.items[i];
@@ -220,14 +220,14 @@ public class IntQuadTree{
      * <p>
      * This will result in false positives, but never a false negative.
      */
-    public void intersect(Rect toCheck, IntSeq out){
+    public void intersect(Rect toCheck, IntAr out){
         intersect(toCheck.x, toCheck.y, toCheck.width, toCheck.height, out);
     }
 
     /**
      * Fills the out parameter with any objects that may intersect the given rectangle.
      */
-    public void intersect(float x, float y, float width, float height, IntSeq out){
+    public void intersect(float x, float y, float width, float height, IntAr out){
         if(!leaf){
             if(topLeft.bounds.overlaps(x, y, width, height)) topLeft.intersect(x, y, width, height, out);
             if(topRight.bounds.overlaps(x, y, width, height)) topRight.intersect(x, y, width, height, out);
@@ -235,7 +235,7 @@ public class IntQuadTree{
             if(botRight.bounds.overlaps(x, y, width, height)) botRight.intersect(x, y, width, height, out);
         }
 
-        IntSeq objects = this.objects;
+        IntAr objects = this.objects;
 
         for(int i = 0; i < objects.size; i++){
             int item = objects.items[i];
@@ -246,8 +246,8 @@ public class IntQuadTree{
         }
     }
 
-    /** Adds all quadtree objects to the specified Seq. */
-    public void getObjects(IntSeq out){
+    /** Adds all quadtree objects to the specified Ar. */
+    public void getObjects(IntAr out){
         out.addAll(objects);
 
         if(!leaf){

@@ -650,12 +650,12 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         }
 
         /** Returns a new array containing the remaining values. */
-        public Seq<V> toSeq(){
-            return toSeq(new Seq<>(true, map.size));
+        public Ar<V> toSeq(){
+            return toSeq(new Ar<>(true, map.size));
         }
 
         /** Adds the remaining values to the specified array. */
-        public Seq<V> toSeq(Seq<V> array){
+        public Ar<V> toSeq(Ar<V> array){
             while(hasNext)
                 array.add(next());
             return array;
@@ -689,12 +689,12 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         }
 
         /** Returns a new array containing the remaining keys. */
-        public Seq<K> toSeq(){
-            return toSeq(new Seq<>(true, map.size));
+        public Ar<K> toSeq(){
+            return toSeq(new Ar<>(true, map.size));
         }
 
         /** Adds the remaining keys to the array. */
-        public Seq<K> toSeq(Seq<K> array){
+        public Ar<K> toSeq(Ar<K> array){
             while(hasNext)
                 array.add(next());
             return array;

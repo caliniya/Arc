@@ -25,7 +25,7 @@ public class Icosphere{
         return data;
     }
 
-    private static void subdivide(int v1, int v2, int v3, FloatSeq vertices, IntSeq faces, int level){
+    private static void subdivide(int v1, int v2, int v3, FloatAr vertices, IntAr faces, int level){
         if(level == 0){
             faces.add(v1, v2, v3);
         }else{
@@ -62,7 +62,7 @@ public class Icosphere{
     }
 
     public static class MeshResult{
-        public FloatSeq vertices = new FloatSeq();
-        public IntSeq indices = new IntSeq();
+        public FloatAr vertices = new FloatAr();
+        public IntAr indices = new IntAr();
     }
 }

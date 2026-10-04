@@ -8,7 +8,7 @@ public class LinearRegression{
     public float intercept, slope;
 
     /** Performs a linear regression on the data points. */
-    public void calculate(Seq<Vec2> v){
+    public void calculate(Ar<Vec2> v){
         int n = v.size;
 
         float sumx = 0f, sumy = 0f;

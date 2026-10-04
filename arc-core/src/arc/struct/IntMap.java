@@ -682,8 +682,8 @@ public class IntMap<V> implements Iterable<IntMap.Entry<V>>{
         }
 
         /** Returns a new array containing the remaining values. */
-        public Seq<V> toArray(){
-            Seq<V> array = new Seq<>(true, map.size);
+        public Ar<V> toArray(){
+            Ar<V> array = new Ar<>(true, map.size);
             while(hasNext)
                 array.add(next());
             return array;
@@ -705,15 +705,15 @@ public class IntMap<V> implements Iterable<IntMap.Entry<V>>{
         }
 
         /** Returns a new array containing the remaining keys. */
-        public IntSeq toSeq(){
-            IntSeq array = new IntSeq(true, map.size);
+        public IntAr toSeq(){
+            IntAr array = new IntAr(true, map.size);
             while(hasNext)
                 array.add(next());
             return array;
         }
 
         /** Adds the remaining values to the specified array. */
-        public IntSeq toSeq(IntSeq array){
+        public IntAr toSeq(IntAr array){
             while(hasNext)
                 array.add(next());
             return array;

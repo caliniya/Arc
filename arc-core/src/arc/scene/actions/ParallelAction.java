@@ -1,6 +1,6 @@
 package arc.scene.actions;
 
-import arc.struct.Seq;
+import arc.struct.Ar;
 import arc.scene.Action;
 import arc.scene.Element;
 import arc.util.pooling.Pool;
@@ -10,7 +10,7 @@ import arc.util.pooling.Pool;
  * @author Nathan Sweet
  */
 public class ParallelAction extends Action{
-    Seq<Action> actions = new Seq<>(4);
+    Ar<Action> actions = new Ar<>(4);
     private boolean complete;
 
     public ParallelAction(){
@@ -53,7 +53,7 @@ public class ParallelAction extends Action{
         Pool pool = getPool();
         setPool(null); // Ensure this action can't be returned to the pool while executing.
         try{
-            Seq<Action> actions = this.actions;
+            Ar<Action> actions = this.actions;
             for(int i = 0, n = actions.size; i < n && actor != null; i++){
                 Action currentAction = actions.get(i);
                 if(currentAction.getActor() != null && !currentAction.act(delta)) complete = false;
@@ -68,7 +68,7 @@ public class ParallelAction extends Action{
     @Override
     public void restart(){
         complete = false;
-        Seq<Action> actions = this.actions;
+        Ar<Action> actions = this.actions;
         for(int i = 0, n = actions.size; i < n; i++)
             actions.get(i).restart();
     }
@@ -86,13 +86,13 @@ public class ParallelAction extends Action{
 
     @Override
     public void setActor(Element actor){
-        Seq<Action> actions = this.actions;
+        Ar<Action> actions = this.actions;
         for(int i = 0, n = actions.size; i < n; i++)
             actions.get(i).setActor(actor);
         super.setActor(actor);
     }
 
-    public Seq<Action> getActions(){
+    public Ar<Action> getActions(){
         return actions;
     }
 
@@ -100,7 +100,7 @@ public class ParallelAction extends Action{
         StringBuilder buffer = new StringBuilder(64);
         buffer.append(super.toString());
         buffer.append('(');
-        Seq<Action> actions = this.actions;
+        Ar<Action> actions = this.actions;
         for(int i = 0, n = actions.size; i < n; i++){
             if(i > 0) buffer.append(", ");
             buffer.append(actions.get(i));

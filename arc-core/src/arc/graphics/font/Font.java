@@ -25,8 +25,8 @@ package arc.graphics.font;
 import arc.Core;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
-import arc.struct.Seq;
-import arc.struct.FloatSeq;
+import arc.struct.Ar;
+import arc.struct.FloatAr;
 import arc.files.Fi;
 import arc.graphics.TextureFilter;
 import arc.graphics.g2d.GlyphLayout.GlyphRun;
@@ -62,7 +62,7 @@ public class Font implements Disposable{
 
     public final FontData data;
     private final FontCache cache;
-    Seq<TextureRegion> regions;
+    Ar<TextureRegion> regions;
     boolean integer;
     private boolean flipped;
     private boolean ownsTexture;
@@ -141,7 +141,7 @@ public class Font implements Disposable{
      * @param integer If true, rendering positions will be at integer values to avoid filtering artifacts.
      */
     public Font(FontData data, TextureRegion region, boolean integer){
-        this(data, region != null ? Seq.with(region) : null, integer);
+        this(data, region != null ? Ar.with(region) : null, integer);
     }
 
     /**
@@ -150,7 +150,7 @@ public class Font implements Disposable{
      * of the region(s) if the regions array is != null and not empty.
      * @param integer If true, rendering positions will be at integer values to avoid filtering artifacts.
      */
-    public Font(FontData data, Seq<TextureRegion> pageRegions, boolean integer){
+    public Font(FontData data, Ar<TextureRegion> pageRegions, boolean integer){
         this.flipped = data.flipped;
         this.data = data;
         this.integer = integer;
@@ -161,7 +161,7 @@ public class Font implements Disposable{
 
             // Load each path.
             int n = data.imagePaths.length;
-            regions = new Seq<>(n);
+            regions = new Ar<>(n);
             for(int i = 0; i < n; i++){
                 Fi file;
                 if(data.fontFile == null)
@@ -305,7 +305,7 @@ public class Font implements Disposable{
      * Returns the array of TextureRegions that represents each texture page of glyphs.
      * @return the array of texture regions; modifying it may produce undesirable results
      */
-    public Seq<TextureRegion> getRegions(){
+    public Ar<TextureRegion> getRegions(){
         return regions;
     }
 
@@ -869,8 +869,8 @@ public class Font implements Disposable{
             boolean markupEnabled = this.markupEnabled;
             float scaleX = this.scaleX;
             Glyph missingGlyph = this.missingGlyph;
-            Seq<Glyph> glyphs = run.glyphs;
-            FloatSeq xAdvances = run.xAdvances;
+            Ar<Glyph> glyphs = run.glyphs;
+            FloatAr xAdvances = run.xAdvances;
 
             // Guess at number of glyphs needed.
             glyphs.ensureCapacity(end - start);
@@ -906,7 +906,7 @@ public class Font implements Disposable{
          * Returns the first valid glyph index to use to wrap to the next line, starting at the specified start index and
          * (typically) moving toward the beginning of the glyphs array.
          */
-        public int getWrapIndex(Seq<Glyph> glyphs, int start){
+        public int getWrapIndex(Ar<Glyph> glyphs, int start){
             int i = start - 1;
             if(isWhitespace((char)glyphs.get(i).id)) return i;
             for(; i > 0; i--)

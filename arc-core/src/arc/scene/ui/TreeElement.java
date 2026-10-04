@@ -24,7 +24,7 @@ import static arc.Core.*;
  * @author Nathan Sweet
  */
 public class TreeElement extends WidgetGroup{
-    final Seq<TreeElementNode> rootNodes = new Seq<>();
+    final Ar<TreeElementNode> rootNodes = new Ar<>();
     final Selection<TreeElementNode> selection;
     TreeStyle style;
     float ySpacing = 4, iconSpacingLeft = 2, iconSpacingRight = 2, padding = 0, indentSpacing;
@@ -58,7 +58,7 @@ public class TreeElement extends WidgetGroup{
         initialize();
     }
 
-    static boolean findExpandedObjects(Seq<TreeElementNode> nodes, Seq<Object> objects){
+    static boolean findExpandedObjects(Ar<TreeElementNode> nodes, Ar<Object> objects){
         boolean expanded = false;
         for(int i = 0, n = nodes.size; i < n; i++){
             TreeElementNode node = nodes.get(i);
@@ -67,7 +67,7 @@ public class TreeElement extends WidgetGroup{
         return expanded;
     }
 
-    static TreeElementNode findNode(Seq<TreeElementNode> nodes, Object object){
+    static TreeElementNode findNode(Ar<TreeElementNode> nodes, Object object){
         for(int i = 0, n = nodes.size; i < n; i++){
             TreeElementNode node = nodes.get(i);
             if(object.equals(node.object)) return node;
@@ -80,7 +80,7 @@ public class TreeElement extends WidgetGroup{
         return null;
     }
 
-    static void collapseAll(Seq<TreeElementNode> nodes){
+    static void collapseAll(Ar<TreeElementNode> nodes){
         for(int i = 0, n = nodes.size; i < n; i++){
             TreeElementNode node = nodes.get(i);
             node.setExpanded(false);
@@ -88,7 +88,7 @@ public class TreeElement extends WidgetGroup{
         }
     }
 
-    static void expandAll(Seq<TreeElementNode> nodes){
+    static void expandAll(Ar<TreeElementNode> nodes){
         for(int i = 0, n = nodes.size; i < n; i++)
             nodes.get(i).expandAll();
     }
@@ -176,7 +176,7 @@ public class TreeElement extends WidgetGroup{
         selection.clear();
     }
 
-    public Seq<TreeElementNode> getNodes(){
+    public Ar<TreeElementNode> getNodes(){
         return rootNodes;
     }
 
@@ -198,7 +198,7 @@ public class TreeElement extends WidgetGroup{
         prefHeight = getHeight() - prefHeight;
     }
 
-    private void computeSize(Seq<TreeElementNode> nodes, float indent){
+    private void computeSize(Ar<TreeElementNode> nodes, float indent){
         float ySpacing = this.ySpacing;
         float spacing = iconSpacingLeft + iconSpacingRight;
         for(int i = 0, n = nodes.size; i < n; i++){
@@ -229,7 +229,7 @@ public class TreeElement extends WidgetGroup{
         layout(rootNodes, leftColumnWidth + indentSpacing + iconSpacingRight, getHeight() - ySpacing / 2);
     }
 
-    private float layout(Seq<TreeElementNode> nodes, float indent, float y){
+    private float layout(Ar<TreeElementNode> nodes, float indent, float y){
         float ySpacing = this.ySpacing;
         for(int i = 0, n = nodes.size; i < n; i++){
             TreeElementNode node = nodes.get(i);
@@ -262,7 +262,7 @@ public class TreeElement extends WidgetGroup{
     }
 
     /** Draws selection, icons, and expand icons. */
-    private void draw(Seq<TreeElementNode> nodes, float indent){
+    private void draw(Ar<TreeElementNode> nodes, float indent){
         Drawable plus = style.plus, minus = style.minus;
         float x = this.x, y = this.y;
         for(int i = 0, n = nodes.size; i < n; i++){
@@ -300,7 +300,7 @@ public class TreeElement extends WidgetGroup{
         return foundNode;
     }
 
-    private float getNodeAt(Seq<TreeElementNode> nodes, float y, float rowY){
+    private float getNodeAt(Ar<TreeElementNode> nodes, float y, float rowY){
         for(int i = 0, n = nodes.size; i < n; i++){
             TreeElementNode node = nodes.get(i);
             float height = node.height;
@@ -318,7 +318,7 @@ public class TreeElement extends WidgetGroup{
         return rowY;
     }
 
-    void selectNodes(Seq<TreeElementNode> nodes, float low, float high){
+    void selectNodes(Ar<TreeElementNode> nodes, float low, float high){
         for(int i = 0, n = nodes.size; i < n; i++){
             TreeElementNode node = nodes.get(i);
             if(node.element.y < low) break;
@@ -341,7 +341,7 @@ public class TreeElement extends WidgetGroup{
         indentSpacing = Math.max(style.plus.getMinWidth(), style.minus.getMinWidth()) + iconSpacingLeft;
     }
 
-    public Seq<TreeElementNode> getRootNodes(){
+    public Ar<TreeElementNode> getRootNodes(){
         return rootNodes;
     }
 
@@ -398,11 +398,11 @@ public class TreeElement extends WidgetGroup{
         return prefHeight;
     }
 
-    public void findExpandedObjects(Seq objects){
+    public void findExpandedObjects(Ar objects){
         findExpandedObjects(rootNodes, objects);
     }
 
-    public void restoreExpandedObjects(Seq objects){
+    public void restoreExpandedObjects(Ar objects){
         for(int i = 0, n = objects.size; i < n; i++){
             TreeElementNode node = findNode(objects.get(i));
             if(node != null){
@@ -432,7 +432,7 @@ public class TreeElement extends WidgetGroup{
     }
 
     public static class TreeElementNode{
-        final Seq<TreeElementNode> children = new Seq<>(0);
+        final Ar<TreeElementNode> children = new Ar<>(0);
         @Nullable Cons<Cons<TreeElementNode>> childProvider;
         Element element;
         TreeElementNode parent;
@@ -494,7 +494,7 @@ public class TreeElement extends WidgetGroup{
             return this;
         }
 
-        public TreeElementNode addAll(Seq<TreeElementNode> nodes){
+        public TreeElementNode addAll(Ar<TreeElementNode> nodes){
             for(int i = 0, n = nodes.size; i < n; i++)
                 insert(children.size, nodes.get(i));
             return this;
@@ -565,7 +565,7 @@ public class TreeElement extends WidgetGroup{
         }
 
         /** If the children order is changed, {@link #updateChildren()} must be called. */
-        public Seq<TreeElementNode> getChildren(){
+        public Ar<TreeElementNode> getChildren(){
             return children;
         }
 
@@ -646,11 +646,11 @@ public class TreeElement extends WidgetGroup{
             this.selectable = selectable;
         }
 
-        public void findExpandedObjects(Seq<Object> objects){
+        public void findExpandedObjects(Ar<Object> objects){
             if(expanded && !TreeElement.findExpandedObjects(children, objects)) objects.add(object);
         }
 
-        public void restoreExpandedObjects(Seq objects){
+        public void restoreExpandedObjects(Ar objects){
             for(int i = 0, n = objects.size; i < n; i++){
                 TreeElementNode node = findNode(objects.get(i));
                 if(node != null){

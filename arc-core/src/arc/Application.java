@@ -9,7 +9,7 @@ import java.net.*;
 public interface Application extends Disposable{
 
     /** Returns a list of all the application listeners used. */
-    Seq<ApplicationListener> getListeners();
+    Ar<ApplicationListener> getListeners();
 
     /** Adds a new application listener. */
     default void addListener(ApplicationListener listener){
@@ -116,7 +116,7 @@ public interface Application extends Disposable{
         return false;
     }
 
-    default void getDnsServers(Seq<InetSocketAddress> out){}
+    default void getDnsServers(Ar<InetSocketAddress> out){}
 
     /** Posts a runnable on the main loop thread.*/
     void post(Runnable runnable);

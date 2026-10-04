@@ -19,7 +19,7 @@ public abstract class CustomLoader extends AsynchronousAssetLoader{
     }
 
     @Override
-    public Seq<AssetDescriptor> getDependencies(String fileName, Fi file, AssetLoaderParameters parameter){
+    public Ar<AssetDescriptor> getDependencies(String fileName, Fi file, AssetLoaderParameters parameter){
         return null;
     }
 }

@@ -455,7 +455,7 @@ public interface Jval{
     }
 
     /** Alias class of json arrays. */
-    class JsonArray extends Seq<Jval> implements Jval{
+    class JsonArray extends Ar<Jval> implements Jval{
 
         public JsonArray(){
             super(false, 8);

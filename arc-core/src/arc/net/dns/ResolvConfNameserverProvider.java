@@ -17,8 +17,8 @@ import static arc.net.dns.ArcDns.*;
 public final class ResolvConfNameserverProvider implements NameserverProvider{
 
     @Override
-    public Seq<InetSocketAddress> getNameservers(){
-        Seq<InetSocketAddress> out = new Seq<>();
+    public Ar<InetSocketAddress> getNameservers(){
+        Ar<InetSocketAddress> out = new Ar<>();
         // first try the default unix config path
         if(!tryParseResolveConf("/etc/resolv.conf", out)){
             // then fallback to netware
@@ -27,7 +27,7 @@ public final class ResolvConfNameserverProvider implements NameserverProvider{
         return out;
     }
 
-    private boolean tryParseResolveConf(String path, Seq<InetSocketAddress> out){
+    private boolean tryParseResolveConf(String path, Ar<InetSocketAddress> out){
         Fi conf = new Fi(path);
 
         if(conf.exists()){

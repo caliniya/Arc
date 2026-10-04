@@ -23,45 +23,45 @@ import java.util.Comparator;
  * @author Nathan Sweet
  */
 @SuppressWarnings("unchecked")
-public class SnapshotSeq<T> extends Seq<T>{
+public class SnapshotAr<T> extends Ar<T>{
     private T[] snapshot, recycled;
     private int snapshots;
 
-    public SnapshotSeq(){
+    public SnapshotAr(){
         super();
     }
 
-    public SnapshotSeq(Seq<T> array){
+    public SnapshotAr(Ar<T> array){
         super(array);
     }
 
-    public SnapshotSeq(boolean ordered, int capacity, Class<?> arrayType){
+    public SnapshotAr(boolean ordered, int capacity, Class<?> arrayType){
         super(ordered, capacity, arrayType);
     }
 
-    public SnapshotSeq(boolean ordered, int capacity){
+    public SnapshotAr(boolean ordered, int capacity){
         super(ordered, capacity);
     }
 
-    public SnapshotSeq(boolean ordered, T[] array, int startIndex, int count){
+    public SnapshotAr(boolean ordered, T[] array, int startIndex, int count){
         super(ordered, array, startIndex, count);
     }
 
-    public SnapshotSeq(Class<?> arrayType){
+    public SnapshotAr(Class<?> arrayType){
         super(arrayType);
     }
 
-    public SnapshotSeq(int capacity){
+    public SnapshotAr(int capacity){
         super(capacity);
     }
 
-    public SnapshotSeq(T[] array){
+    public SnapshotAr(T[] array){
         super(array);
     }
 
-    /** @see #SnapshotSeq(Object[]) */
-    public static <T> SnapshotSeq<T> with(T... array){
-        return new SnapshotSeq<>(array);
+    /** @see #SnapshotAr(Object[]) */
+    public static <T> SnapshotAr<T> with(T... array){
+        return new SnapshotAr<>(array);
     }
 
     /** Returns the backing array, which is guaranteed to not be modified before {@link #end()}. */
@@ -126,7 +126,7 @@ public class SnapshotSeq<T> extends Seq<T>{
         super.removeRange(start, end);
     }
 
-    public boolean removeAll(Seq<? extends T> array, boolean identity){
+    public boolean removeAll(Ar<? extends T> array, boolean identity){
         modified();
         return super.removeAll(array, identity);
     }
@@ -136,28 +136,28 @@ public class SnapshotSeq<T> extends Seq<T>{
         return super.pop();
     }
 
-    public Seq<T> clear(){
+    public Ar<T> clear(){
         modified();
         super.clear();
         return this;
     }
 
-    public Seq<T> sort(){
+    public Ar<T> sort(){
         modified();
         return super.sort();
     }
 
-    public Seq<T> sort(Comparator<? super T> comparator){
+    public Ar<T> sort(Comparator<? super T> comparator){
         modified();
         return super.sort(comparator);
     }
 
-    public Seq<T> reverse(){
+    public Ar<T> reverse(){
         modified();
         return super.reverse();
     }
 
-    public Seq<T> shuffle(){
+    public Ar<T> shuffle(){
         modified();
         return super.shuffle();
     }

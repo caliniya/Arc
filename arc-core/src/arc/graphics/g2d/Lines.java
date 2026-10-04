@@ -11,8 +11,8 @@ public class Lines{
 
     private static float stroke = 1f;
     private static Vec2 vector = new Vec2(), u = new Vec2(), v = new Vec2();
-    private static FloatSeq floats = new FloatSeq(20);
-    private static FloatSeq floatBuilder = new FloatSeq(20);
+    private static FloatAr floats = new FloatAr(20);
+    private static FloatAr floatBuilder = new FloatAr(20);
     private static boolean building;
     private static float circlePrecision = 0.4f;
 
@@ -161,7 +161,7 @@ public class Lines{
         building = false;
     }
 
-    public static void polyline(FloatSeq points, boolean wrap){
+    public static void polyline(FloatAr points, boolean wrap){
         polyline(points.items, points.size, wrap);
     }
 

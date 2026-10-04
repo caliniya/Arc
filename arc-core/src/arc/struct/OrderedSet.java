@@ -5,35 +5,35 @@ import arc.util.*;
 import java.util.*;
 
 /**
- * An {@link ObjectSet} that also stores keys in an {@link Seq} using the insertion order. {@link #iterator() Iteration} is
+ * An {@link ObjectSet} that also stores keys in an {@link Ar} using the insertion order. {@link #iterator() Iteration} is
  * ordered and faster than an unordered set. Keys can also be accessed and the order changed using {@link #orderedItems()}. There
  * is some additional overhead for put and remove. When used for faster iteration versus ObjectSet and the order does not actually
- * matter, copying during remove can be greatly reduced by setting {@link Seq#ordered} to false for
+ * matter, copying during remove can be greatly reduced by setting {@link Ar#ordered} to false for
  * {@link OrderedSet#orderedItems()}.
  * @author Nathan Sweet
  */
 
 public class OrderedSet<T> extends ObjectSet<T>{
-    final Seq<T> items;
+    final Ar<T> items;
     transient OrderedSetIterator iterator1, iterator2;
 
     public OrderedSet(){
-        items = new Seq();
+        items = new Ar();
     }
 
     public OrderedSet(int initialCapacity, float loadFactor){
         super(initialCapacity, loadFactor);
-        items = new Seq(initialCapacity);
+        items = new Ar(initialCapacity);
     }
 
     public OrderedSet(int initialCapacity){
         super(initialCapacity);
-        items = new Seq(initialCapacity);
+        items = new Ar(initialCapacity);
     }
 
     public OrderedSet(OrderedSet<? extends T> set){
         super(set);
-        items = new Seq(set.items);
+        items = new Ar(set.items);
     }
 
     public boolean add(T key){
@@ -123,7 +123,7 @@ public class OrderedSet<T> extends ObjectSet<T>{
         super.clear();
     }
 
-    public Seq<T> orderedItems(){
+    public Ar<T> orderedItems(){
         return items;
     }
 
@@ -187,7 +187,7 @@ public class OrderedSet<T> extends ObjectSet<T>{
     }
 
     static public class OrderedSetIterator<K> extends ObjectSetIterator<K>{
-        private Seq<K> items;
+        private Ar<K> items;
 
         public OrderedSetIterator(OrderedSet<K> set){
             super(set);
@@ -214,15 +214,15 @@ public class OrderedSet<T> extends ObjectSet<T>{
             ((OrderedSet)set).removeIndex(nextIndex);
         }
 
-        public Seq<K> toSeq(Seq<K> array){
+        public Ar<K> toSeq(Ar<K> array){
             array.addAll(items, nextIndex, items.size - nextIndex);
             nextIndex = items.size;
             hasNext = false;
             return array;
         }
 
-        public Seq<K> toSeq(){
-            return toSeq(new Seq(true, set.size - nextIndex));
+        public Ar<K> toSeq(){
+            return toSeq(new Ar(true, set.size - nextIndex));
         }
     }
 

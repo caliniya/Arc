@@ -30,7 +30,7 @@ public class FrameBuffer implements Disposable{
     protected FrameBuffer lastBoundFramebuffer = null;
 
     /** all texture attachments, defined in the same order as the formats were specified. **/
-    public Seq<Texture> textureAttachments = new Seq<>();
+    public Ar<Texture> textureAttachments = new Ar<>();
     public int width, height;
     public @Nullable Texture texture, depthTexture, stencilTexture;
 
@@ -61,7 +61,7 @@ public class FrameBuffer implements Disposable{
     }
 
     protected void init(int width, int height, Format[] formats){
-        Seq<Texture> oldFilters = textureAttachments.isEmpty() ? null : textureAttachments.copy();
+        Ar<Texture> oldFilters = textureAttachments.isEmpty() ? null : textureAttachments.copy();
 
         //init() can be called multiple times, so dispose the old textures
         disposeTextures();
