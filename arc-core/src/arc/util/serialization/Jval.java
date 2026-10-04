@@ -1,32 +1,25 @@
 package arc.util.serialization;
 
+import arc.files.*;
 import arc.struct.*;
 import arc.util.*;
 
 import java.io.*;
-import java.util.*;
 
 /** An hsjon parser. Can be used as a standard json value.
  * Output can be converted to standard JSON. This class is heavily based upon the Hjson Java implementation.*/
-public class Jval{
-    public static final Jval
-        TRUE = new Jval(true),
-        FALSE = new Jval(false),
-        NULL = new Jval(null);
+public interface Jval{
+    Jval
+    trueValue = new JsonBool(true),
+    falseValue = new JsonBool(false),
+    nullValue = new JsonNull();
 
-    /** Internal value. May be a string, number, boolean, JsonArray, JsonMap or null. */
-    private @Nullable Object value;
-
-    Jval(Object value){
-        this.value = value;
+    static JsonMap newObject(){
+        return new JsonMap();
     }
 
-    public static Jval newObject(){
-        return new Jval(new JsonMap());
-    }
-
-    public static Jval newArray(){
-        return new Jval(new JsonArray());
+    static JsonArray newArray(){
+        return new JsonArray();
     }
 
     /**
@@ -39,17 +32,17 @@ public class Jval{
      * @param reader the reader to read the Hjson value from
      * @return the Hjson value that has been read
      */
-    public static Jval read(Reader reader){
+    static Jval read(Reader reader){
         try{
-            return new Hparser(reader).parse();
+            return new JvalReader(reader).parse();
         }catch(IOException e){
             throw new ArcRuntimeException(e);
         }
     }
 
-    public static Jval read(byte[] bytes){
+    static Jval read(byte[] bytes){
         try{
-            return new Hparser(new InputStreamReader(new ByteArrayInputStream(bytes))).parse();
+            return new JvalReader(new InputStreamReader(new ByteArrayInputStream(bytes))).parse();
         }catch(IOException e){
             throw new ArcRuntimeException(e);
         }
@@ -60,206 +53,218 @@ public class Jval{
      * @param text the string that contains the Hjson value
      * @return the Hjson value that has been read
      */
-    public static Jval read(String text){
-        return new Hparser(text).parse();
+    static Jval read(String text){
+        return new JvalReader(text).parse();
     }
 
-    public Jtype getType(){
-        return value == null ? Jtype.nil :
-                value instanceof Number ? Jtype.number :
-                value instanceof String ? Jtype.string :
-                value instanceof Boolean ? Jtype.bool :
-                value instanceof JsonMap ? Jtype.object :
-                value instanceof JsonArray ? Jtype.array : null;
+    static Jval read(Fi file){
+        return read(file.reader());
     }
 
-    public static Jval valueOf(int value){ return new Jval(value); }
-    public static Jval valueOf(long value){ return new Jval(value); }
-    public static Jval valueOf(float value){ return new Jval(value); }
-    public static Jval valueOf(double value){ return new Jval(value); }
-    public static Jval valueOf(String string){ return string == null ? NULL : new Jval(string); }
-    public static Jval valueOf(boolean value){ return value ? TRUE : FALSE; }
+    static Jval valueOf(int value){ return new JsonLong(value); }
+    static Jval valueOf(long value){ return new JsonLong(value); }
+    static Jval valueOf(float value){ return new JsonDouble(value); }
+    static Jval valueOf(double value){ return new JsonDouble(value); }
+    static Jval valueOf(String string){ return string == null ? nullValue : new JsonString(string); }
+    static Jval valueOf(boolean value){ return value ? trueValue : falseValue; }
+    /** Buckets any Number into a long or double value, depending on its kind. */
+    static Jval valueOf(Number value){ return value instanceof Float || value instanceof Double ? valueOf(value.doubleValue()) : valueOf(value.longValue()); }
 
-    public boolean isObject(){ return value instanceof JsonMap; }
-    public boolean isArray(){ return value instanceof JsonArray; }
-    public boolean isNumber(){ return value instanceof Number; }
-    public boolean isString(){ return value instanceof String; }
-    public boolean isBoolean(){ return value instanceof Boolean; }
-    public boolean isTrue(){ return value == Boolean.TRUE; }
-    public boolean isFalse(){ return value == Boolean.FALSE; }
-    public boolean isNull(){ return value == null; }
+    Jtype getType();
 
-    public JsonMap asObject(){ if(!(value instanceof JsonMap)) throw new UnsupportedOperationException("Not an object: " + this); return (JsonMap)value; }
-    public JsonArray asArray(){ if(!(value instanceof JsonArray)) throw new UnsupportedOperationException("Not an array: " + this); return (JsonArray)value; }
+    default boolean isObject(){ return getType() == Jtype.object; }
+    default boolean isArray(){ return getType() == Jtype.array; }
+    default boolean isNumber(){ return getType() == Jtype.number; }
+    default boolean isString(){ return getType() == Jtype.string; }
+    default boolean isBoolean(){ return getType() == Jtype.bool; }
+    default boolean isTrue(){ return this == trueValue; }
+    default boolean isFalse(){ return this == falseValue; }
+    default boolean isNull(){ return getType() == Jtype.nil; }
 
-    public byte asByte(){
-        if(value instanceof Number){
-            return ((Number)value).byteValue();
-        }else if(value instanceof String){
-            return Byte.parseByte((String)value);
-        }else{
-            throw new UnsupportedOperationException("Not a number: " + this);
-        }
+    default JsonMap asObject(){ throw new UnsupportedOperationException("Not an object: " + this); }
+    default JsonArray asArray(){ throw new UnsupportedOperationException("Not an array: " + this); }
+
+    default byte asByte(){ throw new UnsupportedOperationException("Not a number: " + this); }
+    default short asShort(){ throw new UnsupportedOperationException("Not a number: " + this); }
+    default int asInt(){ throw new UnsupportedOperationException("Not a number: " + this); }
+    default long asLong(){ throw new UnsupportedOperationException("Not a number: " + this); }
+    default float asFloat(){ throw new UnsupportedOperationException("Not a number: " + this); }
+    default double asDouble(){ throw new UnsupportedOperationException("Not a number: " + this); }
+    default @Nullable String asString(){ throw new UnsupportedOperationException("Not a string: " + this); }
+    default boolean asBool(){ throw new UnsupportedOperationException("Not a bool: " + this); }
+
+    default byte[] asByteArray(){
+        JsonArray arr = asArray();
+        byte[] out = new byte[arr.size];
+        for(int i = 0; i < out.length; i++) out[i] = arr.get(i).asByte();
+        return out;
     }
 
-    public short asShort(){
-        if(value instanceof Number){
-            return ((Number)value).shortValue();
-        }else if(value instanceof String){
-            return Short.parseShort((String)value);
-        }else{
-            throw new UnsupportedOperationException("Not a number: " + this);
-        }
+    default short[] asShortArray(){
+        JsonArray arr = asArray();
+        short[] out = new short[arr.size];
+        for(int i = 0; i < out.length; i++) out[i] = arr.get(i).asShort();
+        return out;
     }
 
-    public int asInt(){
-        if(value instanceof Number){
-            return ((Number)value).intValue();
-        }else if(value instanceof String){
-            return Integer.parseInt((String)value);
-        }else{
-            throw new UnsupportedOperationException("Not a number: " + this);
-        }
+    default int[] asIntArray(){
+        JsonArray arr = asArray();
+        int[] out = new int[arr.size];
+        for(int i = 0; i < out.length; i++) out[i] = arr.get(i).asInt();
+        return out;
     }
 
-    public long asLong(){
-        if(value instanceof Number){
-            return ((Number)value).longValue();
-        }else if(value instanceof String){
-            return Long.parseLong((String)value);
-        }else{
-            throw new UnsupportedOperationException("Not a number: " + this);
-        }
+    default long[] asLongArray(){
+        JsonArray arr = asArray();
+        long[] out = new long[arr.size];
+        for(int i = 0; i < out.length; i++) out[i] = arr.get(i).asLong();
+        return out;
     }
 
-    public float asFloat(){
-        if(value instanceof Number){
-            return ((Number)value).floatValue();
-        }else if(value instanceof String){
-            return Float.parseFloat((String)value);
-        }else{
-            throw new UnsupportedOperationException("Not a number: " + this);
-        }
+    default float[] asFloatArray(){
+        JsonArray arr = asArray();
+        float[] out = new float[arr.size];
+        for(int i = 0; i < out.length; i++) out[i] = arr.get(i).asFloat();
+        return out;
     }
 
-    public double asDouble(){
-        if(value instanceof Number){
-            return ((Number)value).doubleValue();
-        }else if(value instanceof String){
-            return Double.parseDouble((String)value);
-        }else{
-            throw new UnsupportedOperationException("Not a number: " + this);
-        }
+    default double[] asDoubleArray(){
+        JsonArray arr = asArray();
+        double[] out = new double[arr.size];
+        for(int i = 0; i < out.length; i++) out[i] = arr.get(i).asDouble();
+        return out;
     }
 
-    public String asString(){
-        if(!(value instanceof String) && !(value instanceof Number)) throw new UnsupportedOperationException("Not a string: " + this);
-        return String.valueOf(value);
+    default boolean[] asBooleanArray(){
+        JsonArray arr = asArray();
+        boolean[] out = new boolean[arr.size];
+        for(int i = 0; i < out.length; i++) out[i] = arr.get(i).asBool();
+        return out;
     }
 
-    public boolean asBool(){
-        if(value instanceof Boolean){
-            return (Boolean)value;
-        }else if(value instanceof String){
-            return Boolean.parseBoolean((String)value);
-        }
-        throw new UnsupportedOperationException("Not a bool: " + this);
+    default String[] asStringArray(){
+        JsonArray arr = asArray();
+        String[] out = new String[arr.size];
+        for(int i = 0; i < out.length; i++) out[i] = arr.get(i).asString();
+        return out;
     }
 
-    public Jval get(String name){
-        if(name == null) throw new NullPointerException("name is null");
-        return asObject().get(name);
+    default Jval get(int i){
+        throw new UnsupportedOperationException("Not an array: " + this);
     }
 
-    public void add(String name, Jval val){
-        if(name == null) throw new NullPointerException("name is null");
-        asObject().put(name, val == null ? NULL : val);
+    default Jval get(String name){
+        throw new UnsupportedOperationException("Not an object: " + this);
     }
 
-    public void add(String name, String val){
+    default Jval add(Jval value){
+        throw new UnsupportedOperationException("Not an array: " + this);
+    }
+
+    default Jval add(String value){
+        return add(valueOf(value));
+    }
+
+    default Jval add(Number value){
+        return add(valueOf(value));
+    }
+
+    default Jval add(boolean value){
+        return add(valueOf(value));
+    }
+
+    default void add(String name, String val){
         add(name, valueOf(val));
     }
 
-    public Jval add(Jval value){
-        asArray().add(value);
-        return this;
+    default void add(String name, Jval val){
+        throw new UnsupportedOperationException("Not an object: " + this);
     }
 
-    public Jval add(String value){
-        asArray().add(new Jval(value));
-        return this;
-    }
-
-    public Jval add(Number value){
-        asArray().add(new Jval(value));
-        return this;
-    }
-
-    public Jval add(boolean value){
-        asArray().add(new Jval(value));
-        return this;
-    }
-
-    public Jval put(String name, Jval val){
+    default Jval put(String name, Jval val){
         if(val != null) add(name, val);
         return this;
     }
 
-    public Jval put(String name, String val){
+    default Jval put(String name, String val){
         if(val != null) add(name, val);
         return this;
     }
 
-    public Jval put(String name, Number val){
-        if(val != null) add(name, new Jval(val));
+    default Jval put(String name, Number val){
+        if(val != null) add(name, valueOf(val));
         return this;
     }
 
-    public Jval put(String name, boolean val){
-        add(name, new Jval(val));
+    default Jval put(String name, boolean val){
+        add(name, valueOf(val));
         return this;
     }
 
-    public Jval remove(String name){
+    default Jval clear(){
+        return this;
+    }
+
+    default Jval remove(String name){
         if(name == null) throw new NullPointerException("name is null");
         return asObject().removeKey(name);
     }
 
-    public boolean has(String name){
+    default boolean has(String name){
         if(name == null) throw new NullPointerException("name is null");
         return asObject().containsKey(name);
     }
 
-    public int getInt(String name, int defaultValue){
+    default int getInt(String name){
+        return getInt(name, 0);
+    }
+
+    default int getInt(String name, int defaultValue){
         Jval value = get(name);
         return value != null ? value.asInt() : defaultValue;
     }
 
-    public long getLong(String name, long defaultValue){
+    default long getLong(String name, long defaultValue){
         Jval value = get(name);
         return value != null ? value.asLong() : defaultValue;
     }
 
-    public float getFloat(String name, float defaultValue){
+    default float getFloat(String name, float defaultValue){
         Jval value = get(name);
         return value != null ? value.asFloat() : defaultValue;
     }
 
-    public double getDouble(String name, double defaultValue){
+    default double getDouble(String name, double defaultValue){
         Jval value = get(name);
         return value != null ? value.asDouble() : defaultValue;
     }
 
-    public boolean getBool(String name, boolean defaultValue){
+    default boolean getBool(String name, boolean defaultValue){
         Jval value = get(name);
         return value != null ? value.asBool() : defaultValue;
     }
 
-    public @Nullable String getString(String name){
+    default long getLong(String name){
+        return getLong(name, 0L);
+    }
+
+    default float getFloat(String name){
+        return getFloat(name, 0f);
+    }
+
+    default double getDouble(String name){
+        return getDouble(name, 0);
+    }
+
+    default boolean getBool(String name){
+        return getBool(name, false);
+    }
+
+    default @Nullable String getString(String name){
         return getString(name, "");
     }
 
-    public String getString(String name, String defaultValue){
+    default String getString(String name, String defaultValue){
         Jval value = get(name);
         return value != null && !value.isNull() ? value.asString() : defaultValue;
     }
@@ -273,7 +278,7 @@ public class Jval{
      * @param writer the writer to write this value to
      * @throws IOException if an I/O error occurs in the writer
      */
-    public void writeTo(Writer writer) throws IOException{
+    default void writeTo(Writer writer) throws IOException{
         writeTo(writer, Jformat.plain);
     }
 
@@ -286,41 +291,23 @@ public class Jval{
      * @param format controls the formatting
      * @throws IOException if an I/O error occurs in the writer
      */
-    public void writeTo(Writer writer, Jformat format) throws IOException{
+    default void writeTo(Writer writer, Jformat format) throws IOException{
         WritingBuffer buffer = new WritingBuffer(writer, 128);
         switch(format){
             case plain:
-                Jwriter.save(this, false, true, buffer, 0);
+                JvalWriter.writeJson(this, false, true, buffer, 0);
                 break;
             case minimal:
-                Jwriter.save(this, false, false, buffer, 0);
+                JvalWriter.writeJson(this, false, false, buffer, 0);
                 break;
             case formatted:
-                Jwriter.save(this, true, true, buffer, 0);
+                JvalWriter.writeJson(this, true, true, buffer, 0);
                 break;
             case hjson:
-                Hwriter.save(this, buffer, -1, "", true);
+                JvalWriter.writeHjson(this, buffer, -1, "", true);
                 break;
         }
         buffer.flush();
-    }
-
-    /** Returns the JSON string for this value in its minimal form, without any additional whitespace.*/
-    @Override
-    public String toString(){
-        Jtype type = getType();
-        switch(type){
-            case nil: return "null";
-            case number:{
-                String s = value.toString();
-                if(s.endsWith(".0")) s = s.substring(0, s.length() - 2);
-                return s.replace('E', 'e');
-            }
-            case string:
-            case bool: return value.toString();
-        }
-
-        return toString(Jformat.plain);
     }
 
     /**
@@ -328,7 +315,7 @@ public class Jval{
      * @param format controls the formatting
      * @return a JSON/Hjson string that represents this value
      */
-    public String toString(Jformat format){
+    default String toString(Jformat format){
         StringWriter writer = new StringWriter();
         try{
             writeTo(writer, format);
@@ -339,18 +326,127 @@ public class Jval{
         return writer.toString();
     }
 
-    @Override
-    public boolean equals(Object object){
-        return object != null && object.getClass() == getClass() &&
-            ((value == null && ((Jval)object).value == null)
-            || (((Jval)object).value != null && value != null && value.equals(((Jval)object).value)));
+    /** Holds a true/false value; true and false are the shared singleton instances. */
+    class JsonBool implements Jval{
+        private final boolean value;
+
+        JsonBool(boolean value){ this.value = value; }
+
+        @Override public Jtype getType(){ return Jtype.bool; }
+        @Override public boolean asBool(){ return value; }
+        @Override public String toString(){ return value ? "true" : "false"; }
+        @Override public boolean equals(Object o){ return o instanceof JsonBool && ((JsonBool)o).value == value; }
+        @Override public int hashCode(){ return Boolean.hashCode(value); }
+    }
+
+    /** Holds an integral number as a raw, unboxed long. */
+    class JsonLong implements Jval{
+        private final long value;
+
+        JsonLong(long value){ this.value = value; }
+
+        @Override public Jtype getType(){ return Jtype.number; }
+        @Override public byte asByte(){ return (byte)value; }
+        @Override public short asShort(){ return (short)value; }
+        @Override public int asInt(){ return (int)value; }
+        @Override public long asLong(){ return value; }
+        @Override public float asFloat(){ return value; }
+        @Override public double asDouble(){ return value; }
+        @Override public String asString(){ return String.valueOf(value); }
+        @Override public String toString(){ return Long.toString(value); }
+        @Override public boolean equals(Object o){ return o instanceof JsonLong && ((JsonLong)o).value == value; }
+        @Override public int hashCode(){ return Long.hashCode(value); }
+    }
+
+    /** Holds a floating-point number as a raw, unboxed double. */
+    class JsonDouble implements Jval{
+        private final double value;
+
+        JsonDouble(double value){ this.value = value; }
+
+        @Override public Jtype getType(){ return Jtype.number; }
+        @Override public byte asByte(){ return (byte)value; }
+        @Override public short asShort(){ return (short)value; }
+        @Override public int asInt(){ return (int)value; }
+        @Override public long asLong(){ return (long)value; }
+        @Override public float asFloat(){ return (float)value; }
+        @Override public double asDouble(){ return value; }
+        @Override public String asString(){ return String.valueOf(value); }
+
+        @Override
+        public String toString(){
+            String s = Double.toString(value);
+            if(s.endsWith(".0")) s = s.substring(0, s.length() - 2);
+            return s.replace('E', 'e');
+        }
+
+        @Override public boolean equals(Object o){ return o instanceof JsonDouble && ((JsonDouble)o).value == value; }
+        @Override public int hashCode(){ return Double.hashCode(value); }
+    }
+
+    /** Holds a string value. */
+    class JsonString implements Jval{
+        private final String value;
+
+        JsonString(String value){ this.value = value; }
+
+        @Override public Jtype getType(){ return Jtype.string; }
+        @Override public String asString(){ return value; }
+        @Override public byte asByte(){ return Byte.parseByte(value); }
+        @Override public short asShort(){ return Short.parseShort(value); }
+        @Override public int asInt(){ return Integer.parseInt(value); }
+        @Override public long asLong(){ return Long.parseLong(value); }
+        @Override public float asFloat(){ return Float.parseFloat(value); }
+        @Override public double asDouble(){ return Double.parseDouble(value); }
+        @Override public boolean asBool(){ return Boolean.parseBoolean(value); }
+        @Override public String toString(){ return value; }
+        @Override public boolean equals(Object o){ return o instanceof JsonString && ((JsonString)o).value.equals(value); }
+        @Override public int hashCode(){ return value.hashCode(); }
+    }
+
+    /** Holds no value at all; represents JSON null. */
+    class JsonNull implements Jval{
+        JsonNull(){}
+
+        @Override public Jtype getType(){ return Jtype.nil; }
+        @Override public @Nullable String asString(){ return null; }
+        @Override public String toString(){ return "null"; }
+        @Override public boolean equals(Object o){ return o instanceof JsonNull; }
+        @Override public int hashCode(){ return 0; }
     }
 
     /** Alias class of whatever is used to store json maps (objects). */
-    public static class JsonMap extends ArrayMap<String, Jval>{
+    class JsonMap extends ArrayMap<String, Jval> implements Jval{
+
+        public JsonMap(){
+            //maps have no capacity until actually used; this calls resize() after the first put(), but that's fine, there is no initial allocation with 0 capacity
+            super(0);
+        }
+
+        @Override public Jtype getType(){ return Jtype.object; }
+        @Override public JsonMap asObject(){ return this; }
+        @Override public String toString(){ return toString(Jformat.minimal); }
+
+        @Override
+        public JsonMap put(String key, Jval value){
+            super.put(key, value);
+            return this;
+        }
+
+        @Override
+        public JsonMap clear(){
+            super.clear();
+            return this;
+        }
+
+        @Override
+        public void add(String name, Jval val){
+            if(name == null) throw new NullPointerException("name is null");
+            put(name, val == null ? nullValue : val);
+        }
 
         /** Puts a value without checking if it's in the map first. This is unsafe, but prevents O(n) put. */
-        protected void putAdd(String key, Jval value){
+        public void putAdd(String key, Jval value){
             if(size == ((Object[])keys).length) resize(Math.max(8, (int)(size * 1.75f)));
             int index = size++;
             ((Object[])keys)[index] = key;
@@ -359,74 +455,31 @@ public class Jval{
     }
 
     /** Alias class of json arrays. */
-    public static class JsonArray extends Seq<Jval>{
+    class JsonArray extends Seq<Jval> implements Jval{
 
+        public JsonArray(){
+            super(false, 8);
+        }
+
+        @Override
+        public JsonArray add(Jval value){
+            super.add(value);
+            return this;
+        }
+
+        @Override
+        public JsonArray clear(){
+            super.clear();
+            return this;
+        }
+
+        @Override public Jtype getType(){ return Jtype.array; }
+        @Override public JsonArray asArray(){ return this; }
+        @Override public String toString(){ return toString(Jformat.minimal); }
     }
 
-    /**
-     * A lightweight writing buffer to reduce the amount of write operations to be performed on the
-     * underlying writer. This implementation is not thread-safe. It deliberately deviates from the
-     * contract of Writer. In particular, it does not flush or close the wrapped writer nor does it
-     * ensure that the wrapped writer is open.
-     */
-    static class WritingBuffer extends Writer{
-        private final Writer writer;
-        private final char[] buffer;
-        private int fill = 0;
-
-        WritingBuffer(Writer writer, int bufferSize){
-            this.writer = writer;
-            buffer = new char[bufferSize];
-        }
-
-        @Override
-        public void write(int c) throws IOException{
-            if(fill > buffer.length - 1){
-                flush();
-            }
-            buffer[fill++] = (char)c;
-        }
-
-        @Override
-        public void write(char[] cbuf, int off, int len) throws IOException{
-            if(fill > buffer.length - len){
-                flush();
-                if(len > buffer.length){
-                    writer.write(cbuf, off, len);
-                    return;
-                }
-            }
-            System.arraycopy(cbuf, off, buffer, fill, len);
-            fill += len;
-        }
-
-        @Override
-        public void write(String str, int off, int len) throws IOException{
-            if(fill > buffer.length - len){
-                flush();
-                if(len > buffer.length){
-                    writer.write(str, off, len);
-                    return;
-                }
-            }
-            str.getChars(off, off + len, buffer, fill);
-            fill += len;
-        }
-
-        /**  Flushes the internal buffer but does not flush the wrapped writer.*/
-        @Override
-        public void flush() throws IOException{
-            writer.write(buffer, 0, fill);
-            fill = 0;
-        }
-
-        /** Does not close or flush the wrapped writer.*/
-        @Override
-        public void close(){}
-    }
-
-    /** The ToString format. */
-    public enum Jformat{
+    /** The toString format. */
+    enum Jformat{
         /** JSON (no whitespace). */
         plain,
         /** Minimal quote-less JSON. Equivalent to libGDX's minimal output type. */
@@ -437,888 +490,9 @@ public class Jval{
         hjson,
     }
 
-    /**
-     * Defines the known json types.
-     * There is no null type as the primitive will be null instead of the JsonValue containing null.
-     */
-    public enum Jtype{
+    /** Defines the known json types. */
+    enum Jtype{
         string, number, object, array, bool, nil,
     }
 
-    static class Hparser{
-        private final char[] buffer;
-        private int index, bufferLength;
-        private int line;
-        private int lineOffset;
-        private int current;
-        private StringBuilder captureBuffer;
-        private int captureStart;
-        private int rawStart;
-        private boolean escaped;
-        private boolean isArray;
-
-        Hparser(String string){
-            buffer = string.toCharArray();
-            bufferLength = buffer.length;
-            reset();
-        }
-
-        Hparser(Reader reader) throws IOException{
-            char[] data = new char[8 * 1024];
-            int size = 0, n;
-            while((n = reader.read(data, size, data.length - size)) != -1){
-                size += n;
-                if(size == data.length) data = Arrays.copyOf(data, data.length * 2);
-            }
-            buffer = size == data.length ? data : Arrays.copyOf(data, size);
-            bufferLength = buffer.length;
-            reset();
-        }
-
-        static boolean isWhiteSpace(int ch){
-            return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r';
-        }
-
-        void reset(){
-            index = lineOffset = current = 0;
-            line = 1;
-            captureBuffer = null;
-            escaped = false;
-        }
-
-        Jval parse(){
-            //braces for the root object are optional
-
-            read();
-            skipWhiteSpace();
-
-            switch(current){
-                case '[':
-                case '{':
-                    return checkTrailing(readValue());
-                default:
-                    try{
-                        // assume we have a root object without braces
-                        return checkTrailing(readObject(true));
-                    }catch(Exception exception){
-                        // test if we are dealing with a single JSON value instead (true/false/null/num/"")
-                        reset();
-                        read();
-                        skipWhiteSpace();
-                        try{
-                            return checkTrailing(readValue());
-                        }catch(Exception ignored){
-                        }
-                        throw exception; // throw original error
-                    }
-            }
-        }
-
-        Jval checkTrailing(Jval v) throws JsonParseException{
-            skipWhiteSpace();
-            if(!isEndOfText()) throw error("Extra characters in input: " + current);
-            return v;
-        }
-
-        private Jval readValue(){
-            switch(current){
-                case '\'':
-                case '"':
-                    return readString();
-                case '[':
-                    return readArray();
-                case '{':
-                    return readObject(false);
-                default:
-                    return readTfnns();
-            }
-        }
-
-        private Jval readTfnns(){
-            int start = index - 1;
-            int first = current;
-            if(Hwriter.isPunctuatorChar(first))
-                throw error("Found a punctuator character '" + (char)first + "' when expecting a quoteless string (check your syntax)");
-
-            while(true){
-                read();
-                boolean isComment = current == '#' || (current == '/' && (peek() == '/' || peek() == '*'));
-                boolean isEol = current < 0 || current == '\r' || current == '\n' || (current == ',' && isArray) || current == ']'  || current == '}' || isComment;
-                if(isEol || current == ','){
-                    int stop = current < 0 ? index : index - 1; // position of the stopping char, not yet part of the value
-
-                    switch(first){
-                        case 'f':
-                        case 'n':
-                        case 't': {
-                            int s = start, e = stop;
-                            while(s < e && isTrimChar(buffer[s])) s++;
-                            while(e > s && isTrimChar(buffer[e - 1])) e--;
-                            int len = e - s;
-                            if(len == 5 && regionMatches(s, "false")) return FALSE;
-                            if(len == 4 && regionMatches(s, "null")) return NULL;
-                            if(len == 4 && regionMatches(s, "true")) return TRUE;
-                            break;
-                        }
-                        default:
-                            if(first == '-' || first >= '0' && first <= '9'){
-                                Jval n = tryParseNumber(buffer, start, stop, false);
-                                if(n != null) return n;
-                            }
-                    }
-                    if(isEol){
-                        int end = stop;
-                        //remove trailing comma
-                        if(end > start && buffer[end - 1] == ',') end--;
-                        //trim like String.trim() (<= 0x20), matching original .trim() behavior
-                        int s = start, e = end;
-                        while(s < e && isTrimChar(buffer[s])) s++;
-                        while(e > s && isTrimChar(buffer[e - 1])) e--;
-                        return new Jval(new String(buffer, s, e - s));
-                    }
-                }
-            }
-        }
-
-        static Jval tryParseNumber(char[] buf, int from, int to, boolean stopAtNext){
-            int idx = from, len = to;
-            if(idx < len && buf[idx] == '-') idx++;
-
-            if(idx >= len) return null;
-            char first = buf[idx++];
-            if(!isDigit(first)) return null;
-
-            if(first == '0' && idx < len && isDigit(buf[idx]))
-                return null; // leading zero is not allowed
-
-            while(idx < len && isDigit(buf[idx])) idx++;
-
-            // frac
-            if(idx < len && buf[idx] == '.'){
-                idx++;
-                if(idx >= len || !isDigit(buf[idx++])) return null;
-                while(idx < len && isDigit(buf[idx])) idx++;
-            }
-
-            // exp
-            if(idx < len && Character.toLowerCase(buf[idx]) == 'e'){
-                idx++;
-                if(idx < len && (buf[idx] == '+' || buf[idx] == '-')) idx++;
-                if(idx >= len || !isDigit(buf[idx++])) return null;
-                while(idx < len && isDigit(buf[idx])) idx++;
-            }
-
-            int last = idx;
-            while(idx < len && isWhiteSpace(buf[idx])) idx++;
-
-            boolean foundStop = false;
-            if(idx < len && stopAtNext){
-                char ch = buf[idx];
-                if(ch == ',' || ch == '}' || ch == ']' || ch == '#' || ch == '/' && (len > idx + 1 && (buf[idx + 1] == '/' || buf[idx + 1] == '*')))
-                    foundStop = true;
-            }
-
-            if(idx < len && !foundStop) return null;
-
-            boolean isDecimal = false;
-            for(int i = from; i < last; i++){
-                char c = buf[i];
-                if(c == '.' || c == 'e' || c == 'E'){
-                    isDecimal = true;
-                    break;
-                }
-            }
-
-            String str = new String(buf, from, last - from);
-
-            if(!isDecimal){
-                try{
-                    return new Jval(Long.parseLong(str));
-                }catch(NumberFormatException ignored){
-                }
-            }
-
-            return new Jval(Double.parseDouble(str));
-        }
-
-        private boolean regionMatches(int off, String kw){
-            int n = kw.length();
-            for(int i = 0; i < n; i++) if(buffer[off + i] != kw.charAt(i)) return false;
-            return true;
-        }
-
-        /** Matches String.trim()'s definition (chars <= 0x20), used where the original relied on .trim(). */
-        private static boolean isTrimChar(char c){
-            return c <= ' ';
-        }
-
-        private Jval readArray(){
-            isArray = true;
-            read();
-            JsonArray array = new JsonArray();
-            skipWhiteSpace();
-            if(readIf(']')){
-                return new Jval(array);
-            }
-            while(true){
-                skipWhiteSpace();
-                array.add(readValue());
-                skipWhiteSpace();
-                if(readIf(',')) skipWhiteSpace(); // , is optional
-                if(readIf(']')) break;
-                else if(isEndOfText()) throw error("End of input while parsing an array (did you forget a closing ']'?)");
-            }
-            isArray = false;
-            return new Jval(array);
-        }
-
-        private Jval readObject(boolean objectWithoutBraces){
-            if(!objectWithoutBraces) read();
-            JsonMap object = new JsonMap();
-            skipWhiteSpace();
-            while(true){
-                if(objectWithoutBraces){
-                    if(isEndOfText()) break;
-                }else{
-                    if(isEndOfText()) throw error("End of input while parsing an object (did you forget a closing '}'?)");
-                    if(readIf('}')) break;
-                }
-                String name = readName();
-                skipWhiteSpace();
-                if(!readIf(':')){
-                    throw expected("':'");
-                }
-                skipWhiteSpace();
-                object.putAdd(name, readValue());
-                skipWhiteSpace();
-                if(readIf(',')) skipWhiteSpace(); // , is optional
-            }
-            return new Jval(object);
-        }
-
-        private String readName(){
-            if(current == '"' || current == '\'') return readStringInternal(false);
-
-            StringBuilder name = new StringBuilder();
-            int space = -1, start = index;
-            while(true){
-                if(current == ':'){
-                    if(name.length() == 0) throw error("Found ':' but no key name (for an empty key name use quotes)");
-                    else if(space >= 0 && space != name.length()){
-                        index = start + space;
-                        throw error("Found whitespace in your key name (use quotes to include)");
-                    }
-                    return name.toString();
-                }else if(isWhiteSpace(current)){
-                    if(space < 0) space = name.length();
-                }else if(current < ' '){
-                    throw error("Name is not closed");
-                }else if(Hwriter.isPunctuatorChar(current)){
-                    throw error("Found '" + (char)current + "' where a key name was expected (check your syntax or use quotes if the key name includes {}[],: or whitespace)");
-                }else name.append((char)current);
-                read();
-            }
-        }
-
-        private String readMlString(){
-
-            // Parse a multiline string value.
-            StringBuilder sb = new StringBuilder();
-            int triple = 0;
-
-            // we are at '''
-            int indent = index - lineOffset - 4;
-
-            // skip white/to (newline)
-            while(true){
-                if(isWhiteSpace(current) && current != '\n') read();
-                else break;
-            }
-            if(current == '\n'){
-                read();
-                skipIndent(indent);
-            }
-
-            // When parsing for string values, we must look for " and \ characters.
-            while(true){
-                if(current < 0) throw error("Bad multiline string");
-                else if(current == '\''){
-                    triple++;
-                    read();
-                    if(triple == 3){
-                        if(sb.charAt(sb.length() - 1) == '\n') sb.deleteCharAt(sb.length() - 1);
-
-                        return sb.toString();
-                    }else continue;
-                }else{
-                    while(triple > 0){
-                        sb.append('\'');
-                        triple--;
-                    }
-                }
-                if(current == '\n'){
-                    sb.append('\n');
-                    read();
-                    skipIndent(indent);
-                }else{
-                    if(current != '\r') sb.append((char)current);
-                    read();
-                }
-            }
-        }
-
-        private void skipIndent(int indent){
-            while(indent-- > 0){
-                if(isWhiteSpace(current) && current != '\n') read();
-                else break;
-            }
-        }
-
-        private Jval readString(){
-            return new Jval(readStringInternal(true));
-        }
-
-        private String readStringInternal(boolean allowML){
-            // callees make sure that (current=='"' || current=='\'')
-            int exitCh = current;
-            read();
-            startCapture();
-            while(current >= 0 && current != exitCh){
-                if(current == '\\') readEscape();
-                else read();
-            }
-            String string = endCapture();
-            read();
-
-            if(allowML && exitCh == '\'' && current == '\'' && string.length() == 0){
-                // ''' indicates a multiline string
-                read();
-                return readMlString();
-            }else return string;
-        }
-
-        private void startCapture(){
-            captureStart = index - 1; // current already holds buffer[index-1]
-            rawStart = captureStart;
-            escaped = false;
-        }
-
-        private void readEscape(){
-            // flush the raw (unescaped) run seen so far, up to this backslash
-            int backslashPos = index - 1;
-            if(captureBuffer == null) captureBuffer = new StringBuilder(32);
-            captureBuffer.append(buffer, rawStart, backslashPos - rawStart);
-            escaped = true;
-
-            read(); // consume '\', current -> escape designator
-            switch(current){
-                case '"':
-                case '\'':
-                case '#':
-                case '/':
-                case '\\':
-                    captureBuffer.append((char)current);
-                    break;
-                case 'b':
-                    captureBuffer.append('\b');
-                    break;
-                case 'f':
-                    captureBuffer.append('\f');
-                    break;
-                case 'n':
-                    captureBuffer.append('\n');
-                    break;
-                case 'r':
-                    captureBuffer.append('\r');
-                    break;
-                case 't':
-                    captureBuffer.append('\t');
-                    break;
-                case 'u':
-                    char[] hexChars = new char[4];
-                    for(int i = 0; i < 4; i++){
-                        read();
-                        if(!isHexDigit()){
-                            throw expected("hexadecimal digit");
-                        }
-                        hexChars[i] = (char)current;
-                    }
-                    captureBuffer.append((char)Integer.parseInt(new String(hexChars), 16));
-                    break;
-                default:
-                    throw expected("valid escape sequence");
-            }
-            read(); // advance past the escape sequence
-            rawStart = index - 1; // next raw run starts here
-        }
-
-        private String endCapture(){
-            int end = index - 1; // current is exitCh (or -1 on unterminated input, pre-existing edge case)
-            String result;
-            if(escaped){
-                captureBuffer.append(buffer, rawStart, end - rawStart);
-                result = captureBuffer.toString();
-                captureBuffer.setLength(0); // reuse the builder for the next escaped string, if any
-            }else{
-                result = new String(buffer, captureStart, end - captureStart); // single copy, common case
-            }
-            return result;
-        }
-
-        private static boolean isDigit(char ch){
-            return ch >= '0' && ch <= '9';
-        }
-
-        static Jval tryParseNumber(StringBuilder value, boolean stopAtNext){
-            int idx = 0, len = value.length();
-            if(idx < len && value.charAt(idx) == '-') idx++;
-
-            if(idx >= len) return null;
-            char first = value.charAt(idx++);
-            if(!isDigit(first)) return null;
-
-            if(first == '0' && idx < len && isDigit(value.charAt(idx)))
-                return null; // leading zero is not allowed
-
-            while(idx < len && isDigit(value.charAt(idx))) idx++;
-
-            // frac
-            if(idx < len && value.charAt(idx) == '.'){
-                idx++;
-                if(idx >= len || !isDigit(value.charAt(idx++))) return null;
-                while(idx < len && isDigit(value.charAt(idx))) idx++;
-            }
-
-            // exp
-            if(idx < len && Character.toLowerCase(value.charAt(idx)) == 'e'){
-                idx++;
-                if(idx < len && (value.charAt(idx) == '+' || value.charAt(idx) == '-')) idx++;
-
-                if(idx >= len || !isDigit(value.charAt(idx++))) return null;
-                while(idx < len && isDigit(value.charAt(idx))) idx++;
-            }
-
-            int last = idx;
-            while(idx < len && isWhiteSpace(value.charAt(idx))) idx++;
-
-            boolean foundStop = false;
-            if(idx < len && stopAtNext){
-                char ch = value.charAt(idx);
-                if(ch == ',' || ch == '}' || ch == ']' || ch == '#' || ch == '/' && (len > idx + 1 && (value.charAt(idx + 1) == '/' || value.charAt(idx + 1) == '*')))
-                    foundStop = true;
-            }
-
-            if(idx < len && !foundStop) return null;
-
-            boolean isDecimal = false;
-            for(int i = 0; i < last; i++){
-                char c = value.charAt(i);
-                if(c == '.' || c == 'e' || c == 'E'){
-                    isDecimal = true;
-                    break;
-                }
-            }
-
-            String str = value.substring(0, last);
-
-            if(!isDecimal){
-                try{
-                    return new Jval(Long.parseLong(str));
-                }catch(NumberFormatException ignored){
-                }
-            }
-
-            return new Jval(Double.parseDouble(str));
-        }
-
-        static Jval tryParseNumber(String value){
-            return tryParseNumber(new StringBuilder(value), true);
-        }
-
-        private boolean readIf(char ch){
-            if(current != ch){
-                return false;
-            }
-            read();
-            return true;
-        }
-
-        private void skipWhiteSpace(){
-            while(!isEndOfText()){
-                while(isWhiteSpace()) read();
-                if(current == '#' || current == '/' && peek() == '/'){
-                    do{
-                        read();
-                    }while(current >= 0 && current != '\n');
-                }else if(current == '/' && peek() == '*'){
-                    read();
-                    do{
-                        read();
-                    }while(current >= 0 && !(current == '*' && peek() == '/'));
-                    read();
-                    read();
-                }else break;
-            }
-        }
-
-        private void read(){
-            if(current == '\n'){ line++; lineOffset = index; }
-            current = index < bufferLength ? buffer[index++] : -1;
-        }
-
-        private int peek(int idx){
-            int p = index + idx;
-            return p < bufferLength ? buffer[p] : -1;
-        }
-
-        private int peek(){
-            return peek(0);
-        }
-
-        private JsonParseException expected(String expected){
-            if(isEndOfText()){
-                return error("Unexpected end of input");
-            }
-            return error("Expected " + expected);
-        }
-
-        private JsonParseException error(String message){
-            int column = index - lineOffset;
-            int offset = isEndOfText() ? index : index - 1;
-            return new JsonParseException(message, offset, line, column - 1);
-        }
-
-        private boolean isWhiteSpace(){
-            return isWhiteSpace((char)current);
-        }
-
-        private boolean isHexDigit(){
-            return current >= '0' && current <= '9'
-            || current >= 'a' && current <= 'f'
-            || current >= 'A' && current <= 'F';
-        }
-
-        private boolean isEndOfText(){
-            return current == -1;
-        }
-    }
-
-    /** An unchecked exception to indicate that an input does not qualify as valid JSON.*/
-    public static class JsonParseException extends RuntimeException{
-        public final int offset;
-        public final int line;
-        public final int column;
-
-        JsonParseException(String message, int offset, int line, int column){
-            super(message + " at " + line + ":" + column);
-            this.offset = offset;
-            this.line = line;
-            this.column = column;
-        }
-    }
-
-    static class Hwriter{
-
-        static void nl(Writer tw, int level) throws IOException{
-            tw.write('\n');
-            for(int i = 0; i < level; i++) tw.write("  ");
-        }
-
-        public static void save(Jval value, Writer tw, int level, String separator, boolean noIndent) throws IOException{
-            if(value == null){
-                tw.write(separator);
-                tw.write("null");
-                return;
-            }
-
-            switch(value.getType()){
-                case object:
-                    JsonMap obj = value.asObject();
-                    if(!noIndent){
-                        tw.write(" ");
-                    }
-                    if(level >= 0) tw.write('{');
-                    int index = 0;
-
-                    for(ObjectMap.Entry<String, Jval> pair : obj){
-                        if(!(index++ == 0 && level < 0)) nl(tw, level + 1);
-                        tw.write(escapeName(pair.key));
-                        tw.write(":");
-                        save(pair.value, tw, level + 1, " ", false);
-                    }
-
-                    if(obj.size > 0) nl(tw, level);
-                    if(level >= 0) tw.write('}');
-                    break;
-                case array:
-                    JsonArray arr = value.asArray();
-                    int n = arr.size;
-                    if(!noIndent){
-                        tw.write(" ");
-                    }
-                    tw.write('[');
-                    for(int i = 0; i < n; i++){
-                        nl(tw, level + 1);
-                        save(arr.get(i), tw, level + 1, "", true);
-                    }
-                    if(n > 0) nl(tw, level);
-                    tw.write(']');
-                    break;
-                case bool:
-                    tw.write(separator);
-                    tw.write(value.isTrue() ? "true" : "false");
-                    break;
-                case string:
-                    writeString(value.asString(), tw, level, separator);
-                    break;
-                default:
-                    tw.write(separator);
-                    tw.write(value.toString());
-                    break;
-            }
-        }
-
-        static String escapeName(String name){
-            if(name.length() == 0 || needsEscapeName(name))
-                return "\"" + Jwriter.escapeString(name) + "\"";
-            else
-                return name;
-        }
-
-        static boolean needsEscapeName(String name){
-            int len = name.length();
-            for(int i = 0; i < len; i++){
-                char c = name.charAt(i);
-                switch(c){
-                    case ',': case '{': case '[': case '}': case ']': case ':': case '"': case '\'':
-                    case ' ': case '\t': case '\n': case '\u000B': case '\f': case '\r':
-                        return true;
-                }
-                if(c == '/' && i + 1 < len && (name.charAt(i + 1) == '/' || name.charAt(i + 1) == '*')) return true;
-            }
-            return false;
-        }
-
-        static void writeString(String value, Writer tw, int level, String separator) throws IOException{
-            int len = value.length();
-            if(len == 0){
-                tw.write(separator);
-                tw.write("\"\"");
-                return;
-            }
-
-            char left = value.charAt(0), right = value.charAt(len - 1);
-            char left1 = len > 1 ? value.charAt(1) : '\0';
-
-            if(Hparser.isWhiteSpace(left) || Hparser.isWhiteSpace(right) ||
-            left == '"' ||
-            left == '\'' ||
-            left == '#' ||
-            left == '/' && (left1 == '*' || left1 == '/') ||
-            isPunctuatorChar(left) ||
-            startsWithKeyword(value) ||
-            Hparser.tryParseNumber(value) != null ||
-            containsQuoteChar(value)){
-
-                boolean noEscape = true, noEscapeML = true, allWhite = true;
-                for(int i = 0; i < len && (noEscape || noEscapeML || allWhite); i++){
-                    char ch = value.charAt(i);
-                    if(noEscape && needsEscape(ch)) noEscape = false;
-                    if(noEscapeML && needsEscapeML(ch)) noEscapeML = false;
-                    if(allWhite && !Hparser.isWhiteSpace(ch)) allWhite = false;
-                }
-
-                if(noEscape){
-                    tw.write(separator);
-                    tw.write('"');
-                    tw.write(value);
-                    tw.write('"');
-                    return;
-                }
-
-                if(noEscapeML && !allWhite && value.indexOf("'''") < 0) writeMLString(value, tw, level, separator);
-                else{
-                    tw.write(separator);
-                    tw.write('"');
-                    tw.write(Jwriter.escapeString(value));
-                    tw.write('"');
-                }
-            }else{
-                tw.write(separator);
-                tw.write(value);
-            }
-        }
-
-        static boolean containsQuoteChar(String value){
-            int len = value.length();
-            for(int i = 0; i < len; i++){
-                if(needsQuotes(value.charAt(i))) return true;
-            }
-            return false;
-        }
-
-        static void writeMLString(String value, Writer tw, int level, String separator) throws IOException{
-            String[] lines = value.replace("\r", "").split("\n", -1);
-
-            if(lines.length == 1){
-                tw.write(separator + "'''");
-                tw.write(lines[0]);
-                tw.write("'''");
-            }else{
-                level++;
-                nl(tw, level);
-                tw.write("'''");
-
-                for(String line : lines){
-                    nl(tw, line.length() > 0 ? level : 0);
-                    tw.write(line);
-                }
-                nl(tw, level);
-                tw.write("'''");
-            }
-        }
-
-        static boolean startsWithKeyword(String text){
-            int p;
-            if(text.startsWith("true") || text.startsWith("null")) p = 4;
-            else if(text.startsWith("false")) p = 5;
-            else return false;
-            while(p < text.length() && Hparser.isWhiteSpace(text.charAt(p))) p++;
-            if(p == text.length()) return true;
-            char ch = text.charAt(p);
-            return ch == ',' || ch == '}' || ch == ']' || ch == '#' || ch == '/' && (text.length() > p + 1 && (text.charAt(p + 1) == '/' || text.charAt(p + 1) == '*'));
-        }
-
-        static boolean isPunctuatorChar(int c){
-            return c == '{' || c == '}' || c == '[' || c == ']' || c == ',' || c == ':';
-        }
-
-        static boolean needsQuotes(char c){
-            return c == '\t' || c == '\f' || c == '\b' || c == '\n' || c == '\r' || c == ']' || c == '[' || c == ',';
-        }
-
-        static boolean needsEscape(char c){
-            return c == '\"' || c == '\\' || needsQuotes(c);
-        }
-
-        static boolean needsEscapeML(char c){
-            switch(c){
-                case '\n':
-                case '\r':
-                case '\t':
-                    return false;
-                default:
-                    return needsQuotes(c);
-            }
-        }
-    }
-
-    static class Jwriter{
-
-        static void nl(Writer tw, int level) throws IOException{
-            tw.write('\n');
-            for(int i = 0; i < level; i++) tw.write("  ");
-        }
-
-        public static void save(Jval value, boolean format, boolean includeQuotes, Writer tw, int level) throws IOException{
-            boolean following = false;
-            switch(value.getType()){
-                case object:
-                    JsonMap obj = value.asObject();
-                    tw.write('{');
-                    for(ObjectMap.Entry<String, Jval> pair : obj){
-                        if(following) tw.write(",");
-                        if(format) nl(tw, level + 1);
-                        if(includeQuotes){
-                            tw.write('\"');
-                            tw.write(escapeString(pair.key));
-                            tw.write("\":");
-                        }else{
-                            tw.write(Hwriter.escapeName(pair.key));
-                            tw.write(':');
-                        }
-
-                        Jval v = pair.value;
-                        Jtype vType = v.getType();
-                        if(format && vType != Jtype.array && vType != Jtype.object) tw.write(" ");
-                        save(v, format, includeQuotes, tw, level + 1);
-                        following = true;
-                    }
-                    if(following && format) nl(tw, level);
-                    tw.write('}');
-                    break;
-                case array:
-                    JsonArray arr = value.asArray();
-                    int n = arr.size;
-                    tw.write('[');
-                    for(int i = 0; i < n; i++){
-                        if(following) tw.write(",");
-                        Jval v = arr.get(i);
-                        Jtype vType = v.getType();
-                        if(vType != Jtype.array && format) nl(tw, level + 1);
-                        save(v, format, includeQuotes, tw, level + 1);
-                        following = true;
-                    }
-                    if(following && format) nl(tw, level);
-                    tw.write(']');
-                    break;
-                case bool:
-                    tw.write(value.isTrue() ? "true" : "false");
-                    break;
-                case string:
-                    if(includeQuotes){
-                        tw.write('"');
-                        tw.write(escapeString(value.asString()));
-                        tw.write('"');
-                    }else{
-                        tw.write(Hwriter.escapeName(value.asString()));
-                    }
-
-                    break;
-                default:
-                    tw.write(value.toString());
-                    break;
-            }
-        }
-
-        static String escapeString(String src){
-            if(src == null) return null;
-
-            for(int i = 0; i < src.length(); i++){
-                if(getEscapedChar(src.charAt(i)) != null){
-                    StringBuilder sb = new StringBuilder();
-                    if(i > 0) sb.append(src, 0, i);
-                    return doEscapeString(sb, src, i);
-                }
-            }
-            return src;
-        }
-
-        private static String doEscapeString(StringBuilder sb, String src, int cur){
-            int start = cur;
-            for(int i = cur; i < src.length(); i++){
-                String escaped = getEscapedChar(src.charAt(i));
-                if(escaped != null){
-                    sb.append(src, start, i);
-                    sb.append(escaped);
-                    start = i + 1;
-                }
-            }
-            sb.append(src, start, src.length());
-            return sb.toString();
-        }
-
-        private static String getEscapedChar(char c){
-            switch(c){
-                case '\"': return "\\\"";
-                case '\t': return "\\t";
-                case '\n': return "\\n";
-                case '\r': return "\\r";
-                case '\f': return "\\f";
-                case '\b': return "\\b";
-                case '\\': return "\\\\";
-                default: return null;
-            }
-        }
-    }
 }

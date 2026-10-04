@@ -4,6 +4,7 @@ import arc.*;
 import arc.audio.*;
 import arc.backend.robovm.custom.*;
 import arc.graphics.*;
+import arc.graphics.gl.*;
 import arc.struct.*;
 import arc.util.*;
 import org.robovm.apple.coregraphics.*;
@@ -67,9 +68,7 @@ public class IOSApplication implements Application{
 
         pixelsPerPoint = (float)uiWindowScene.getScreen().getNativeScale();
 
-        this.graphics = new IOSGraphics(this, config, input, config.useGL30);
-        Core.gl = Core.gl20 = graphics.gl20;
-        Core.gl30 = graphics.gl30;
+        this.graphics = new IOSGraphics(this, config, input);
         Core.graphics = this.graphics;
 
         this.uiWindow.setRootViewController(this.graphics.viewController);
@@ -149,6 +148,7 @@ public class IOSApplication implements Application{
         Log.info("[IOSApplication] resumed");
         graphics.makeCurrent();
         graphics.resume();
+        input.resumeAccelerometer();
     }
 
     final void willEnterForeground(UIScene uiScene){
@@ -159,12 +159,14 @@ public class IOSApplication implements Application{
         graphics.makeCurrent();
         graphics.pause();
         Gl.finish();
+        input.pauseAccelerometer();
     }
 
     final void willTerminate(UIApplication uiApp){
         Log.info("[IOSApplication] disposed");
         // willTerminate can be called before a scene is connected and graphics initialized
         if(graphics != null) graphics.makeCurrent();
+        input.disposeAccelerometer();
         Seq<ApplicationListener> listeners = this.listeners;
         synchronized(listeners){
             for(ApplicationListener listener : listeners){
@@ -241,6 +243,14 @@ public class IOSApplication implements Application{
     @Override
     public void setClipboardText(String text){
         UIPasteboard.getGeneralPasteboard().setString(text);
+    }
+
+    @Override
+    public void setClipboardImage(Pixmap pixmap){
+        try{
+            UIPasteboard.getGeneralPasteboard().setData(new NSData(PixmapIO.writePngBytes(pixmap)), "public.png");
+        }catch(Throwable ignored){
+        }
     }
 
     @Override

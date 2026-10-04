@@ -1,7 +1,7 @@
 package arc.scene.ui;
 
 import arc.graphics.Color;
-import arc.graphics.g2d.Font;
+import arc.graphics.font.Font;
 import arc.scene.style.Drawable;
 import arc.scene.ui.CheckBox.*;
 import arc.scene.ui.Label.LabelStyle;

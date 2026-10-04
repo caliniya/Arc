@@ -4,7 +4,6 @@ import arc.*;
 import arc.Files.*;
 import arc.files.*;
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.TextureAtlas.TextureAtlasData.*;
 import arc.scene.style.*;
 import arc.struct.*;
@@ -20,11 +19,11 @@ import java.io.*;
  * @author Nathan Sweet
  */
 public class TextureAtlas implements Disposable{
-    private final ObjectSet<Texture> textures = new ObjectSet<>(4);
     private final Seq<AtlasRegion> regions = new Seq<>(false);
     private final ObjectMap<String, Drawable> drawables = new ObjectMap<>();
-    private final ObjectMap<String, AtlasRegion> regionmap = new ObjectMap<>();
-    private final ObjectMap<Texture, Pixmap> pixmaps = new ObjectMap<>();
+    private final ObjectMap<String, AtlasRegion> regionMap = new ObjectMap<>();
+    private final Seq<AtlasPage> pages = new Seq<>();
+    private TextureArray textureArray;
     protected AtlasRegion error, white;
     protected float drawableScale = 1f;
 
@@ -74,31 +73,27 @@ public class TextureAtlas implements Disposable{
         if(data != null) load(data);
     }
 
-    public void setDrawableScale(float scale){
-        this.drawableScale = scale;
-    }
-
     private void load(TextureAtlasData data){
-        ObjectMap<AtlasPage, Texture> pageToTexture = new ObjectMap<>();
+        this.pages.set(data.pages);
+        AtlasPage first = data.pages.first();
+        if(data.texture != null){
+            textureArray = data.texture;
+        }else{
+            textureArray = new TextureArray(data.pages.map(p -> p.textureFile).toArray(Fi.class), first.useMipMaps);
+        }
+
+        textureArray.setWrap(first.uWrap, first.vWrap);
+        textureArray.setFilter(first.minFilter, first.magFilter);
+
+        int i = 0;
         for(AtlasPage page : data.pages){
-            Texture texture;
-            if(page.texture == null){
-                texture = new Texture(page.textureFile, page.useMipMaps);
-                texture.setFilter(page.minFilter, page.magFilter);
-                texture.setWrap(page.uWrap, page.vWrap);
-            }else{
-                texture = page.texture;
-                texture.setFilter(page.minFilter, page.magFilter);
-                texture.setWrap(page.uWrap, page.vWrap);
-            }
-            textures.add(texture);
-            pageToTexture.put(page, texture);
+            page.texture = new ArraySliceTexture(textureArray, i ++);
         }
 
         for(Region region : data.regions){
             int width = region.width;
             int height = region.height;
-            AtlasRegion atlasRegion = new AtlasRegion(pageToTexture.get(region.page), region.left, region.top,
+            AtlasRegion atlasRegion = new AtlasRegion(region.page.texture, region.left, region.top,
             region.rotate ? height : width, region.rotate ? width : height);
             atlasRegion.name = region.name;
             atlasRegion.offsetX = region.offsetX;
@@ -110,56 +105,26 @@ public class TextureAtlas implements Disposable{
             atlasRegion.pads = region.pads;
             if(region.flip) atlasRegion.flip(false, true);
             regions.add(atlasRegion);
-            regionmap.put(atlasRegion.name, atlasRegion);
+            regionMap.put(atlasRegion.name, atlasRegion);
         }
 
         error = find("error");
     }
 
-    public PixmapRegion getPixmap(String name){
-        return getPixmap(find(name));
+    public TextureArray getTexture(){
+        return textureArray;
     }
 
-    public PixmapRegion getPixmap(AtlasRegion region){
-        if(region.pixmapRegion == null){
-            Pixmap pix = pixmaps.get(region.texture, () -> region.texture.getTextureData().getPixmap());
-            region.pixmapRegion = new PixmapRegion(pix, region.getX(), region.getY(), region.width, region.height);
-        }
-
-        return region.pixmapRegion;
+    public void setTexture(TextureArray textureArray){
+        this.textureArray = textureArray;
     }
 
-    public PixmapRegion getPixmap(TextureRegion region){
-        return getPixmap((AtlasRegion)region);
+    public Seq<AtlasPage> getPages(){
+        return pages;
     }
 
-    public ObjectMap<Texture, Pixmap> getPixmaps(){
-        return pixmaps;
-    }
-
-    public void disposePixmap(Texture texture){
-        if(pixmaps.containsKey(texture) && !pixmaps.get(texture).isDisposed()){
-            pixmaps.get(texture).dispose();
-        }
-        pixmaps.remove(texture);
-    }
-
-    /** Adds a region to the atlas. The specified texture will be disposed when the atlas is disposed. */
-    public AtlasRegion addRegion(String name, Texture texture, int x, int y, int width, int height){
-        textures.add(texture);
-        AtlasRegion region = new AtlasRegion(texture, x, y, width, height);
-        region.name = name;
-        region.originalWidth = width;
-        region.originalHeight = height;
-        regions.add(region);
-        regionmap.put(name, region);
-        return region;
-    }
-
-    /** Adds a region to the atlas. The texture for the specified region will be disposed when the atlas is disposed. */
-    public AtlasRegion addRegion(String name, TextureRegion textureRegion){
-        return addRegion(name, textureRegion.texture, textureRegion.getX(), textureRegion.getY(),
-        textureRegion.width, textureRegion.height);
+    public void setDrawableScale(float scale){
+        this.drawableScale = scale;
     }
 
     /** Returns all regions in the atlas. */
@@ -169,7 +134,7 @@ public class TextureAtlas implements Disposable{
 
     /** Returns the region map in the atlas. */
     public ObjectMap<String, AtlasRegion> getRegionMap(){
-        return regionmap;
+        return regionMap;
     }
 
     /** Returns the blank 1x1 texture region, if it exists.*/
@@ -196,7 +161,7 @@ public class TextureAtlas implements Disposable{
      * @return The region, or the error region (if it is defined), or null.
      */
     public AtlasRegion find(String name){
-        AtlasRegion r = regionmap.get(name, error);
+        AtlasRegion r = regionMap.get(name, error);
         if(r == null && !name.equals("error"))
             throw new IllegalArgumentException("The region \"" + name + "\" does not exist!");
         return r;
@@ -207,12 +172,12 @@ public class TextureAtlas implements Disposable{
     }
 
     public TextureRegion find(String name, TextureRegion def){
-        TextureRegion region = regionmap.get(name);
+        TextureRegion region = regionMap.get(name);
         return region == null || region == error ? def : region;
     }
 
     public boolean has(String s){
-        return regionmap.containsKey(s);
+        return regionMap.containsKey(s);
     }
 
     @SuppressWarnings("unchecked")
@@ -255,56 +220,22 @@ public class TextureAtlas implements Disposable{
     }
 
     /**
-     * Returns the first region found with the specified name as a {@link NinePatch}. The region must have been packed with
-     * ninepatch splits. This method uses string comparison to find the region and constructs a new ninepatch, so the result should
-     * be cached rather than calling this method multiple times.
-     * @return The ninepatch, or null.
-     */
-    public NinePatch createPatch(String name){
-        for(int i = 0, n = regions.size; i < n; i++){
-            AtlasRegion region = regions.get(i);
-            if(region.name.equals(name)){
-                int[] splits = region.splits;
-                if(splits == null) throw new IllegalArgumentException("Region does not have ninepatch splits: " + name);
-                NinePatch patch = new NinePatch(region, splits[0], splits[1], splits[2], splits[3]);
-                if(region.pads != null)
-                    patch.setPadding(region.pads[0], region.pads[1], region.pads[2], region.pads[3]);
-                return patch;
-            }
-        }
-        return null;
-    }
-
-    /** @return the textures of the pages, unordered */
-    public ObjectSet<Texture> getTextures(){
-        return textures;
-    }
-
-    /** @return the first texture of the pages.*/
-    public Texture texture(){
-        return textures.first();
-    }
-
-    /**
      * Releases all resources associated with this TextureAtlas instance. This releases all the textures backing all TextureRegions
      * and Sprites, which should no longer be used after calling dispose.
      */
+    @Override
     public void dispose(){
-        for(Texture texture : textures)
-            texture.dispose();
-        for(Pixmap pixmap : pixmaps.values())
-            if(!pixmap.isDisposed())
-                pixmap.dispose();
-        textures.clear();
-        pixmaps.clear();
+        if(textureArray != null) textureArray.dispose();
+        textureArray = null;
     }
 
     public static class TextureAtlasData{
         public static final byte formatVersion = 0;
         public static final byte[] formatHeader = new byte[]{'A', 'A', 'T', 'L', 'S'};
 
-        final Seq<AtlasPage> pages = new Seq<>();
-        final Seq<Region> regions = new Seq<>();
+        public @Nullable TextureArray texture;
+        public final Seq<AtlasPage> pages = new Seq<>();
+        public final Seq<Region> regions = new Seq<>();
 
         public TextureAtlasData(Fi packFile, Fi imagesDir, boolean flip){
             try(Reads read = packFile.reads()){
@@ -366,14 +297,6 @@ public class TextureAtlas implements Disposable{
             }
         }
 
-        public Seq<AtlasPage> getPages(){
-            return pages;
-        }
-
-        public Seq<Region> getRegions(){
-            return regions;
-        }
-
         public static class AtlasPage{
             public final Fi textureFile;
             public final int width, height;
@@ -382,7 +305,7 @@ public class TextureAtlas implements Disposable{
             public final TextureFilter magFilter;
             public final TextureWrap uWrap;
             public final TextureWrap vWrap;
-            public Texture texture;
+            Texture texture;
 
             public AtlasPage(Fi handle, int width, int height, boolean useMipMaps, TextureFilter minFilter,
                              TextureFilter magFilter, TextureWrap uWrap, TextureWrap vWrap){
@@ -417,7 +340,6 @@ public class TextureAtlas implements Disposable{
 
     /** Describes the region of a packed image and provides information about the original image before it was packed. */
     public static class AtlasRegion extends TextureRegion{
-        public PixmapRegion pixmapRegion;
 
         /**
          * The name of the original image file, up to the first underscore. Underscores denote special instructions to the texture

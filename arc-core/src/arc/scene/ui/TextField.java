@@ -4,8 +4,9 @@ import arc.*;
 import arc.Input.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.Font.*;
+import arc.graphics.font.Font.*;
 import arc.graphics.g2d.GlyphLayout.*;
 import arc.input.*;
 import arc.math.*;
@@ -86,6 +87,18 @@ public class TextField extends Element implements Disableable{
 
     public TextField(String text){
         this(text, scene.getStyle(TextFieldStyle.class));
+    }
+
+    public TextField(String text, @Nullable Cons<String> listener){
+        this(text);
+
+        if(listener != null){
+            changed(() -> {
+                if(isValid()){
+                    listener.get(getText());
+                }
+            });
+        }
     }
 
     public TextField(String text, TextFieldStyle style){

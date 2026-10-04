@@ -1,5 +1,6 @@
 package arc.struct;
 
+import arc.func.*;
 import arc.struct.ObjectMap.*;
 import arc.math.*;
 import arc.util.*;
@@ -16,6 +17,8 @@ import java.util.*;
  */
 @SuppressWarnings("unchecked")
 public class ArrayMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
+    private static final Object[] empty = {};
+
     public K[] keys;
     public V[] values;
     public int size;
@@ -42,8 +45,9 @@ public class ArrayMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
      */
     public ArrayMap(boolean ordered, int capacity){
         this.ordered = ordered;
-        keys = (K[])new Object[capacity];
-        values = (V[])new Object[capacity];
+        //optimization: don't allocate anything until it's used
+        keys = capacity == 0 ?  (K[])empty : (K[])new Object[capacity];
+        values = capacity == 0 ?  (V[])empty : (V[])new Object[capacity];
     }
 
     /**
@@ -75,7 +79,14 @@ public class ArrayMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         System.arraycopy(array.values, 0, values, 0, size);
     }
 
-    public int put(K key, V value){
+    /**Iterates through key/value pairs.*/
+    public void each(Cons2<K, V> cons){
+        for(Entry<K, V> entry : entries()){
+            cons.get(entry.key, entry.value);
+        }
+    }
+
+    public int putIndex(K key, V value){
         int index = indexOfKey(key);
         if(index == -1){
             if(size == keys.length) resize(Math.max(8, (int)(size * 1.75f)));
@@ -84,6 +95,12 @@ public class ArrayMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         keys[index] = key;
         values[index] = value;
         return index;
+    }
+
+
+    public ArrayMap<K, V> put(K key, V value){
+        putIndex(key, value);
+        return this;
     }
 
     public int put(K key, V value, int index){
@@ -328,7 +345,7 @@ public class ArrayMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         resize(maximumCapacity);
     }
 
-    public void clear(){
+    public ArrayMap<K, V> clear(){
         K[] keys = this.keys;
         V[] values = this.values;
         for(int i = 0, n = size; i < n; i++){
@@ -336,6 +353,7 @@ public class ArrayMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
             values[i] = null;
         }
         size = 0;
+        return this;
     }
 
     /**
@@ -596,11 +614,11 @@ public class ArrayMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
             index = 0;
         }
 
-        public Seq<V> toArray(){
+        public Seq<V> toSeq(){
             return new Seq(true, map.values, index, map.size - index);
         }
 
-        public Seq<V> toArray(Seq array){
+        public Seq<V> toSeq(Seq array){
             array.addAll(map.values, index, map.size - index);
             return array;
         }
@@ -639,11 +657,11 @@ public class ArrayMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
             index = 0;
         }
 
-        public Seq<K> toArray(){
+        public Seq<K> toSeq(){
             return new Seq(true, map.keys, index, map.size - index);
         }
 
-        public Seq<K> toArray(Seq array){
+        public Seq<K> toSeq(Seq array){
             array.addAll(map.keys, index, map.size - index);
             return array;
         }

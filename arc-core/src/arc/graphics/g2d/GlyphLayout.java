@@ -1,11 +1,12 @@
 package arc.graphics.g2d;
 
+import arc.graphics.font.*;
 import arc.struct.Seq;
 import arc.struct.FloatSeq;
 import arc.graphics.Color;
 import arc.graphics.Colors;
-import arc.graphics.g2d.Font.FontData;
-import arc.graphics.g2d.Font.Glyph;
+import arc.graphics.font.Font.FontData;
+import arc.graphics.font.Font.Glyph;
 import arc.util.Align;
 import arc.util.pooling.Pool;
 import arc.util.pooling.Pool.Poolable;

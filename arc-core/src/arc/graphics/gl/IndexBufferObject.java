@@ -1,6 +1,5 @@
 package arc.graphics.gl;
 
-import arc.graphics.*;
 import arc.util.*;
 
 import java.nio.*;
@@ -25,7 +24,7 @@ import java.nio.*;
  * </p>
  * @author mzechner, Thorsten Schleinzer
  */
-public class IndexBufferObject implements IndexData{
+public class IndexBufferObject implements Disposable{
     final ShortBuffer buffer;
     final ByteBuffer byteBuffer;
     final boolean isDirect;
@@ -62,19 +61,21 @@ public class IndexBufferObject implements IndexData{
         buffer = byteBuffer.asShortBuffer();
         buffer.flip();
         byteBuffer.flip();
-        usage = isStatic ? GL20.GL_STATIC_DRAW : GL20.GL_DYNAMIC_DRAW;
+        usage = isStatic ? Gl.staticDraw : Gl.dynamicDraw;
     }
 
     /** @return the number of indices currently stored in this buffer */
-    @Override
     public int size(){
         return empty ? 0 : buffer.limit();
     }
 
     /** @return the maximum number of indices this IndexBufferObject can store. */
-    @Override
     public int max(){
         return empty ? 0 : buffer.capacity();
+    }
+
+    public void set(short[] indices){
+        set(indices, 0, indices.length);
     }
 
     /**
@@ -90,7 +91,6 @@ public class IndexBufferObject implements IndexData{
      * @param offset the offset to start copying the data from
      * @param count the number of shorts to copy
      */
-    @Override
     public void set(short[] indices, int offset, int count){
         dirty = true;
         buffer.clear();
@@ -100,12 +100,11 @@ public class IndexBufferObject implements IndexData{
         byteBuffer.limit(count << 1);
 
         if(bound){
-            Gl.bufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, byteBuffer.limit(), byteBuffer, usage);
+            Gl.bufferData(Gl.elementArrayBuffer, byteBuffer.limit(), byteBuffer, usage);
             dirty = false;
         }
     }
 
-    @Override
     public void set(ShortBuffer indices){
         dirty = true;
         int pos = indices.position();
@@ -117,12 +116,11 @@ public class IndexBufferObject implements IndexData{
         byteBuffer.limit(buffer.limit() << 1);
 
         if(bound){
-            Gl.bufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, byteBuffer.limit(), byteBuffer, usage);
+            Gl.bufferData(Gl.elementArrayBuffer, byteBuffer.limit(), byteBuffer, usage);
             dirty = false;
         }
     }
 
-    @Override
     public void update(int targetOffset, short[] indices, int offset, int count){
         dirty = true;
         final int pos = byteBuffer.position();
@@ -132,7 +130,7 @@ public class IndexBufferObject implements IndexData{
         buffer.position(0);
 
         if(bound){
-            Gl.bufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, byteBuffer.limit(), byteBuffer, usage);
+            Gl.bufferData(Gl.elementArrayBuffer, byteBuffer.limit(), byteBuffer, usage);
             dirty = false;
         }
     }
@@ -144,14 +142,12 @@ public class IndexBufferObject implements IndexData{
      * </p>
      * @return the underlying short buffer.
      */
-    @Override
     public ShortBuffer buffer(){
         dirty = true;
         return buffer;
     }
 
     /** Binds this IndexBufferObject for rendering with glDrawElements. */
-    @Override
     public void bind(){
         if(!created){
             bufferHandle = Gl.genBuffer();
@@ -159,26 +155,25 @@ public class IndexBufferObject implements IndexData{
         }
         if(bufferHandle == 0) throw new ArcRuntimeException("No buffer allocated!");
 
-        Gl.bindBuffer(GL20.GL_ELEMENT_ARRAY_BUFFER, bufferHandle);
+        Gl.bindBuffer(Gl.elementArrayBuffer, bufferHandle);
         if(dirty){
             byteBuffer.limit(buffer.limit() * 2);
-            Gl.bufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, byteBuffer.limit(), byteBuffer, usage);
+            Gl.bufferData(Gl.elementArrayBuffer, byteBuffer.limit(), byteBuffer, usage);
             dirty = false;
         }
         bound = true;
     }
 
     /** Unbinds this IndexBufferObject. */
-    @Override
     public void unbind(){
-        Gl.bindBuffer(GL20.GL_ELEMENT_ARRAY_BUFFER, 0);
+        Gl.bindBuffer(Gl.elementArrayBuffer, 0);
         bound = false;
     }
 
     /** Disposes this IndexBufferObject and all its associated OpenGL resources. */
     @Override
     public void dispose(){
-        Gl.bindBuffer(GL20.GL_ELEMENT_ARRAY_BUFFER, 0);
+        Gl.bindBuffer(Gl.elementArrayBuffer, 0);
         Gl.deleteBuffer(bufferHandle);
         bufferHandle = 0;
 

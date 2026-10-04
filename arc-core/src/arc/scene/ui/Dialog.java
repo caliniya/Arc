@@ -3,6 +3,7 @@ package arc.scene.ui;
 import arc.*;
 import arc.func.*;
 import arc.graphics.*;
+import arc.graphics.font.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
 import arc.math.*;

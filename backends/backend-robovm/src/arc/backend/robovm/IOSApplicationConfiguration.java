@@ -1,8 +1,7 @@
 package arc.backend.robovm;
 
-import arc.*;
 import arc.func.*;
-import arc.graphics.gl.*;
+import arc.graphics.HdpiUtils.*;
 import arc.util.*;
 import com.badlogic.gdx.backends.iosrobovm.bindings.metalangle.*;
 import org.robovm.apple.uikit.*;
@@ -40,17 +39,11 @@ public class IOSApplicationConfiguration{
     public Cons<Throwable> errorHandler;
 
     /** whether to use the accelerometer, default true **/
-    public boolean useAccelerometer = true;
+    public boolean useAccelerometer = false;
     /** the update interval to poll the accelerometer with, in seconds **/
     public float accelerometerUpdate = 0.05f;
     /** whether or not the onScreenKeyboard should be closed on return key **/
     public boolean keyboardCloseOnReturn = true;
-
-    /**
-     * Whether to enable OpenGL ES 3 if supported. If not supported it will fall-back to OpenGL ES 2.0.
-     * When GLES3 is enabled, {@link Core#gl30} can be used to access its functionality.
-     */
-    public boolean useGL30 = false;
 
     /** whether the home indicator should be hidden or not **/
     public boolean hideHomeIndicator = true;

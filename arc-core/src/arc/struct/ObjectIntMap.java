@@ -595,7 +595,7 @@ public class ObjectIntMap<K> implements Iterable<ObjectIntMap.Entry<K>>{
             return this;
         }
 
-        public Seq<Entry<K>> toArray(){
+        public Seq<Entry<K>> toSeq(){
             Seq<Entry<K>> out = new Seq<>(map.size);
             while(hasNext()){
                 Entry<K> entry = next();

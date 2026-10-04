@@ -64,6 +64,8 @@ arc-*.zip.MD5
 /arc-core/Users/
 /arc-core/csrc/stb_image.h
 /arc-core/csrc/soloud
+/arc-core/csrc/freetype
+/arc-core/csrc/freetype.tar.gz
 #directories created by fetch.xml
 /tmp/
 

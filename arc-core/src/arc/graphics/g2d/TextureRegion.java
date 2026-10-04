@@ -312,6 +312,10 @@ public class TextureRegion{
         return scale * Draw.scl;
     }
 
+    public float getDepth(){
+        return texture.getDepth();
+    }
+
     @Override
     public String toString(){
         return "TextureRegion{" +

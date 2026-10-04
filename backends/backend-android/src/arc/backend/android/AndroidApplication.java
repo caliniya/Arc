@@ -103,7 +103,7 @@ public class AndroidApplication extends Activity implements Application{
         if(this.getVersion() < MINIMUM_SDK){
             throw new ArcRuntimeException("Arc requires Android API Level " + MINIMUM_SDK + " or later.");
         }
-        graphics = new AndroidGraphics(this, config, config.resolutionStrategy == null ? new FillResolutionStrategy() : config.resolutionStrategy);
+        graphics = new AndroidGraphics(this, config);
         input = new AndroidInput(this, this, graphics.view, config);
 
         this.getFilesDir(); // workaround for Android bug #10515463

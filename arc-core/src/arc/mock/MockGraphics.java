@@ -5,10 +5,6 @@ import arc.Graphics.Cursor.*;
 import arc.graphics.*;
 import arc.graphics.gl.*;
 
-/**
- * The headless backend does its best to mock elements. This is intended to make code-sharing between
- * server and client as simple as possible.
- */
 public class MockGraphics extends Graphics{
     long frameId = -1;
     float deltaTime = 0;
@@ -17,31 +13,6 @@ public class MockGraphics extends Graphics{
     int fps;
     long lastTime = System.nanoTime();
     GLVersion glVersion = new GLVersion(Application.ApplicationType.headless, "", "", "");
-
-    @Override
-    public boolean isGL30Available(){
-        return false;
-    }
-
-    @Override
-    public GL20 getGL20(){
-        return null;
-    }
-
-    @Override
-    public void setGL20(GL20 gl20){
-
-    }
-
-    @Override
-    public GL30 getGL30(){
-        return null;
-    }
-
-    @Override
-    public void setGL30(GL30 gl30){
-
-    }
 
     @Override
     public int getWidth(){

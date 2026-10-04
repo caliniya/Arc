@@ -1,7 +1,6 @@
 package arc.graphics.g2d;
 
 import arc.graphics.*;
-import arc.graphics.Texture.*;
 import arc.graphics.g2d.PixmapPacker.SkylineStrategy.SkylinePage.*;
 import arc.graphics.gl.*;
 import arc.math.geom.*;
@@ -78,11 +77,11 @@ public class PixmapPacker implements Disposable{
     boolean disposed;
     int pageWidth, pageHeight;
     int padding;
-    boolean allowMultiplePages = true;
     boolean duplicateBorder;
     boolean stripWhitespaceX, stripWhitespaceY;
     Color transparentColor = new Color(0f, 0f, 0f, 0f);
     PackStrategy packStrategy;
+    @Nullable Texture targetTexture;
 
     /**
      * Uses {@link GuillotineStrategy}.
@@ -119,8 +118,12 @@ public class PixmapPacker implements Disposable{
         this.packStrategy = packStrategy;
     }
 
-    public void setAllowMultiplePages(boolean allowMultiplePages){
-        this.allowMultiplePages = allowMultiplePages;
+    public void setTargetTexture(Texture targetTexture){
+        this.targetTexture = targetTexture;
+    }
+
+    public @Nullable Texture getTargetTexture(){
+        return targetTexture;
     }
 
     /**
@@ -370,33 +373,26 @@ public class PixmapPacker implements Disposable{
     }
 
     /**
-     * Generates a new {@link TextureAtlas} from the pixmaps inserted so far. After calling this method, disposing the packer will
-     * no longer dispose the page pixmaps.
-     */
-    public synchronized TextureAtlas generateTextureAtlas(TextureFilter minFilter, TextureFilter magFilter, boolean useMipMaps){
-        TextureAtlas atlas = new TextureAtlas();
-        updateTextureAtlas(atlas, minFilter, magFilter, useMipMaps, true);
-        return atlas;
-    }
-
-    public synchronized void updateTextureAtlas(TextureAtlas atlas, TextureFilter minFilter, TextureFilter magFilter, boolean useMipMaps){
-        updateTextureAtlas(atlas, minFilter, magFilter, useMipMaps, true);
-    }
-
-    /**
      * Updates the {@link TextureAtlas}, adding any new {@link Pixmap} instances packed since the last call to this method. This
      * can be used to insert Pixmap instances on a separate thread via {@link #pack(String, Pixmap)} and update the TextureAtlas on
      * the rendering thread. This method must be called on the rendering thread. After calling this method, disposing the packer
      * will no longer dispose the page pixmaps.
      */
-    public synchronized void updateTextureAtlas(TextureAtlas atlas, TextureFilter minFilter, TextureFilter magFilter, boolean useMipMaps, boolean clearRects){
-        updatePageTextures(minFilter, magFilter, useMipMaps);
+    public synchronized TextureAtlas generateTextureAtlas(TextureFilter minFilter, TextureFilter magFilter, boolean useMipMaps, boolean clearRects, int extraPages){
+        TextureAtlas atlas = new TextureAtlas();
+        TextureArray array = new TextureArray(getPageWidth(), getPageHeight(), pages.size + extraPages);
+        atlas.setTexture(array);
+        array.setFilter(minFilter, magFilter);
 
+        int i = 0;
         for(Page page : pages){
             if(page.addedRects.size > 0){
+                ArraySliceTexture tex = new ArraySliceTexture(array, i);
+                tex.draw(page.image);
+
                 for(String name : page.addedRects){
                     PixmapPackerRect rect = page.rects.get(name);
-                    TextureAtlas.AtlasRegion region = new TextureAtlas.AtlasRegion(page.texture, (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
+                    TextureAtlas.AtlasRegion region = new TextureAtlas.AtlasRegion(tex, (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height);
 
                     if(rect.splits != null){
                         region.splits = rect.splits;
@@ -413,9 +409,12 @@ public class PixmapPacker implements Disposable{
                     atlas.getRegionMap().put(name, region);
                 }
                 if(clearRects) page.addedRects.clear();
-                atlas.getTextures().add(page.texture);
             }
+
+            i ++;
         }
+
+        return atlas;
     }
 
     /**
@@ -637,10 +636,10 @@ public class PixmapPacker implements Disposable{
             if(transparentColor.rgba() != 0){
                 this.image.fill(transparentColor);
             }
-        }
 
-        public Page(Pixmap pixmap){
-            this.image = pixmap;
+            if(packer.targetTexture != null){
+                this.texture = packer.targetTexture;
+            }
         }
 
         public void setDirty(boolean dirty){
@@ -671,15 +670,11 @@ public class PixmapPacker implements Disposable{
         public boolean updateTexture(TextureFilter minFilter, TextureFilter magFilter, boolean useMipMaps){
             if(texture != null){
                 if(!dirty) return false;
-                texture.load(texture.getTextureData());
+
+                //this doesn't update mipmaps, but for UI, I don't care
+                texture.draw(image);
             }else{
-                texture = new Texture(new PixmapTextureData(image, useMipMaps, false)){
-                    @Override
-                    public void dispose(){
-                        super.dispose();
-                        image.dispose();
-                    }
-                };
+                texture = new Texture(image, useMipMaps);
                 texture.setFilter(minFilter, magFilter);
             }
             dirty = false;
@@ -695,7 +690,6 @@ public class PixmapPacker implements Disposable{
      * @author Rob Rendell
      */
     public static class GuillotineStrategy implements PackStrategy{
-        boolean full;
 
         @Override
         public void sort(Seq<PixmapRegion> pixmaps){
@@ -719,7 +713,6 @@ public class PixmapPacker implements Disposable{
             rect.height += padding;
             Node node = insert(page.root, rect);
             if(node == null){
-                if(!packer.allowMultiplePages) throw new ArcRuntimeException("Failed to fit sprites into one page");
                 // Didn't fit, pack into a new page.
                 page = new GuillotinePage(packer);
                 packer.pages.add(page);
@@ -784,15 +777,6 @@ public class PixmapPacker implements Disposable{
 
             public GuillotinePage(PixmapPacker packer){
                 super(packer);
-                root = new Node();
-                root.rect.x = packer.padding;
-                root.rect.y = packer.padding;
-                root.rect.width = packer.pageWidth - packer.padding * 2;
-                root.rect.height = packer.pageHeight - packer.padding * 2;
-            }
-
-            public GuillotinePage(PixmapPacker packer, Pixmap base){
-                super(base);
                 root = new Node();
                 root.rect.x = packer.padding;
                 root.rect.y = packer.padding;
