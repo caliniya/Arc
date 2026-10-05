@@ -88,7 +88,10 @@ public class Strings{
 
     public static String repeat(String str, int count){
         if(count <= 0) return "";
-        StringBuilder builder = new StringBuilder(str.length() * count);
+        //复用 tmp2(与 fixedBuilder 同一模式):结果 toString 拷贝后立即归还缓冲
+        StringBuilder builder = tmp2;
+        builder.setLength(0);
+        builder.ensureCapacity(str.length() * count);
         for(int i = 0; i < count; i++){
             builder.append(str);
         }
