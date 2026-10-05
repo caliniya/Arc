@@ -1,10 +1,16 @@
 package arc.struct;
 
-/** Tiny array wrapper with a mask int for fast contains() checks. */
+/**
+ * Tiny array wrapper with a mask int for fast contains() checks.
+ * 带有一个掩码 int 的小型数组包装器,用于快速的 contains() 检查。
+ */
 public class EnumSet<T extends Enum<T>>{
     private long mask;
 
-    /** Array, for iterating over. Do not change. */
+    /**
+     * Array, for iterating over. Do not change.
+     * 用于遍历的数组。不要修改。
+     */
     public T[] array;
     public int size;
 
@@ -24,7 +30,9 @@ public class EnumSet<T extends Enum<T>>{
         return set;
     }
 
-    /** @return a new set with the specified enum, or itself if this flag is already present. */
+    /**
+     * @return a new set with the specified enum, or itself if this flag is already present. 包含指定 enum 的新集合;如果此标志已存在,则返回其自身。
+     */
     public EnumSet<T> with(T add){
         if(!contains(add)){
             T[] copy = (T[])java.lang.reflect.Array.newInstance(array.getClass().getComponentType(), array.length + 1);

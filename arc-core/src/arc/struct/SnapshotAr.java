@@ -20,6 +20,8 @@ import java.util.Comparator;
  * }
  * array.end();
  * </pre>
+ * <p>
+ * 保证在调用 {@link #begin()} 时索引 0 到 {@link #size} 之间由 begin 返回的数组条目,在调用 {@link #end()} 之前不会被修改。如果在 begin/end 之间发生了对 SnapshotArray 的修改,底层数组会在修改之前被复制,确保 {@link #begin()} 返回的底层数组不受影响。为避免内存分配,会在后续复制时尝试复用因该复制而创建的多余数组。<p> 建议按以下特定方式进行遍历:<pre> SnapshotArray array = new SnapshotArray(); // ... Object[] items = array.begin(); for (int i = 0, n = array.size; i &lt; n; i++) { Object item = items[i]; // ... } array.end(); </pre>
  * @author Nathan Sweet
  */
 @SuppressWarnings("unchecked")
@@ -64,7 +66,10 @@ public class SnapshotAr<T> extends Ar<T>{
         return new SnapshotAr<>(array);
     }
 
-    /** Returns the backing array, which is guaranteed to not be modified before {@link #end()}. */
+    /**
+     * Returns the backing array, which is guaranteed to not be modified before {@link #end()}.
+     * 返回底层数组,并保证在 {@link #end()} 之前它不会被修改。
+     */
     public T[] begin(){
         modified();
         snapshot = items;
@@ -72,12 +77,16 @@ public class SnapshotAr<T> extends Ar<T>{
         return items;
     }
 
-    /** Releases the guarantee that the array returned by {@link #begin()} won't be modified. */
+    /**
+     * Releases the guarantee that the array returned by {@link #begin()} won't be modified.
+     * 解除 {@link #begin()} 返回的数组不会被修改的保证。
+     */
     public void end(){
         snapshots = Math.max(0, snapshots - 1);
         if(snapshot == null) return;
         if(snapshot != items && snapshots == 0){
             // The backing array was copied, keep around the old array.
+            // 底层数组已被复制,保留旧数组以备复用。
             recycled = snapshot;
             for(int i = 0, n = recycled.length; i < n; i++)
                 recycled[i] = null;
@@ -88,6 +97,7 @@ public class SnapshotAr<T> extends Ar<T>{
     private void modified(){
         if(snapshot == null || snapshot != items) return;
         // Snapshot is in use, copy backing array to recycled array or create new backing array.
+        // 快照正在使用中,将底层数组复制到回收的数组,或创建新的底层数组。
         if(recycled != null && recycled.length >= size){
             System.arraycopy(items, 0, recycled, 0, size);
             items = recycled;

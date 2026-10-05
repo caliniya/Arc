@@ -18,12 +18,14 @@ public class BinaryHeap<T extends BinaryHeap.Node>{
 
     public T add(T node){
         // Expand if necessary.
+        // 必要时扩容。
         if(size == nodes.length){
             Node[] newNodes = new Node[size << 1];
             System.arraycopy(nodes, 0, newNodes, 0, size);
             nodes = newNodes;
         }
         // Insert at end and bubble up.
+        // 在末尾插入并向上冒泡。
         node.index = size;
         nodes[size] = node;
         up(size++);
@@ -37,8 +39,10 @@ public class BinaryHeap<T extends BinaryHeap.Node>{
 
     /**
      * Returns if binary heap contains the provided node.
-     * @param node May be null.
-     * @param identity If true, == comparison will be used. If false, .equals() comparison will be used.
+     * <p>
+     * 返回二叉堆是否包含给定节点。
+     * @param node May be null. 可能为 null。
+     * @param identity If true, == comparison will be used. If false, .equals() comparison will be used. 如果为 true,使用 == 比较;如果为 false,使用 .equals() 比较。
      */
     public boolean contains(T node, boolean identity){
         if(identity || node == null){
@@ -73,7 +77,10 @@ public class BinaryHeap<T extends BinaryHeap.Node>{
         return (T)removed;
     }
 
-    /** Returns true if the heap is empty. */
+    /**
+     * Returns true if the heap is empty.
+     * 如果堆为空,返回 true。
+     */
     public boolean isEmpty(){
         return size == 0;
     }
@@ -125,10 +132,12 @@ public class BinaryHeap<T extends BinaryHeap.Node>{
             int rightIndex = leftIndex + 1;
 
             // Always have a left child.
+            // 一定有左子节点。
             Node leftNode = nodes[leftIndex];
             float leftValue = leftNode.value;
 
             // May have a right child.
+            // 可能有右子节点。
             Node rightNode;
             float rightValue;
             if(rightIndex >= size){
@@ -140,6 +149,7 @@ public class BinaryHeap<T extends BinaryHeap.Node>{
             }
 
             // The smallest of the three values is the parent.
+            // 三个值中最小的是父节点。
             if(leftValue < rightValue ^ isMaxHeap){
                 if(leftValue == value || (leftValue > value ^ isMaxHeap)) break;
                 nodes[index] = leftNode;

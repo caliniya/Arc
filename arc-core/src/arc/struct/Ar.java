@@ -13,16 +13,23 @@ import java.util.*;
  * A resizable, ordered or unordered array of objects. If unordered, this class avoids a memory copy
  * when removing elements (the last element is moved to the removed element's position).
  *
+ * <p>
+ * 一种可调整大小的有序或无序对象数组。无序时,该类在移除元素时避免内存复制(将最后一个元素移动到被移除元素的位置)。
  * @author Nathan Sweet
  */
 @SuppressWarnings("unchecked")
 public class Ar<T> implements Iterable<T>, Eachable<T> {
-  /** Debugging variable to count total number of iterators allocated. */
+  /**
+   * Debugging variable to count total number of iterators allocated.
+   * 用于统计已分配迭代器总数的调试变量。
+   */
   public static int iteratorsAllocated = 0;
 
   /**
    * Provides direct access to the underlying array. If the Array's generic type is not Object, this
    * field may only be accessed if the {@link Ar#Ar(boolean, int, Class)} constructor was used.
+   * <p>
+   * 提供对底层数组的直接访问。如果 Array 的泛型类型不是 Object,则只有在使用了 {@link Ar#Ar(boolean, int, Class)} 构造函数的情况下才能访问此字段。
    */
   public T[] items;
 
@@ -31,7 +38,10 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
 
   private @Nullable ArIterable<T> iterable;
 
-  /** Creates an ordered array with a capacity of 16. */
+  /**
+   * Creates an ordered array with a capacity of 16.
+   * 创建一个容量为 16 的有序数组。
+   */
   public Ar() {
     this(true, 16);
   }
@@ -41,15 +51,18 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     this(true, capacity);
   }
 
-  /** Creates an ordered/unordered array with the specified capacity. */
+  /**
+   * Creates an ordered/unordered array with the specified capacity.
+   * 创建一个具有指定容量的有序/无序数组。
+   */
   public Ar(boolean ordered) {
     this(ordered, 16);
   }
 
   /**
-   * @param ordered If false, methods that remove elements may change the order of other elements in
+   * @param ordered If false, methods that remove elements may change the order of other elements in 如果为 false,移除元素的方法可能改变数组中其他元素的顺序
    *     the array, which avoids a memory copy.
-   * @param capacity Any elements added beyond this will cause the backing array to be grown.
+   * @param capacity Any elements added beyond this will cause the backing array to be grown. 超出此值添加的任何元素都会导致底层数组增长。
    */
   public Ar(boolean ordered, int capacity) {
     this.ordered = ordered;
@@ -95,6 +108,8 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
    * Creates a new ordered array containing the elements in the specified array. The new array will
    * have the same type of backing array. The capacity is set to the number of elements, so any
    * subsequent elements added will cause the backing array to be grown.
+   * <p>
+   * 创建一个包含指定数组元素的新的有序数组。新数组将具有相同类型的底层数组。容量被设为元素数量,因此之后添加的任何元素都会导致底层数组增长。
    */
   public Ar(T[] array) {
     this(true, array, 0, array.length);
@@ -227,7 +242,10 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     return arr;
   }
 
-  /** Returns a new array with the mapped values. */
+  /**
+   * Returns a new array with the mapped values.
+   * 返回一个包含映射后值的新数组。
+   */
   public <R> Ar<R> flatMap(Func<T, Iterable<R>> mapper) {
     Ar<R> arr = new Ar<>(size);
     for (int i = 0; i < size; i++) {
@@ -236,7 +254,10 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     return arr;
   }
 
-  /** Returns a new array with the mapped values. */
+  /**
+   * Returns a new array with the mapped values.
+   * 返回一个包含映射后值的新数组。
+   */
   public <R> Ar<R> map(Func<T, R> mapper) {
     Ar<R> arr = new Ar<>(size);
     for (int i = 0; i < size; i++) {
@@ -246,7 +267,7 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   }
 
   /**
-   * @return a new int array with the mapped values.
+   * @return a new int array with the mapped values. 一个包含映射后值的新 int 数组。
    */
   public IntAr mapInt(Intf<T> mapper) {
     IntAr arr = new IntAr(size);
@@ -257,7 +278,7 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   }
 
   /**
-   * @return a new int array with the mapped values.
+   * @return a new int array with the mapped values. 一个包含映射后值的新 int 数组。
    */
   public IntAr mapInt(Intf<T> mapper, Boolf<T> retain) {
     IntAr arr = new IntAr(size);
@@ -271,7 +292,7 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   }
 
   /**
-   * @return a new float array with the mapped values.
+   * @return a new float array with the mapped values. 一个包含映射后值的新 float 数组。
    */
   public FloatAr mapFloat(Floatf<T> mapper) {
     FloatAr arr = new FloatAr(size);
@@ -440,6 +461,7 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     T[] items = this.items;
     if (size + 3 >= items.length)
       items = resize(Math.max(8, (int) (size * 1.8f))); // 1.75 isn't enough when size=5.
+      // 当 size=5 时,1.75 并不够。
     items[size] = value1;
     items[size + 1] = value2;
     items[size + 2] = value3;
@@ -496,14 +518,20 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     return this;
   }
 
-  /** Sets this array's contents to the specified array. */
+  /**
+   * Sets this array's contents to the specified array.
+   * 将此数组的内容设置为指定数组。
+   */
   public void set(Ar<? extends T> array) {
     if(array == this) return;
     clear();
     addAll(array);
   }
 
-  /** Sets this array's contents to the specified array. */
+  /**
+   * Sets this array's contents to the specified array.
+   * 将此数组的内容设置为指定数组。
+   */
   public void set(T[] array) {
     clear();
     addAll(array);
@@ -552,7 +580,9 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   /**
    * Replaces the first occurrence of 'from' with 'to'.
    *
-   * @return whether anything was replaced.
+   * <p>
+   * 将第一次出现的 'from' 替换为 'to'。
+   * @return whether anything was replaced. 是否有内容被替换。
    */
   public boolean replace(T from, T to) {
     int idx = indexOf(from);
@@ -564,14 +594,14 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   }
 
   /**
-   * @return whether this sequence contains every other element in the other sequence.
+   * @return whether this sequence contains every other element in the other sequence. 此序列是否包含另一序列中的每一个其他元素。
    */
   public boolean containsAll(Ar<T> Ar) {
     return containsAll(Ar, false);
   }
 
   /**
-   * @return whether this sequence contains every other element in the other sequence.
+   * @return whether this sequence contains every other element in the other sequence. 此序列是否包含另一序列中的每一个其他元素。
    */
   public boolean containsAll(Ar<T> Ar, boolean identity) {
     T[] others = Ar.items;
@@ -591,10 +621,12 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   /**
    * Returns if this array contains value.
    *
-   * @param value May be null.
-   * @param identity If true, == comparison will be used. If false, .equals() comparison will be
+   * <p>
+   * 返回此数组是否包含 value。
+   * @param value May be null. 可能为 null。
+   * @param identity If true, == comparison will be used. If false, .equals() comparison will be 如果为 true,使用 == 比较;如果为 false,使用 .equals() 比较
    *     used.
-   * @return true if array contains value, false if it doesn't
+   * @return true if array contains value, false if it doesn't 如果数组包含 value 则为 true,否则为 false
    */
   public boolean contains(T value, boolean identity) {
     T[] items = this.items;
@@ -639,10 +671,12 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
    * Returns an index of last occurrence of value in array or -1 if no such value exists. Search is
    * started from the end of an array.
    *
-   * @param value May be null.
-   * @param identity If true, == comparison will be used. If false, .equals() comparison will be
+   * <p>
+   * 返回 value 在数组中最后一次出现的索引,如果不存在这样的值则返回 -1。搜索从数组末尾开始。
+   * @param value May be null. 可能为 null。
+   * @param identity If true, == comparison will be used. If false, .equals() comparison will be 如果为 true,使用 == 比较;如果为 false,使用 .equals() 比较
    *     used.
-   * @return An index of last occurrence of value in array or -1 if no such value exists
+   * @return An index of last occurrence of value in array or -1 if no such value exists value 在数组中最后一次出现的索引,如果不存在则为 -1
    */
   public int lastIndexOf(T value, boolean identity) {
     T[] items = this.items;
@@ -654,7 +688,10 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     return -1;
   }
 
-  /** Removes a value, without using identity. */
+  /**
+   * Removes a value, without using identity.
+   * 移除一个值,不使用 identity。
+   */
   public boolean remove(T value) {
     return remove(value, false);
   }
@@ -662,7 +699,9 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   /**
    * Removes a single value by predicate.
    *
-   * @return whether the item was found and removed.
+   * <p>
+   * 按谓词移除单个值。
+   * @return whether the item was found and removed. 该项是否被找到并移除。
    */
   public boolean remove(Boolf<T> value) {
     for (int i = 0; i < size; i++) {
@@ -677,10 +716,12 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   /**
    * Removes the first instance of the specified value in the array.
    *
-   * @param value May be null.
-   * @param identity If true, == comparison will be used. If false, .equals() comparison will be
+   * <p>
+   * 移除数组中指定值的第一个实例。
+   * @param value May be null. 可能为 null。
+   * @param identity If true, == comparison will be used. If false, .equals() comparison will be 如果为 true,使用 == 比较;如果为 false,使用 .equals() 比较
    *     used.
-   * @return true if value was found and removed, false otherwise
+   * @return true if value was found and removed, false otherwise 如果值被找到并移除则为 true,否则为 false
    */
   public boolean remove(T value, boolean identity) {
     T[] items = this.items;
@@ -702,7 +743,10 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     return false;
   }
 
-  /** Removes and returns the item at the specified index. */
+  /**
+   * Removes and returns the item at the specified index.
+   * 移除并返回指定索引处的条目。
+   */
   public T remove(int index) {
     if (index >= size)
       throw new IndexOutOfBoundsException("index can't be >= size: " + index + " >= " + size);
@@ -715,7 +759,10 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     return value;
   }
 
-  /** Removes the items between the specified indices, inclusive. */
+  /**
+   * Removes the items between the specified indices, inclusive.
+   * 移除指定索引之间的条目(含两端)。
+   */
   public void removeRange(int start, int end) {
     if (end >= size)
       throw new IndexOutOfBoundsException("end can't be >= size: " + end + " >= " + size);
@@ -732,7 +779,7 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   }
 
   /**
-   * @return this object
+   * @return this object 此对象
    */
   public Ar<T> removeAll(Boolf<T> pred) {
     Iterator<T> iter = iterator();
@@ -751,8 +798,10 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   /**
    * Removes from this array all of elements contained in the specified array.
    *
-   * @param identity True to use ==, false to use .equals().
-   * @return true if this array was modified.
+   * <p>
+   * 从此数组中移除指定数组包含的所有元素。
+   * @param identity True to use ==, false to use .equals(). 为 true 使用 ==,为 false 使用 .equals()。
+   * @return true if this array was modified. 如果此数组被修改过则为 true。
    */
   public boolean removeAll(Ar<? extends T> array, boolean identity) {
     int size = this.size;
@@ -793,7 +842,10 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     return pop();
   }
 
-  /** Removes and returns the last item. */
+  /**
+   * Removes and returns the last item.
+   * 移除并返回最后一个条目。
+   */
   public T pop() {
     if (size == 0) throw new IllegalStateException("Array is empty.");
     --size;
@@ -808,20 +860,29 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     return items[size - 1];
   }
 
-  /** Returns the first item. */
+  /**
+   * Returns the first item.
+   * 返回第一个条目。
+   */
   public T first() {
     if (size == 0) throw new IllegalStateException("Array is empty.");
     return items[0];
   }
 
-  /** Returns the first item, or null if this Ar is empty. */
+  /**
+   * Returns the first item, or null if this Ar is empty.
+   * 返回第一个条目,如果此 Ar 为空则返回 null。
+   */
   @Nullable
   public T firstOpt() {
     if (size == 0) return null;
     return items[0];
   }
 
-  /** Returns true if the array is empty. */
+  /**
+   * Returns true if the array is empty.
+   * 如果数组为空,返回 true。
+   */
   public boolean isEmpty() {
     return size == 0;
   }
@@ -842,6 +903,8 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
    * release memory when many items have been removed, or if it is known that more items will not be
    * added.
    *
+   * <p>
+   * 将底层数组的大小缩减为实际条目数。当已移除大量条目,或确定不会再添加更多条目时,这对释放内存很有用。
    * @return {@link #items}
    */
   public T[] shrink() {
@@ -866,6 +929,8 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   /**
    * Sets the array size, leaving any values beyond the current size null.
    *
+   * <p>
+   * 设置数组大小,超出当前大小的值置为 null。
    * @return {@link #items}
    */
   public T[] setSize(int newSize) {
@@ -882,6 +947,7 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   protected T[] resize(int newSize) {
     T[] items = this.items;
     // avoid reflection when possible
+    // 尽可能避免反射
     T[] newItems =
         (T[])
             (items.getClass() == Object[].class
@@ -902,7 +968,10 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     return this;
   }
 
-  /** Sorts the array. This method is not thread safe (uses {@link Sort#instance()}). */
+  /**
+   * Sorts the array. This method is not thread safe (uses {@link Sort#instance()}).
+   * 对数组进行排序。此方法不是线程安全的(使用 {@link Sort#instance()})。
+   */
   public Ar<T> sort(Comparator<? super T> comparator) {
     Sort.instance().sort(items, comparator, 0, size);
     return this;
@@ -930,7 +999,10 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     return this;
   }
 
-  /** Note that this allocates a new set. Mutates. */
+  /**
+   * Note that this allocates a new set. Mutates.
+   * 注意这会分配一个新集合。会修改原集合。
+   */
   public Ar<T> distinct() {
     ObjectSet<T> set = asSet();
     clear();
@@ -942,7 +1014,10 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     return (Ar<R>) this;
   }
 
-  /** Allocates a new array with all elements that match the predicate. */
+  /**
+   * Allocates a new array with all elements that match the predicate.
+   * 分配一个新数组,包含所有匹配谓词的元素。
+   */
   public Ar<T> select(Boolf<T> predicate) {
     Ar<T> arr = new Ar<>();
     for (int i = 0; i < size; i++) {
@@ -953,7 +1028,10 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
     return arr;
   }
 
-  /** Removes everything that does not match this predicate. */
+  /**
+   * Removes everything that does not match this predicate.
+   * 移除所有不匹配此谓词的元素。
+   */
   public Ar<T> retainAll(Boolf<T> predicate) {
     return removeAll(e -> !predicate.get(e));
   }
@@ -973,11 +1051,13 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
    * partially sort the Array. The array must have a size greater than 0, or a {@link
    * ArcRuntimeException} will be thrown.
    *
-   * @param comparator used for comparison
-   * @param kthLowest rank of desired object according to comparison, n is based on ordinal numbers,
+   * <p>
+   * 根据 Comparator 的排名从 Ar 中选择第 n 小的元素。这可能会部分排序数组。数组的大小必须大于 0,否则将抛出 {@link ArcRuntimeException}。
+   * @param comparator used for comparison 用于比较
+   * @param kthLowest rank of desired object according to comparison, n is based on ordinal numbers, 按比较排名的所需对象的序号,n 基于序数,
    *     not array indices. for min value use 1, for max value use size of array, using 0 results in
    *     runtime exception.
-   * @return the value of the Nth lowest ranked object.
+   * @return the value of the Nth lowest ranked object. 第 N 小排名对象的值。
    * @see Select
    */
   public T selectRanked(Comparator<T> comparator, int kthLowest) {
@@ -988,11 +1068,11 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   }
 
   /**
-   * @param comparator used for comparison
-   * @param kthLowest rank of desired object according to comparison, n is based on ordinal numbers,
+   * @param comparator used for comparison 用于比较
+   * @param kthLowest rank of desired object according to comparison, n is based on ordinal numbers, 按比较排名的所需对象的序号,n 基于序数,
    *     not array indices. for min value use 1, for max value use size of array, using 0 results in
    *     runtime exception.
-   * @return the index of the Nth lowest ranked object.
+   * @return the index of the Nth lowest ranked object. 第 N 小排名对象的索引。
    * @see Ar#selectRanked(java.util.Comparator, int)
    */
   public int selectRankedIndex(Comparator<T> comparator, int kthLowest) {
@@ -1029,6 +1109,8 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   /**
    * Reduces the size of the array to the specified size. If the array is already smaller than the
    * specified size, no action is taken.
+   * <p>
+   * 将数组大小缩减到指定大小。如果数组已经小于指定大小,则不执行任何操作。
    */
   public void truncate(int newSize) {
     if (newSize < 0) throw new IllegalArgumentException("newSize must be >= 0: " + newSize);
@@ -1061,9 +1143,11 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
 
     int eidx = indexOf(exclude);
     // this item isn't even in the array!
+    // 这个条目根本不在这个数组中!
     if (eidx == -1) return random();
 
     // shift up the index
+    // 将索引向上移动
     int index = Mathf.random(0, size - 2);
     if (index >= eidx) {
       index++;
@@ -1074,6 +1158,8 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
   /**
    * Returns the items as an array. Note the array is typed, so the {@link #Ar(Class)} constructor
    * must have been used. Otherwise use {@link #toArray(Class)} to specify the array type.
+   * <p>
+   * 将条目作为数组返回。注意数组是有类型的,因此必须使用过 {@link #Ar(Class)} 构造函数。否则请使用 {@link #toArray(Class)} 来指定数组类型。
    */
   public T[] toArray() {
     return toArray(items.getClass().getComponentType());
@@ -1191,6 +1277,7 @@ public class Ar<T> implements Iterable<T>, Eachable<T> {
         return iterator2;
       }
       // allocate new iterator in the case of 3+ nested loops.
+      // 在 3 层及以上的嵌套循环情况下分配新迭代器。
       return new ArIterator();
     }
 

@@ -17,6 +17,8 @@ import static arc.struct.ObjectSet.*;
  * <br>
  * Iteration can be very slow for a map with a large capacity. {@link #clear(int)} and {@link #shrink(int)} can be used to reduce
  * the capacity. {@link OrderedMap} provides much faster iteration.
+ * <p>
+ * 无序映射。此实现是布谷鸟哈希映射,使用 3 个哈希函数、随机游走以及一个存放问题键的小 stash。不允许 null 键。允许 null 值。除扩容表大小外不进行任何分配。<br> <br> 此映射的 get、containsKey 和 remove 非常快(通常 O(1),最坏 O(log(n)))。put 可能稍慢,取决于哈希冲突。负载因子大于 0.91 会大大增加映射被迫重新哈希到下一个更高 2 的幂(POT)大小的机会。<br> <br> 对于容量较大的映射,遍历可能非常慢。可以使用 {@link #clear(int)} 和 {@link #shrink(int)} 来减小容量。{@link OrderedMap} 提供快得多的遍历。
  * @author Nathan Sweet
  */
 @SuppressWarnings("unchecked")
@@ -40,6 +42,8 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
      * <p>
      * {@link #mask} can also be used to mask the low bits of a number, which may be faster for some hashcodes, if
      * {@link #place(Object)} is overridden.
+     * <p>
+     * 供 {@link #place(Object)} 使用,将 {@code long} 的高位移入可用范围(&gt;= 0 且 &lt;= {@link #mask})。shift 可以为负,这便于匹配 mask 的位数:如果 mask 是一个 7 位数,-7 的 shift 会把高 7 位移入最低 7 位。此类将 shift 设为 &gt; 32 且 &lt; 64,若与 int 一起使用,由于 Java 对移位的隐式取模,int 的高位仍会移到低位。<p> {@link #mask} 也可用于屏蔽数字的低位,如果重写了 {@link #place(Object)},这对某些哈希码可能更快。
      */
     protected int shift;
 
@@ -47,6 +51,8 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
      * A bitmask used to confine hashcodes to the size of the table. Must be all 1 bits in its low positions, ie a power of two
      * minus 1. If {@link #place(Object)} is overridden, this can be used instead of {@link #shift} to isolate usable bits of a
      * hash.
+     * <p>
+     * 用于将哈希码限制在表大小范围内的位掩码。其低位必须全为 1,即 2 的幂减 1。如果重写了 {@link #place(Object)},可以用它代替 {@link #shift} 来隔离哈希的可用位。
      */
     protected int mask;
 
@@ -64,14 +70,19 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         return map;
     }
 
-    /** Creates a new map with an initial capacity of 51 and a load factor of 0.8. */
+    /**
+     * Creates a new map with an initial capacity of 51 and a load factor of 0.8.
+     * 创建一个初始容量为 51、负载因子为 0.8 的新映射。
+     */
     public ObjectMap(){
         this(51, 0.8f);
     }
 
     /**
      * Creates a new map with a load factor of 0.8.
-     * @param initialCapacity The backing array size is initialCapacity / loadFactor, increased to the next power of two.
+     * <p>
+     * 创建一个负载因子为 0.8 的新映射。
+     * @param initialCapacity The backing array size is initialCapacity / loadFactor, increased to the next power of two. 底层数组大小为 initialCapacity / loadFactor,并增加到下一个 2 的幂。
      */
     public ObjectMap(int initialCapacity){
         this(initialCapacity, 0.8f);
@@ -80,7 +91,9 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
     /**
      * Creates a new map with the specified initial capacity and load factor. This map will hold initialCapacity items before
      * growing the backing table.
-     * @param initialCapacity The backing array size is initialCapacity / loadFactor, increased to the next power of two.
+     * <p>
+     * 创建一个具有指定初始容量和负载因子的新映射。在底层数组扩容之前,此映射可容纳 initialCapacity 个条目。
+     * @param initialCapacity The backing array size is initialCapacity / loadFactor, increased to the next power of two. 底层数组大小为 initialCapacity / loadFactor,并增加到下一个 2 的幂。
      */
     public ObjectMap(int initialCapacity, float loadFactor){
         if(loadFactor <= 0f || loadFactor >= 1f)
@@ -96,7 +109,10 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         valueTable = (V[])new Object[tableSize];
     }
 
-    /** Creates a new map identical to the specified map. */
+    /**
+     * Creates a new map identical to the specified map.
+     * 创建一个与指定映射完全相同的新映射。
+     */
     public ObjectMap(ObjectMap<? extends K, ? extends V> map){
         this((int)(map.keyTable.length * map.loadFactor), map.loadFactor);
         System.arraycopy(map.keyTable, 0, keyTable, 0, map.keyTable.length);
@@ -119,6 +135,8 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
      * This method can be overridden to customizing hashing. This may be useful eg in the unlikely event that most hashcodes are
      * Fibonacci numbers, if keys provide poor or incorrect hashcodes, or to simplify hashing if keys provide high quality
      * hashcodes and don't need Fibonacci hashing: {@code return item.hashCode() & mask;}
+     * <p>
+     * 为指定的 {@code item} 返回一个 >= 0 且 <= {@link #mask} 的索引。<p> 默认实现对 item 的 {@link Object#hashCode()} 使用斐波那契哈希:哈希码乘以一个 long 常量(2 的 64 次方除以黄金分割比),然后将最高位移入最低位,以获得所需范围内的索引。用 long 相乘可能比 int 慢(例如在 GWT 上),但能大大改进重新哈希,使得即使非常差的哈希码(例如只有高位不同的哈希码)也能在不会产生高冲突率的情况下使用。当全部或大多数哈希码是较大斐波那契数的倍数时,斐波那契哈希的冲突率会升高(见 <a href= "https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/">Malte Skarupke 的博客文章</a>)。<p> 可以重写此方法来自定义哈希。这在以下情况下可能有用:例如绝大多数哈希码恰为斐波那契数这种罕见情况、键提供的哈希码质量差或不正确时,或当键提供的哈希码质量很高、不需要斐波那契哈希从而简化哈希时:{@code return item.hashCode() & mask;}
      */
     protected int place(K item){
         return (int)(item.hashCode() * 0x9E3779B97F4A7C15L >>> shift);
@@ -127,6 +145,8 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
     /**
      * Returns the index of the key if already present, else -(index + 1) for the next empty index. This can be overridden in this
      * pacakge to compare for equality differently than {@link Object#equals(Object)}.
+     * <p>
+     * 如果键已存在,返回其索引;否则返回 -(index + 1),即下一个空索引。在本包中可以重写此方法,以使用不同于 {@link Object#equals(Object)} 的相等比较。
      */
     int locateKey(K key){
         if(key == null) throw new IllegalArgumentException("key cannot be null.");
@@ -134,19 +154,26 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         for(int i = place(key); ; i = i + 1 & mask){
             K other = keyTable[i];
             if(other == null) return -(i + 1); // Empty space is available.
+            // 有空位可用。
             if(other.equals(key)) return i; // Same key was found.
+            // 已找到相同的键。
         }
     }
 
-    /** Returns the old value associated with the specified key, or null. */
+    /**
+     * Returns the old value associated with the specified key, or null.
+     * 返回指定键关联的旧值,或 null。
+     */
     public @Nullable V put(K key, @Nullable V value){
         int i = locateKey(key);
         if(i >= 0){ // Existing key was found.
+        // 已找到现有键。
             V oldValue = valueTable[i];
             valueTable[i] = value;
             return oldValue;
         }
         i = -(i + 1); // Empty space was found.
+        // 已找到空位。
         keyTable[i] = key;
         valueTable[i] = value;
         if(++size >= threshold) resize(keyTable.length << 1);
@@ -156,7 +183,9 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
     public @Nullable V putMissing(K key, @Nullable V value){
         int i = locateKey(key);
         if(i >= 0) return valueTable[i]; // Existing key was found.
+        // 已找到现有键。
         i = -(i + 1); // Empty space was found.
+        // 已找到空位。
         keyTable[i] = key;
         valueTable[i] = value;
         if(++size >= threshold) resize(keyTable.length << 1);
@@ -180,13 +209,19 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         }
     }
 
-    /** Put all the keys of this other map into this map, and return this map for chaining. */
+    /**
+     * Put all the keys of this other map into this map, and return this map for chaining.
+     * 将另一个映射的所有键放入此映射,并返回此映射以便链式调用。
+     */
     public ObjectMap<K, V> merge(ObjectMap<? extends K, ? extends V> map){
         putAll(map);
         return this;
     }
 
-    /**Iterates through key/value pairs.*/
+    /**
+     * Iterates through key/value pairs.
+     * 遍历键/值对。
+     */
     public void each(Cons2<K, V> cons){
         for(Entry<K, V> entry : entries()){
             cons.get(entry.key, entry.value);
@@ -202,7 +237,10 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         putAll(value);
     }
 
-    /** Skips checks for existing keys, doesn't increment size. */
+    /**
+     * Skips checks for existing keys, doesn't increment size.
+     * 跳过对现有键的检查,不增加大小。
+     */
     private void putResize(K key, @Nullable V value){
         K[] keyTable = this.keyTable;
         for(int i = place(key); ; i = (i + 1) & mask){
@@ -221,7 +259,10 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         return get(key);
     }
 
-    /** Tries to get the value. If it does not exist, it creates a new instance using the supplier and places it, returning the value.*/
+    /**
+     * Tries to get the value. If it does not exist, it creates a new instance using the supplier and places it, returning the value.
+     * 尝试获取值。如果它不存在,则使用 supplier 创建新实例并放入,然后返回该值。
+     */
     public V get(K key, Prov<V> supplier){
         V val = get(key);
         if(val == null){
@@ -230,20 +271,29 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         return val;
     }
 
-    /** Returns the value for the specified key, or null if the key is not in the map. */
+    /**
+     * Returns the value for the specified key, or null if the key is not in the map.
+     * 返回指定键对应的值,如果键不在映射中则返回 null。
+     */
     public @Nullable <T extends K> V get(T key){
         int i = locateKey(key);
         return i < 0 ? null : valueTable[i];
     }
 
-    /** Returns the value for the specified key, or the default value if the key is not in the map. */
+    /**
+     * Returns the value for the specified key, or the default value if the key is not in the map.
+     * 返回指定键对应的值,如果键不在映射中则返回默认值。
+     */
     public V get(K key, @Nullable V defaultValue){
         if(key == null) return defaultValue;
         int i = locateKey(key);
         return i < 0 ? defaultValue : valueTable[i];
     }
 
-    /** Returns the value for the removed key, or null if the key is not in the map. */
+    /**
+     * Returns the value for the removed key, or null if the key is not in the map.
+     * 返回被移除键对应的值,如果键不在映射中则返回 null。
+     */
     public @Nullable V remove(K key){
         int i = locateKey(key);
         if(i < 0) return null;
@@ -266,12 +316,18 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         return oldValue;
     }
 
-    /** Returns true if the map has one or more items. */
+    /**
+     * Returns true if the map has one or more items.
+     * 如果映射中有一个或多个条目,返回 true。
+     */
     public boolean notEmpty(){
         return size > 0;
     }
 
-    /** Returns true if the map is empty. */
+    /**
+     * Returns true if the map is empty.
+     * 如果映射为空,返回 true。
+     */
     public boolean isEmpty(){
         return size == 0;
     }
@@ -280,6 +336,8 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
      * Reduces the size of the backing arrays to be the specified capacity / loadFactor, or less. If the capacity is already less,
      * nothing is done. If the map contains more items than the specified capacity, the next highest power of two capacity is used
      * instead.
+     * <p>
+     * 将底层数组的大小缩减为不超过指定容量 / loadFactor。如果容量已经更小,则不做任何操作。如果映射包含的条目多于指定容量,则改用次高的 2 的幂容量。
      */
     public void shrink(int maximumCapacity){
         if(maximumCapacity < 0) throw new IllegalArgumentException("maximumCapacity must be >= 0: " + maximumCapacity);
@@ -288,7 +346,10 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
         if(keyTable.length > tableSize) resize(tableSize);
     }
 
-    /** Clears the map and reduces the size of the backing arrays to be the specified capacity / loadFactor, if they are larger. */
+    /**
+     * Clears the map and reduces the size of the backing arrays to be the specified capacity / loadFactor, if they are larger.
+     * 清除映射,并将底层数组的大小缩减为指定容量 / loadFactor(如果它们更大的话)。
+     */
     public void clear(int maximumCapacity){
         int tableSize = tableSize(maximumCapacity, loadFactor);
         if(keyTable.length <= tableSize){
@@ -309,7 +370,9 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
     /**
      * Returns true if the specified value is in the map. Note this traverses the entire map and compares every value, which may
      * be an expensive operation.
-     * @param identity If true, uses == to compare the specified value with values in the map. If false, uses
+     * <p>
+     * 如果指定 value 在映射中,返回 true。注意这会遍历整个映射并比较每个值,可能是昂贵的操作。
+     * @param identity If true, uses == to compare the specified value with values in the map. If false, uses 如果为 true,使用 == 将指定值与映射中的值比较;如果为 false,使用 .equals()
      * {@link #equals(Object)}.
      */
     public boolean containsValue(@Nullable Object value, boolean identity){
@@ -335,7 +398,9 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
     /**
      * Returns the key for the specified value, or null if it is not in the map. Note this traverses the entire map and compares
      * every value, which may be an expensive operation.
-     * @param identity If true, uses == to compare the specified value with values in the map. If false, uses
+     * <p>
+     * 返回指定 value 对应的 key,如果它不在映射中则返回 null。注意这会遍历整个映射并比较每个值,可能是昂贵的操作。
+     * @param identity If true, uses == to compare the specified value with values in the map. If false, uses 如果为 true,使用 == 将指定值与映射中的值比较;如果为 false,使用 .equals()
      * {@link #equals(Object)}.
      */
     public @Nullable K findKey(@Nullable Object value, boolean identity){
@@ -357,6 +422,8 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
     /**
      * Increases the size of the backing array to accommodate the specified number of additional items / loadFactor. Useful before
      * adding many items to avoid multiple backing array resizes.
+     * <p>
+     * 增大底层数组的大小,以容纳指定数量的额外条目 / loadFactor。在添加大量条目之前很有用,可避免多次底层数组扩容。
      */
     public void ensureCapacity(int additionalCapacity){
         int tableSize = tableSize(size + additionalCapacity, loadFactor);
@@ -466,6 +533,8 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
      * Returns an iterator for the entries in the map. Remove is supported.
      * <p>
      * Use the {@link Entries} constructor for nested or multithreaded iteration.
+     * <p>
+     * 返回映射中条目的迭代器。支持移除。<p> 嵌套或多线程遍历时,请使用 {@link Entries} 构造函数。
      */
     public Entries<K, V> entries(){
         if(entries1 == null){
@@ -488,6 +557,8 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
      * Returns an iterator for the values in the map. Remove is supported.
      * <p>
      * Use the {@link Values} constructor for nested or multithreaded iteration.
+     * <p>
+     * 返回映射中值的迭代器。支持移除。<p> 嵌套或多线程遍历时,请使用 {@link Values} 构造函数。
      */
     public Values<V> values(){
         if(values1 == null){
@@ -510,6 +581,8 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
      * Returns an iterator for the keys in the map. Remove is supported.
      * <p>
      * Use the {@link Keys} constructor for nested or multithreaded iteration.
+     * <p>
+     * 返回映射中键的迭代器。支持移除。<p> 嵌套或多线程遍历时,请使用 {@link Keys} 构造函数。
      */
     public Keys<K> keys(){
         if(keys1 == null){
@@ -598,7 +671,10 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
             super(map);
         }
 
-        /** Note the same entry instance is returned each time this method is called. */
+        /**
+         * Note the same entry instance is returned each time this method is called.
+         * 注意每次调用此方法都返回相同的 entry 实例。
+         */
         @Override
         public Entry<K, V> next(){
             if(!hasNext) throw new NoSuchElementException();
@@ -649,12 +725,18 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
             return this;
         }
 
-        /** Returns a new array containing the remaining values. */
+        /**
+         * Returns a new array containing the remaining values.
+         * 返回一个包含剩余值的新数组。
+         */
         public Ar<V> toSeq(){
             return toSeq(new Ar<>(true, map.size));
         }
 
-        /** Adds the remaining values to the specified array. */
+        /**
+         * Adds the remaining values to the specified array.
+         * 将剩余的值添加到指定数组。
+         */
         public Ar<V> toSeq(Ar<V> array){
             while(hasNext)
                 array.add(next());
@@ -688,12 +770,18 @@ public class ObjectMap<K, V> implements Iterable<ObjectMap.Entry<K, V>>{
             return this;
         }
 
-        /** Returns a new array containing the remaining keys. */
+        /**
+         * Returns a new array containing the remaining keys.
+         * 返回一个包含剩余键的新数组。
+         */
         public Ar<K> toSeq(){
             return toSeq(new Ar<>(true, map.size));
         }
 
-        /** Adds the remaining keys to the array. */
+        /**
+         * Adds the remaining keys to the array.
+         * 将剩余的键添加到数组。
+         */
         public Ar<K> toSeq(Ar<K> array){
             while(hasNext)
                 array.add(next());

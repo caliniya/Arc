@@ -22,6 +22,8 @@ import java.util.*;
  * {@link #clear(int)} and {@link #shrink(int)} can be used to reduce
  * the capacity. {@link OrderedSet} provides much faster iteration.
  * 
+ * <p>
+ * 键为对象的无序集合。此实现使用布谷鸟哈希,采用 3 个哈希函数、随机游走以及一个存放问题键的小 stash。不允许 null 键。除扩容表大小外不进行任何分配。<br> <br> 此集合的 contains 和 remove 非常快(通常 O(1),最坏 O(log(n)))。add 可能稍慢,取决于哈希冲突。负载因子大于 0.91 会大大增加集合被迫重新哈希到下一个更高 2 的幂(POT)大小的机会。<br> <br> 对于容量较大的集合,遍历可能非常慢。可以使用 {@link #clear(int)} 和 {@link #shrink(int)} 来减小容量。{@link OrderedSet} 提供快得多的遍历。
  * @author Nathan Sweet
  */
 @SuppressWarnings("unchecked")
@@ -44,6 +46,8 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
 
   /**
    * Creates a new set with an initial capacity of 51 and a load factor of 0.8.
+   * <p>
+   * 创建一个初始容量为 51、负载因子为 0.8 的新集合。
    */
   public ObjectSet() {
     this(51, 0.8f);
@@ -52,7 +56,9 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
   /**
    * Creates a new set with a load factor of 0.8.
    * 
-   * @param initialCapacity If not a power of two, it is increased to the next
+   * <p>
+   * 创建一个负载因子为 0.8 的新集合。
+   * @param initialCapacity If not a power of two, it is increased to the next 如果不是 2 的幂,则增加到下一个
    *                        nearest power of two.
    */
   public ObjectSet(int initialCapacity) {
@@ -64,7 +70,9 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
    * set will hold initialCapacity items before
    * growing the backing table.
    * 
-   * @param initialCapacity If not a power of two, it is increased to the next
+   * <p>
+   * 创建一个具有指定初始容量和负载因子的新集合。在底层数组扩容之前,此集合可容纳 initialCapacity 个条目。
+   * @param initialCapacity If not a power of two, it is increased to the next 如果不是 2 的幂,则增加到下一个
    *                        nearest power of two.
    */
   public ObjectSet(int initialCapacity, float loadFactor) {
@@ -88,7 +96,10 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
     keyTable = (T[]) new Object[capacity + stashCapacity];
   }
 
-  /** Creates a new set identical to the specified set. */
+  /**
+   * Creates a new set identical to the specified set.
+   * 创建一个与指定集合完全相同的新集合。
+   */
   public ObjectSet(ObjectSet<? extends T> set) {
     this((int) Math.floor(set.capacity * set.loadFactor), set.loadFactor);
     stashSize = set.stashSize;
@@ -108,7 +119,10 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
     return set;
   }
 
-  /** Allocates a new set with all elements that match the predicate. */
+  /**
+   * Allocates a new set with all elements that match the predicate.
+   * 分配一个新集合,包含所有匹配谓词的元素。
+   */
   public ObjectSet<T> select(Boolf<T> predicate) {
     ObjectSet<T> arr = new ObjectSet<>();
     for (T t : this) {
@@ -139,7 +153,10 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
     return size > 0;
   }
 
-  /** Returns true if the set has one or more items. */
+  /**
+   * Returns true if the set has one or more items.
+   * 如果集合中有一个或多个条目,返回 true。
+   */
   public boolean notEmpty() {
     return size > 0;
   }
@@ -155,6 +172,8 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
    * Returns true if the key was not already in the set. If this set already
    * contains the key, the call leaves the set unchanged
    * and returns false.
+   * <p>
+   * 如果键原本不在集合中,返回 true。如果此集合已包含该键,调用会保持集合不变并返回 false。
    */
   public boolean add(T key) {
     if (key == null)
@@ -162,6 +181,7 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
     T[] keyTable = this.keyTable;
 
     // Check for existing keys.
+    // 检查已存在的键。
     int hashCode = key.hashCode();
     int index1 = hashCode & mask;
     T key1 = keyTable[index1];
@@ -179,11 +199,13 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
       return false;
 
     // Find key in the stash.
+    // 在 stash 中查找键。
     for (int i = capacity, n = i + stashSize; i < n; i++)
       if (key.equals(keyTable[i]))
         return false;
 
     // Check for empty buckets.
+    // 检查空桶。
     if (key1 == null) {
       keyTable[index1] = key;
       if (size++ >= threshold)
@@ -253,9 +275,13 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
     removeAll(array.items, 0, array.size);
   }
 
-  /** Skips checks for existing keys. */
+  /**
+   * Skips checks for existing keys.
+   * 跳过对现有键的检查。
+   */
   private void addResize(T key) {
     // Check for empty buckets.
+    // 检查空桶。
     int hashCode = key.hashCode();
     int index1 = hashCode & mask;
     T key1 = keyTable[index1];
@@ -292,10 +318,12 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
     int mask = this.mask;
 
     // Push keys until an empty bucket is found.
+    // 持续放入键,直到找到空桶。
     T evictedKey;
     int i = 0, pushIterations = this.pushIterations;
     do {
       // Replace the key and value for one of the hashes.
+      // 替换其中一个哈希的键和值。
       switch (Mathf.random(2)) {
         case 0:
           evictedKey = key1;
@@ -312,6 +340,7 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
       }
 
       // If the evicted key hashes to an empty bucket, put it there and stop.
+      // 如果被逐出的键哈希到了空桶,就把它放在那里并停止。
       int hashCode = evictedKey.hashCode();
       index1 = hashCode & mask;
       key1 = keyTable[index1];
@@ -352,18 +381,23 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
   private void addStash(T key) {
     if (stashSize == stashCapacity) {
       // Too many pushes occurred and the stash is full, increase the table size.
+      // 放入次数过多且 stash 已满,应增大表的大小。
       resize(capacity << 1);
       addResize(key);
       return;
     }
     // Store key in the stash.
+    // 将键存入 stash。
     int index = capacity + stashSize;
     keyTable[index] = key;
     stashSize++;
     size++;
   }
 
-  /** Returns true if the key was removed. */
+  /**
+   * Returns true if the key was removed.
+   * 如果键被移除了,返回 true。
+   */
   public boolean remove(T key) {
     int hashCode = key.hashCode();
     int index = hashCode & mask;
@@ -404,7 +438,9 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
 
   void removeStashIndex(int index) {
     // If the removed location was not last, move the last tuple to the removed
+    // 如果被移除的位置不是最后一个,则把最后一个元组移动到被移除的
     // location.
+    // 位置。
     stashSize--;
     int lastIndex = capacity + stashSize;
     if (index < lastIndex) {
@@ -413,7 +449,10 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
     }
   }
 
-  /** Returns true if the set is empty. */
+  /**
+   * Returns true if the set is empty.
+   * 如果集合为空,返回 true。
+   */
   public boolean isEmpty() {
     return size == 0;
   }
@@ -423,6 +462,8 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
    * If the capacity is already less, nothing is
    * done. If the set contains more items than the specified capacity, the next
    * highest power of two capacity is used instead.
+   * <p>
+   * 将底层数组的大小缩减为不超过指定容量。如果容量已经更小,则不做任何操作。如果集合包含的条目多于指定容量,则改用次高的 2 的幂容量。
    */
   public void shrink(int maximumCapacity) {
     if (maximumCapacity < 0)
@@ -440,6 +481,8 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
    * capacity, if they are larger. The reduction
    * is done by allocating new arrays, though for large arrays this can be faster
    * than clearing the existing array.
+   * <p>
+   * 清除集合并将底层数组的大小缩减为指定容量(如果它们更大的话)。缩减通过分配新数组完成,不过对大数组而言,这可能比清除现有数组更快。
    */
   public void clear(int maximumCapacity) {
     if (capacity <= maximumCapacity) {
@@ -455,6 +498,8 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
    * capacity is high and the population is low,
    * iteration can be unnecessarily slow. {@link #clear(int)} can be used to
    * reduce the capacity.
+   * <p>
+   * 清除集合,底层数组保持当前容量。当容量很高而元素很少时,遍历可能会不必要地变慢。可以使用 {@link #clear(int)} 来减小容量。
    */
   public void clear() {
     if (size == 0)
@@ -482,7 +527,9 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
     return true;
   }
 
-  /** @return May be null. */
+  /**
+   * @return May be null. 可能为 null。
+   */
   public T get(T key) {
     int hashCode = key.hashCode();
     int index = hashCode & mask;
@@ -520,6 +567,8 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
    * Increases the size of the backing array to accommodate the specified number
    * of additional items. Useful before adding many
    * items to avoid multiple backing array resizes.
+   * <p>
+   * 增大底层数组的大小,以容纳指定数量的额外条目。在添加大量条目之前很有用,可避免多次底层数组扩容。
    */
   public void ensureCapacity(int additionalCapacity) {
     if (additionalCapacity < 0)
@@ -617,6 +666,8 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
    * Returns an iterator for the keys in the set. Remove is supported.
    * <p>
    * Use the {@link ObjectSetIterator} constructor for nested or multithreaded iteration.
+   * <p>
+   * 返回集合中键的迭代器。支持移除。<p> 嵌套或多线程遍历时,请使用 {@link ObjectSetIterator} 构造函数。
    */
   public ObjectSetIterator<T> iterator() {
     if (iterator1 == null) {
@@ -710,14 +761,20 @@ public class ObjectSet<T> implements Iterable<T>, Eachable<T> {
       return this;
     }
 
-    /** Adds the remaining values to the array. */
+    /**
+     * Adds the remaining values to the array.
+     * 将剩余的值添加到数组。
+     */
     public Ar<K> toAr(Ar<K> array) {
       while (hasNext)
         array.add(next());
       return array;
     }
 
-    /** Returns a new array containing the remaining values. */
+    /**
+     * Returns a new array containing the remaining values.
+     * 返回一个包含剩余值的新数组。
+     */
     public Ar<K> toAr() {
       return toAr(new Ar<>(true, set.size));
     }

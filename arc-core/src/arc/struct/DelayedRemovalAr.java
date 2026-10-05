@@ -10,6 +10,8 @@ import java.util.Comparator;
  * <p>
  * Code using this class must not rely on items being removed immediately. Consider using {@link SnapshotAr} if this is a
  * problem.
+ * <p>
+ * 使在 {@link #begin()} 被调用之后执行的移除操作延迟到 {@link #end()} 被调用时进行。这可以让不受你控制的代码移除条目而不影响遍历。在 begin 和 end 之间,大多数修改方法会抛出 IllegalStateException。只允许 {@link #remove(int)}、{@link #remove(Object, boolean)}、{@link #removeRange(int, int)}、{@link #clear()} 和 add 方法。<p> 使用此类的代码不得依赖条目被立即移除。如果这成为问题,考虑使用 {@link SnapshotAr}。
  * @author Nathan Sweet
  */
 @SuppressWarnings("unchecked")

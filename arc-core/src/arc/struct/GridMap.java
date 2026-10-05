@@ -2,7 +2,10 @@ package arc.struct;
 
 import arc.struct.LongMap.Values;
 
-/** A 2-dimensional hashmap that stores objects using an x/y coordinate. */
+/**
+ * A 2-dimensional hashmap that stores objects using an x/y coordinate.
+ * 一个使用 x/y 坐标存储对象的二维哈希映射。
+ */
 public class GridMap<T>{
     protected LongMap<T> map = new LongMap<>();
 

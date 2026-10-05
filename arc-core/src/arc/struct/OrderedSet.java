@@ -10,6 +10,8 @@ import java.util.*;
  * is some additional overhead for put and remove. When used for faster iteration versus ObjectSet and the order does not actually
  * matter, copying during remove can be greatly reduced by setting {@link Ar#ordered} to false for
  * {@link OrderedSet#orderedItems()}.
+ * <p>
+ * 一个 {@link ObjectSet},还会按插入顺序将键存储在 {@link Ar} 中。{@link #iterator() Iteration} 是有序的,且比无序集合更快。还可以使用 {@link #orderedItems()} 访问键并改变顺序。put 和 remove 有一些额外的开销。当为了更快遍历而用它代替 ObjectSet 且顺序并不重要时,可通过将 {@link OrderedSet#orderedItems()} 的 {@link Ar#ordered} 设为 false 来大幅减少移除时的复制。
  * @author Nathan Sweet
  */
 
@@ -45,6 +47,8 @@ public class OrderedSet<T> extends ObjectSet<T>{
     /**
      * Sets the key at the specfied index. Returns true if the key was added to the set or false if it was already in the set. If
      * this set already contains the key, the existing key's index is changed if needed and false is returned.
+     * <p>
+     * 设置指定索引处的键。如果键被添加到集合中则返回 true,如果它已在集合中则返回 false。如果此集合已包含该键,现有键的索引会在需要时被更改,并返回 false。
      */
     public boolean add(T key, int index){
         if(!super.add(key)){
@@ -85,9 +89,11 @@ public class OrderedSet<T> extends ObjectSet<T>{
      * has been added to the OrderedSet and {@code before} has been removed; returns false if {@code after} is already present or
      * {@code before} is not present. If you are iterating over an OrderedSet and have an index, you should prefer
      * {@link #alterIndex(int, Object)}, which doesn't need to search for an index like this does and so can be faster.
-     * @param before an item that must be present for this to succeed
-     * @param after an item that must not be in this set for this to succeed
-     * @return true if {@code before} was removed and {@code after} was added, false otherwise
+     * <p>
+     * 将项 {@code before} 更改为 {@code after},而不改变其在顺序中的位置。如果 {@code after} 已被添加到 OrderedSet 且 {@code before} 已被移除,返回 true;如果 {@code after} 已存在或 {@code before} 不存在,返回 false。如果你正在遍历 OrderedSet 并且已有索引,应优先使用 {@link #alterIndex(int, Object)},它无需像此方法那样搜索索引,因此更快。
+     * @param before an item that must be present for this to succeed 一个必须存在的项,此操作才能成功
+     * @param after an item that must not be in this set for this to succeed 一个必须不在此集合中的项,此操作才能成功
+     * @return true if {@code before} was removed and {@code after} was added, false otherwise 如果 {@code before} 被移除且 {@code after} 被添加则为 true,否则为 false
      */
     public boolean alter(T before, T after){
         if(contains(after)) return false;
@@ -101,9 +107,11 @@ public class OrderedSet<T> extends ObjectSet<T>{
      * Changes the item at the given {@code index} in the order to {@code after}, without changing the ordering of other items. If
      * {@code after} is already present, this returns false; it will also return false if {@code index} is invalid for the size of
      * this set. Otherwise, it returns true. Unlike {@link #alter(Object, Object)}, this operates in constant time.
-     * @param index the index in the order of the item to change; must be non-negative and less than {@link #size}
-     * @param after the item that will replace the contents at {@code index}; this item must not be present for this to succeed
-     * @return true if {@code after} successfully replaced the contents at {@code index}, false otherwise
+     * <p>
+     * 将顺序中给定 {@code index} 处的项更改为 {@code after},而不改变其他项的顺序。如果 {@code after} 已存在,返回 false;如果 {@code index} 对此集合的大小无效,也返回 false。否则返回 true。与 {@link #alter(Object, Object)} 不同,此操作耗时为常数。
+     * @param index the index in the order of the item to change; must be non-negative and less than {@link #size} 要更改的项在顺序中的索引;必须非负且小于 {@link #size}
+     * @param after the item that will replace the contents at {@code index}; this item must not be present for this to succeed 将替换 {@code index} 处内容的项;该项必须不存在,此操作才能成功
+     * @return true if {@code after} successfully replaced the contents at {@code index}, false otherwise 如果 {@code after} 成功替换了 {@code index} 处的内容则为 true,否则为 false
      */
     public boolean alterIndex(int index, T after){
         if(index < 0 || index >= size || contains(after)) return false;

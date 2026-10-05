@@ -8,6 +8,8 @@ import java.util.*;
 /**
  * A resizable, ordered or unordered int array. Avoids the boxing that occurs with ArrayList<Integer>. If unordered, this class
  * avoids a memory copy when removing elements (the last element is moved to the removed element's position).
+ * <p>
+ * 一种可调整大小的有序或无序 int 数组。避免了 ArrayList<Integer> 产生的装箱。无序时,该类在移除元素时避免内存复制(将最后一个元素移动到被移除元素的位置)。
  * @author Nathan Sweet
  */
 public class IntAr{
@@ -23,20 +25,26 @@ public class IntAr{
         return out;
     }
 
-    /** Creates an ordered array with a capacity of 16. */
+    /**
+     * Creates an ordered array with a capacity of 16.
+     * 创建一个容量为 16 的有序数组。
+     */
     public IntAr(){
         this(true, 16);
     }
 
-    /** Creates an ordered array with the specified capacity. */
+    /**
+     * Creates an ordered array with the specified capacity.
+     * 创建一个具有指定容量的有序数组。
+     */
     public IntAr(int capacity){
         this(true, capacity);
     }
 
     /**
-     * @param ordered If false, methods that remove elements may change the order of other elements in the array, which avoids a
+     * @param ordered If false, methods that remove elements may change the order of other elements in the array, which avoids a 如果为 false,移除元素的方法可能改变数组中其他元素的顺序,从而避免
      * memory copy.
-     * @param capacity Any elements added beyond this will cause the backing array to be grown.
+     * @param capacity Any elements added beyond this will cause the backing array to be grown. 超出此值添加的任何元素都会导致底层数组增长。
      */
     public IntAr(boolean ordered, int capacity){
         this.ordered = ordered;
@@ -47,6 +55,8 @@ public class IntAr{
      * Creates a new array containing the elements in the specific array. The new array will be ordered if the specific array is
      * ordered. The capacity is set to the number of elements, so any subAruent elements added will cause the backing array to be
      * grown.
+     * <p>
+     * 创建一个包含指定数组元素的新数组。若指定数组有序,新数组也将有序。容量被设为元素数量,因此之后添加的任何元素都会导致底层数组增长。
      */
     public IntAr(IntAr array){
         this.ordered = array.ordered;
@@ -58,6 +68,8 @@ public class IntAr{
     /**
      * Creates a new ordered array containing the elements in the specified array. The capacity is set to the number of elements,
      * so any subAruent elements added will cause the backing array to be grown.
+     * <p>
+     * 创建一个包含指定数组元素的新的有序数组。容量被设为元素数量,因此之后添加的任何元素都会导致底层数组增长。
      */
     public IntAr(int[] array){
         this(true, array, 0, array.length);
@@ -66,7 +78,9 @@ public class IntAr{
     /**
      * Creates a new array containing the elements in the specified array. The capacity is set to the number of elements, so any
      * subAruent elements added will cause the backing array to be grown.
-     * @param ordered If false, methods that remove elements may change the order of other elements in the array, which avoids a
+     * <p>
+     * 创建一个包含指定数组元素的新数组。容量被设为元素数量,因此之后添加的任何元素都会导致底层数组增长。
+     * @param ordered If false, methods that remove elements may change the order of other elements in the array, which avoids a 如果为 false,移除元素的方法可能改变数组中其他元素的顺序,从而避免
      * memory copy.
      */
     public IntAr(boolean ordered, int[] array, int startIndex, int count){
@@ -80,7 +94,9 @@ public class IntAr{
         return new IntAr(array);
     }
 
-    /** @return the most frequently occuring element. */
+    /**
+     * @return the most frequently occuring element. 出现频率最高的元素。
+     */
     public int mode(){
         int count = 1, tempCount;
         int popular = size == 0 ? 0 : items[0];
@@ -134,7 +150,9 @@ public class IntAr{
 
     /**
      * Adds a value if it was already not in this Aruence.
-     * @return whether this value was not present in this Aruence.
+     * <p>
+     * 如果该值尚不在此序列中,则添加它。
+     * @return whether this value was not present in this Aruence. 该值是否原本不在此序列中。
      * */
     public boolean addUnique(int value){
         if(!contains(value)){
@@ -170,6 +188,7 @@ public class IntAr{
     public void add(int value1, int value2, int value3, int value4){
         int[] items = this.items;
         if(size + 3 >= items.length) items = resize(Math.max(8, (int)(size * 1.8f))); // 1.75 isn't enough when size=5.
+        // 当 size=5 时,1.75 并不够。
         items[size] = value1;
         items[size + 1] = value2;
         items[size + 2] = value3;
@@ -273,7 +292,10 @@ public class IntAr{
         return false;
     }
 
-    /** Removes and returns the item at the specified index. */
+    /**
+     * Removes and returns the item at the specified index.
+     * 移除并返回指定索引处的条目。
+     */
     public int removeIndex(int index){
         if(index >= size) throw new IndexOutOfBoundsException("index can't be >= size: " + index + " >= " + size);
         int[] items = this.items;
@@ -286,7 +308,10 @@ public class IntAr{
         return value;
     }
 
-    /** Removes the items between the specified indices, inclusive. */
+    /**
+     * Removes the items between the specified indices, inclusive.
+     * 移除指定索引之间的条目(含两端)。
+     */
     public void removeRange(int start, int end){
         if(end >= size) throw new IndexOutOfBoundsException("end can't be >= size: " + end + " >= " + size);
         if(start > end) throw new IndexOutOfBoundsException("start can't be > end: " + start + " > " + end);
@@ -304,7 +329,9 @@ public class IntAr{
 
     /**
      * Removes from this array all of elements contained in the specified array.
-     * @return true if this array was modified.
+     * <p>
+     * 从此数组中移除指定数组包含的所有元素。
+     * @return true if this array was modified. 如果此数组被修改过则为 true。
      */
     public boolean removeAll(IntAr array){
         int size = this.size;
@@ -323,23 +350,35 @@ public class IntAr{
         return size != startSize;
     }
 
-    /** Removes and returns the last item. */
+    /**
+     * Removes and returns the last item.
+     * 移除并返回最后一个条目。
+     */
     public int pop(){
         return items[--size];
     }
 
-    /** Returns the last item. */
+    /**
+     * Returns the last item.
+     * 返回最后一个条目。
+     */
     public int peek(){
         return items[size - 1];
     }
 
-    /** Returns the first item. */
+    /**
+     * Returns the first item.
+     * 返回第一个条目。
+     */
     public int first(){
         if(size == 0) throw new IllegalStateException("Array is empty.");
         return items[0];
     }
 
-    /** Returns true if the array is empty. */
+    /**
+     * Returns true if the array is empty.
+     * 如果数组为空,返回 true。
+     */
     public boolean isEmpty(){
         return size == 0;
     }
@@ -351,6 +390,8 @@ public class IntAr{
     /**
      * Reduces the size of the backing array to the size of the actual items. This is useful to release memory when many items
      * have been removed, or if it is known that more items will not be added.
+     * <p>
+     * 将底层数组的大小缩减为实际条目数。当已移除大量条目,或确定不会再添加更多条目时,这对释放内存很有用。
      * @return {@link #items}
      */
     public int[] shrink(){
@@ -361,6 +402,8 @@ public class IntAr{
     /**
      * Increases the size of the backing array to accommodate the specified number of additional items. Useful before adding many
      * items to avoid multiple backing array resizes.
+     * <p>
+     * 增大底层数组的大小,以容纳指定数量的额外条目。在添加大量条目之前很有用,可避免多次底层数组扩容。
      * @return {@link #items}
      */
     public int[] ensureCapacity(int additionalCapacity){
@@ -373,6 +416,8 @@ public class IntAr{
 
     /**
      * Sets the array size, leaving any values beyond the current size undefined.
+     * <p>
+     * 设置数组大小,超出当前大小的值保持未定义。
      * @return {@link #items}
      */
     public int[] setSize(int newSize){
@@ -421,12 +466,17 @@ public class IntAr{
     /**
      * Reduces the size of the array to the specified size. If the array is already smaller than the specified size, no action is
      * taken.
+     * <p>
+     * 将数组大小缩减到指定大小。如果数组已经小于指定大小,则不执行任何操作。
      */
     public void truncate(int newSize){
         if(size > newSize) size = newSize;
     }
 
-    /** Returns a random item from the array, or zero if the array is empty. */
+    /**
+     * Returns a random item from the array, or zero if the array is empty.
+     * 返回数组中的一个随机条目,如果数组为空则返回零。
+     */
     public int random(){
         if(size == 0) return 0;
         return items[Mathf.random(0, size - 1)];

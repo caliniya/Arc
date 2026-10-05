@@ -23,6 +23,8 @@ import java.util.Comparator;
  * <br>
  * Note that sorting primitive arrays with the Arrays.sort methods does not allocate memory (unless sorting large arrays of char,
  * short, or byte).
+ * <p>
+ * 提供排序对象数组的方法。排序需要工作内存,该类允许复用这部分内存以避免分配。除此之外,排序与 Arrays.sort 方法完全相同(使用 timsort)。<br> <br> 注意,用 Arrays.sort 方法对基本类型数组排序不会分配内存(除非排序大型 char、short 或 byte 数组)。
  * @author Nathan Sweet
  */
 public class Sort{
@@ -31,7 +33,10 @@ public class Sort{
     private TimSort timSort;
     private ComparableTimSort comparableTimSort;
 
-    /** Returns a Sort instance for convenience. Multiple threads must not use this instance at the same time. */
+    /**
+     * Returns a Sort instance for convenience. Multiple threads must not use this instance at the same time.
+     * 为方便起见返回一个 Sort 实例。多个线程不得同时使用该实例。
+     */
     public static Sort instance(){
         return instance.get();
     }

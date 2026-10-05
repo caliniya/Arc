@@ -2,7 +2,10 @@ package arc.struct;
 
 import arc.util.Strings;
 
-/** An ObjectMap with string keys and values. Comes with extra parsing utilities.*/
+/**
+ * An ObjectMap with string keys and values. Comes with extra parsing utilities.
+ * 键和值都是字符串的 ObjectMap,附带额外的解析工具。
+ */
 public class StringMap extends ObjectMap<String, String>{
 
     public static StringMap of(Object... values){
