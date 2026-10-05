@@ -4,7 +4,9 @@ public class SpriteIndices{
     private static final int maxIndices = 8192*2;
     private static IndexBufferObject indexData;
 
-    /** @return a globally shared IndexData instance for drawing sprites in the same pattern as SpriteBatch/SpriteCache does. */
+    /**
+     * @return a globally shared IndexData instance for drawing sprites in the same pattern as SpriteBatch/SpriteCache does. 一个全局共享的 IndexData 实例,以与 SpriteBatch/SpriteCache 相同的模式绘制精灵。
+     */
     public static IndexBufferObject get(){
         if(indexData == null){
             int j = 0;
@@ -22,6 +24,7 @@ public class SpriteIndices{
                 @Override
                 public void dispose(){
                     //there is never a need to dispose this index buffer
+                    // 该索引缓冲区永远无需释放
                 }
             };
             indexData.set(indices, 0, indices.length);

@@ -319,8 +319,10 @@ public class Gl{
     maxRenderbufferSize = 0x84E8,
     invalidFramebufferOperation = 0x0506,
     programPointSize = 0x8642, //same as GL_PROGRAM_POINT_SIZE_ARB
+    // 同 GL_PROGRAM_POINT_SIZE_ARB
 
     //GL3 constants
+    // GL3 常量
     readBuffer = 0x0C02,
     unpackRowLength = 0x0CF2,
     unpackSkipRows = 0x0CF3,
@@ -627,26 +629,37 @@ public class Gl{
     public static final long timeoutIgnored = -1;
 
     //STATE - optimizes GL calls
+    // 状态缓存 - 优化 GL 调用
 
     private static IntBuffer ibuf = Buffers.newIntBuffer(1);
     private static FloatBuffer fbuf = Buffers.newFloatBuffer(1);
     //last active texture unit
+    // 上次激活的纹理单元
     private static int lastActiveTexture = -1;
     //last bound texture2ds, mapping from texture unit to texture handle
+    // 上次绑定的 texture2d,从纹理单元到纹理句柄的映射
     private static int[] lastBoundTextures = new int[32], lastBoundTexturesArray = new int[32];
     //last useProgram call
+    // 上次 useProgram 调用
     private static int lastUsedProgram = -1;
-    /** enabled bits, from glEnable/disable */
+    /**
+     * enabled bits, from glEnable/disable
+     * 已启用的标志位,来自 glEnable/disable
+     */
     private static Bits enabled = new Bits();
     private static boolean wasDepthMask = true;
     //blend func separate state
+    // 混合函数分离状态
     private static int lastBlendSrc = -1, lastBlendDst = -1, lastBlendSrcAlpha = -1, lastBlendDstAlpha = -1;
 
     static{
         reset();
     }
 
-    /** Reset optimization cache. */
+    /**
+     * Reset optimization cache.
+     * 重置优化缓存。
+     */
     public static void reset(){
         lastActiveTexture = -1;
         Arrays.fill(lastBoundTextures, -1);
@@ -665,24 +678,31 @@ public class Gl{
 
     public static void bindTexture(int target, int texture){
         //TODO optimize 3d array
+        // TODO 优化三维数组
         if(optimize && target == texture2d){
             //current bound texture unit
+            // 当前绑定的纹理单元
             int index = lastActiveTexture - texture0;
             //make sure it's valid
+            // 确保其有效
             if(index >= 0 && index < lastBoundTextures.length){
                 if(lastBoundTextures[index] == texture){
                     //skip double bindings
+                    // 跳过重复绑定
                     return;
                 }
                 lastBoundTextures[index] = texture;
             }
         }else if(optimize && target == Gl.texture2dArray){
             //current bound texture unit
+            // 当前绑定的纹理单元
             int index = lastActiveTexture - texture0;
             //make sure it's valid
+            // 确保其有效
             if(index >= 0 && index < lastBoundTexturesArray.length){
                 if(lastBoundTexturesArray[index] == texture){
                     //skip double bindings
+                    // 跳过重复绑定
                     return;
                 }
                 lastBoundTexturesArray[index] = texture;
@@ -740,6 +760,7 @@ public class Gl{
 
     public static void deleteTexture(int texture){
         //clear deleted texture, as it may be reused later
+        // 清除已删除的纹理,因为它之后可能被复用
         for(int i = 0; i < lastBoundTextures.length; i++){
             if(lastBoundTextures[i] == texture){
                 lastBoundTextures[i] = -1;
@@ -759,6 +780,7 @@ public class Gl{
 
     public static void depthMask(boolean flag){
         //TODO might be buggy, test it. may not clear the depth buffer?
+        // TODO 可能有 bug,需测试。可能无法清除深度缓冲区?
         if(optimize && flag == wasDepthMask) return;
         wasDepthMask = flag;
 
@@ -1327,6 +1349,7 @@ public class Gl{
     }
 
     //GL30 methods below
+    // 以下为 GL30 方法
 
     public static void readBuffer(int mode){
         Core.glProvider.glReadBuffer(mode);

@@ -2,7 +2,10 @@ package arc.graphics.gl;
 
 import java.nio.*;
 
-/** Provides implementations for GLES 3.0 functions. This class should never be used directly outside backends - use {@link Gl} to call OpenGL functions instead. */
+/**
+ * Provides implementations for GLES 3.0 functions. This class should never be used directly outside backends - use {@link Gl} to call OpenGL functions instead.
+ * 提供 GLES 3.0 函数的实现。后端之外的代码不应直接使用此类 - 请改用 {@link Gl} 调用 OpenGL 函数。
+ */
 public interface GLProvider{
 
     //GL 20

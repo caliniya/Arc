@@ -27,21 +27,31 @@ import java.nio.*;
  * A Pixmap stores its data in native heap memory. It is mandatory to call {@link Pixmap#dispose()} when the pixmap is no longer
  * needed, otherwise memory leaks will result.
  * </p>
+ * <p>
+ * <p> Pixmap 表示内存中的一幅图像。它有以像素表示的宽和高,每个像素以 RGBA8888 格式存储。像素坐标相对于图像左上角,x 轴向右,y 轴向下。 </p> <p> {@link Pixmap#draw(Pixmap, int, int, int, int, int, int, int, int)} 方法会将源图像缩放拉伸到目标图像。可使用最近邻或双线性过滤。 </p> <p> Pixmap 将数据存储在原生堆内存中。不再需要时必须调用 {@link Pixmap#dispose()},否则会造成内存泄漏。 </p>
  * @author badlogicgames@gmail.com
  */
 public class Pixmap implements Disposable{
     private static final boolean supportsBufferCopy = OS.javaVersionNumber >= 16 || (OS.isAndroid && Core.app != null && Core.app.getVersion() >= 35);
 
-    /** Size of the pixmap. Do not modify unless you know what you are doing. */
+    /**
+     * Size of the pixmap. Do not modify unless you know what you are doing.
+     * 像素图的大小。除非清楚自己在做什么,否则请勿修改。
+     */
     public int width, height;
 
-    /** Internal data, arranged as RGBA with 1 byte per component. This buffer must be direct or natively-allocated. */
+    /**
+     * Internal data, arranged as RGBA with 1 byte per component. This buffer must be direct or natively-allocated.
+     * 内部数据,按 RGBA 排列,每个分量 1 字节。此缓冲区必须是直接缓冲区或原生分配的缓冲区。
+     */
     public ByteBuffer pixels;
 
     /**
      * When natives are present, this handle is the address of the memory region.
      * When this pixmap is disposed/uninitialized, this value is 0.
      * When natives are not present, this value is -1.
+     * <p>
+     * 存在原生实现时,此句柄是内存区域的地址。此像素图被释放/未初始化时,该值为 0。不存在原生实现时,该值为 -1。
      */
     long handle;
 
@@ -51,7 +61,10 @@ public class Pixmap implements Disposable{
         }
     }
 
-    /** Creates a new Pixmap instance with the given width and height. */
+    /**
+     * Creates a new Pixmap instance with the given width and height.
+     * 以给定宽高创建新的 Pixmap 实例。
+     */
     public Pixmap(int width, int height){
         load(width, height);
     }
@@ -63,7 +76,9 @@ public class Pixmap implements Disposable{
 
     /**
      * Creates a new Pixmap instance from the given encoded image data. The image can be encoded as JPEG, PNG or BMP.
-     * @param encodedData the image data to load, typically read from a PNG file
+     * <p>
+     * 从给定的已编码图像数据创建新的 Pixmap 实例。图像可以是 JPEG、PNG 或 BMP 编码。
+     * @param encodedData the image data to load, typically read from a PNG file 要加载的图像数据,通常从 PNG 文件读取
      */
     public Pixmap(byte[] encodedData, int offset, int len){
         load(encodedData, offset, len, null);
@@ -75,14 +90,19 @@ public class Pixmap implements Disposable{
 
     /**
      * Creates a new Pixmap instance from the given file. The file must be a Png, Jpeg or Bitmap.
-     * @param file the {@link Fi}
+     * <p>
+     * 从给定文件创建新的 Pixmap 实例。文件必须是 PNG、JPEG 或 Bitmap。
+     * @param file the {@link Fi} {@link Fi} 文件
      */
     public Pixmap(Fi file){
         byte[] bytes = file.readBytes();
         load(bytes, 0, bytes.length, file.toString());
     }
 
-    /** Creates a pixmap from a direct ByteBuffer. */
+    /**
+     * Creates a pixmap from a direct ByteBuffer.
+     * 从直接 ByteBuffer 创建像素图。
+     */
     public Pixmap(ByteBuffer buffer, int width, int height){
         if(!buffer.isDirect()) throw new ArcRuntimeException("Pixmaps may only use direct/native ByteBuffers!");
 
@@ -94,14 +114,19 @@ public class Pixmap implements Disposable{
         buffer.position(0).limit(buffer.capacity());
     }
 
-    /** @return a newly allocated copy with the same pixels. */
+    /**
+     * @return a newly allocated copy with the same pixels. 新分配的副本,包含相同的像素。
+     */
     public Pixmap copy(){
         Pixmap out = new Pixmap(width, height);
         copyMem(pixels, 0, out.pixels, 0, pixels.capacity());
         return out;
     }
 
-    /** Iterates through every position in this Pixmap. */
+    /**
+     * Iterates through every position in this Pixmap.
+     * 遍历此 Pixmap 中的每个位置。
+     */
     public void each(Intc2 cons){
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
@@ -118,7 +143,10 @@ public class Pixmap implements Disposable{
         }
     }
 
-    /** Fills the complete bitmap with the specified color. */
+    /**
+     * Fills the complete bitmap with the specified color.
+     * 用指定颜色填充整个位图。
+     */
     public void fill(int color){
         int len = width * height * 4;
         for(int i = 0; i < len; i += 4){
@@ -126,12 +154,17 @@ public class Pixmap implements Disposable{
         }
     }
 
-    /** Fills the complete bitmap with the specified color. */
+    /**
+     * Fills the complete bitmap with the specified color.
+     * 用指定颜色填充整个位图。
+     */
     public void fill(Color color){
         fill(color.rgba());
     }
 
-    /** @return whether this point is in the pixmap. */
+    /**
+     * @return whether this point is in the pixmap. 该点是否在像素图内。
+     */
     public boolean in(int x, int y){
         return x >= 0 && y >= 0 && x < width && y < height;
     }
@@ -143,11 +176,14 @@ public class Pixmap implements Disposable{
         return pixmap;
     }
 
-    /** @return a newly allocated pixmap, flipped vertically. */
+    /**
+     * @return a newly allocated pixmap, flipped vertically. 新分配的像素图,已垂直翻转。
+     */
     public Pixmap flipY(){
         Pixmap copy = new Pixmap(width, height);
 
         //TODO this can be optimized significantly by putting each line
+        // TODO 通过逐行处理可以显著优化
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
                 copy.setRaw(x, height - 1 - y, getRaw(x, y));
@@ -157,7 +193,9 @@ public class Pixmap implements Disposable{
         return copy;
     }
 
-    /** @return a newly allocated pixmap, flipped horizontally. */
+    /**
+     * @return a newly allocated pixmap, flipped horizontally. 新分配的像素图,已水平翻转。
+     */
     public Pixmap flipX(){
         Pixmap copy = new Pixmap(width, height);
 
@@ -170,7 +208,10 @@ public class Pixmap implements Disposable{
         return copy;
     }
 
-    /** Draws a line between the given coordinates using the provided RGBA color. */
+    /**
+     * Draws a line between the given coordinates using the provided RGBA color.
+     * 使用给定的 RGBA 颜色在给定坐标之间画一条线。
+     */
     public void drawLine(int x1, int y1, int x2, int y2, int color){
         int x = x1, dx = Math.abs(x2 - x), sx = x < x2 ? 1 : -1;
         int y = y1, dy = Math.abs(y2 - y), sy = y < y2 ? 1 : -1;
@@ -193,7 +234,10 @@ public class Pixmap implements Disposable{
         }
     }
 
-    /** Draws a rectangle outline starting at x, y extending by width to the right and by height downwards (y-axis points downwards) using the provided color. */
+    /**
+     * Draws a rectangle outline starting at x, y extending by width to the right and by height downwards (y-axis points downwards) using the provided color.
+     * 使用给定颜色从 x, y 开始向右延伸 width、向下延伸 height(y 轴向下)绘制矩形轮廓。
+     */
     public void drawRect(int x, int y, int width, int height, int color){
         hline(x, x + width - 1, y, color);
         hline(x, x + width - 1, y + height - 1, color);
@@ -276,9 +320,11 @@ public class Pixmap implements Disposable{
 
     /**
      * Draws an area from another Pixmap to this Pixmap.
-     * @param pixmap The other Pixmap
-     * @param x The target x-coordinate (top left corner)
-     * @param y The target y-coordinate (top left corner)
+     * <p>
+     * 将另一个 Pixmap 的一块区域绘制到此 Pixmap。
+     * @param pixmap The other Pixmap 另一个 Pixmap
+     * @param x The target x-coordinate (top left corner) 目标 x 坐标(左上角)
+     * @param y The target y-coordinate (top left corner) 目标 y 坐标(左上角)
      */
     public void draw(Pixmap pixmap, int x, int y){
         draw(pixmap, x, y, 0, 0, pixmap.width, pixmap.height);
@@ -286,26 +332,37 @@ public class Pixmap implements Disposable{
 
     /**
      * Draws an area from another Pixmap to this Pixmap.
-     * @param pixmap The other Pixmap
-     * @param x The target x-coordinate (top left corner)
-     * @param y The target y-coordinate (top left corner)
+     * <p>
+     * 将另一个 Pixmap 的一块区域绘制到此 Pixmap。
+     * @param pixmap The other Pixmap 另一个 Pixmap
+     * @param x The target x-coordinate (top left corner) 目标 x 坐标(左上角)
+     * @param y The target y-coordinate (top left corner) 目标 y 坐标(左上角)
      */
     public void draw(Pixmap pixmap, int x, int y, boolean blending){
         draw(pixmap, 0, 0, pixmap.width, pixmap.height, x, y, pixmap.width, pixmap.height, false, blending);
     }
 
 
-    /** Draws an area from another Pixmap to this Pixmap. */
+    /**
+     * Draws an area from another Pixmap to this Pixmap.
+     * 将另一个 Pixmap 的一块区域绘制到此 Pixmap。
+     */
     public void draw(Pixmap pixmap, int x, int y, int width, int height){
         draw(pixmap, x, y, width, height, false);
     }
 
-    /** Draws an area from another Pixmap to this Pixmap. */
+    /**
+     * Draws an area from another Pixmap to this Pixmap.
+     * 将另一个 Pixmap 的一块区域绘制到此 Pixmap。
+     */
     public void draw(Pixmap pixmap, int x, int y, int width, int height, boolean filter){
         draw(pixmap, 0, 0, pixmap.width, pixmap.height, x, y, width, height, filter);
     }
 
-    /** Draws an area from another Pixmap to this Pixmap. */
+    /**
+     * Draws an area from another Pixmap to this Pixmap.
+     * 将另一个 Pixmap 的一块区域绘制到此 Pixmap。
+     */
     public void draw(Pixmap pixmap, int x, int y, int srcx, int srcy, int srcWidth, int srcHeight){
         draw(pixmap, srcx, srcy, srcWidth, srcHeight, x, y, srcWidth, srcHeight);
     }
@@ -313,6 +370,8 @@ public class Pixmap implements Disposable{
     /**
      * Draws an area from another Pixmap to this Pixmap. This will automatically scale and stretch the source image to the
      * specified target rectangle.
+     * <p>
+     * 将另一个 Pixmap 的一块区域绘制到此 Pixmap。会自动将源图像缩放拉伸到指定的目标矩形。
      */
     public void draw(Pixmap pixmap, int srcx, int srcy, int srcWidth, int srcHeight, int dstx, int dsty, int dstWidth, int dstHeight){
         draw(pixmap, srcx, srcy, srcWidth, srcHeight, dstx, dsty, dstWidth, dstHeight, false);
@@ -321,6 +380,8 @@ public class Pixmap implements Disposable{
     /**
      * Draws an area from another Pixmap to this Pixmap. This will automatically scale and stretch the source image to the
      * specified target rectangle.
+     * <p>
+     * 将另一个 Pixmap 的一块区域绘制到此 Pixmap。会自动将源图像缩放拉伸到指定的目标矩形。
      */
     public void draw(Pixmap pixmap, int srcx, int srcy, int srcWidth, int srcHeight, int dstx, int dsty, int dstWidth, int dstHeight, boolean filtering){
         draw(pixmap, srcx, srcy, srcWidth, srcHeight, dstx, dsty, dstWidth, dstHeight, filtering, false);
@@ -329,20 +390,23 @@ public class Pixmap implements Disposable{
     /**
      * Draws an area from another Pixmap to this Pixmap. This will automatically scale and stretch the source image to the
      * specified target rectangle. Blending is currently unsupported for stretched/scaled pixmaps.
-     * @param pixmap The other Pixmap
-     * @param srcx The source x-coordinate (top left corner)
-     * @param srcy The source y-coordinate (top left corner);
-     * @param srcWidth The width of the area from the other Pixmap in pixels
-     * @param srcHeight The height of the area from the other Pixmap in pixels
-     * @param dstx The target x-coordinate (top left corner)
-     * @param dsty The target y-coordinate (top left corner)
-     * @param dstWidth The target width
-     * @param dstHeight the target height
+     * <p>
+     * 将另一个 Pixmap 的一块区域绘制到此 Pixmap。会自动将源图像缩放拉伸到指定的目标矩形。目前拉伸/缩放像素图不支持混合。
+     * @param pixmap The other Pixmap 另一个 Pixmap
+     * @param srcx The source x-coordinate (top left corner) 源 x 坐标(左上角)
+     * @param srcy The source y-coordinate (top left corner); 源 y 坐标(左上角);
+     * @param srcWidth The width of the area from the other Pixmap in pixels 另一个 Pixmap 中区域的宽度,以像素为单位
+     * @param srcHeight The height of the area from the other Pixmap in pixels 另一个 Pixmap 中区域的高度,以像素为单位
+     * @param dstx The target x-coordinate (top left corner) 目标 x 坐标(左上角)
+     * @param dsty The target y-coordinate (top left corner) 目标 y 坐标(左上角)
+     * @param dstWidth The target width 目标宽度
+     * @param dstHeight the target height 目标高度
      */
     public void draw(Pixmap pixmap, int srcx, int srcy, int srcWidth, int srcHeight, int dstx, int dsty, int dstWidth, int dstHeight, boolean filtering, boolean blending){
         int width = this.width, height = this.height, owidth = pixmap.width, oheight = pixmap.height;
 
         //don't bother drawing invalid regions
+        // 无效区域不做绘制
         if(srcWidth == 0 || srcHeight == 0 || dstWidth == 0 || dstHeight == 0){
             return;
         }
@@ -350,6 +414,7 @@ public class Pixmap implements Disposable{
         if(srcWidth == dstWidth && srcHeight == dstHeight){
 
             //same-size blit, no filtering
+            // 相同尺寸的块拷贝,无过滤
             int sx, dx;
             int sy = srcy, dy = dsty;
 
@@ -365,6 +430,7 @@ public class Pixmap implements Disposable{
                     }
                 }
             }else if(this.pixels != pixmap.pixels){ //make sure the buffers are different to prevent a crash
+            // 确保两个缓冲区不同,以防止崩溃
                 ByteBuffer pixels = this.pixels, otherPixels = pixmap.pixels;
                 int
                 startY = Math.max(dsty, 0),
@@ -386,6 +452,7 @@ public class Pixmap implements Disposable{
                     startY ++;
                 }
             }else{ //drawing a pixmap onto itself is not a good idea, but it's better than crashing
+            // 把像素图画到它自身不是好主意,但总比崩溃好
                 for(; sy < srcy + srcHeight; sy++, dy++){
                     if(sy < 0 || dy < 0) continue;
                     if(sy >= oheight || dy >= height) break;
@@ -400,6 +467,7 @@ public class Pixmap implements Disposable{
         }else{
             if(filtering){
                 //blit with bilinear filtering
+                // 使用双线性过滤进行块拷贝
                 float x_ratio = ((float)srcWidth - 1) / dstWidth;
                 float y_ratio = ((float)srcHeight - 1) / dstHeight;
                 int rX = Math.max(Mathf.round(x_ratio), 1), rY = Math.max(Mathf.round(y_ratio), 1);
@@ -445,6 +513,7 @@ public class Pixmap implements Disposable{
                 }
             }else{
                 //blit with nearest neighbor filtering
+                // 使用最近邻过滤进行块拷贝
                 int xratio = (srcWidth << 16) / dstWidth + 1;
                 int yratio = (srcHeight << 16) / dstHeight + 1;
                 int dx, dy, sx, sy;
@@ -479,16 +548,18 @@ public class Pixmap implements Disposable{
      * Colors are averaged premultiplied by alpha, so fully transparent pixels never darken or tint the edges of opaque ones.
      * Averaging is done directly on the stored color values, not in linear light.
      * Source pixels outside of this pixmap's bounds count as transparent; target pixels outside of this pixmap are not drawn.
-     * @param pixmap The other Pixmap
-     * @param srcx The source x-coordinate (top left corner)
-     * @param srcy The source y-coordinate (top left corner)
-     * @param srcWidth The width of the area from the other Pixmap in pixels
-     * @param srcHeight The height of the area from the other Pixmap in pixels
-     * @param dstx The target x-coordinate (top left corner)
-     * @param dsty The target y-coordinate (top left corner)
-     * @param dstWidth The target width
-     * @param dstHeight The target height
-     * @param blending Whether to blend the result over the existing contents, instead of replacing them
+     * <p>
+     * 将另一个 Pixmap 的一块区域绘制到此 Pixmap,采用高质量重采样过滤,在大幅缩小时仍保持正确。与 {@link #draw(Pixmap, int, int, int, int, int, int, int, int, boolean, boolean)} 不同,此方法从不走捷径,即使尺寸相同也不例外。 <ul> <li>缩小时,每个与目标像素重叠的源像素都按覆盖比例参与计算(面积平均/盒式过滤)。不会跳过任何像素,因此细微细节会淡出,而不会走样或消失。</li> <li>放大时,对源像素进行双线性插值。</li> </ul> 颜色按 alpha 预乘后取平均,因此完全透明的像素绝不会使不透明像素的边缘变暗或染色。平均运算直接在存储的颜色值上进行,而非线性光空间。此像素图边界之外的源像素视为透明;此像素图之外的目标像素不会被绘制。
+     * @param pixmap The other Pixmap 另一个 Pixmap
+     * @param srcx The source x-coordinate (top left corner) 源 x 坐标(左上角)
+     * @param srcy The source y-coordinate (top left corner) 源 y 坐标(左上角)
+     * @param srcWidth The width of the area from the other Pixmap in pixels 另一个 Pixmap 中区域的宽度,以像素为单位
+     * @param srcHeight The height of the area from the other Pixmap in pixels 另一个 Pixmap 中区域的高度,以像素为单位
+     * @param dstx The target x-coordinate (top left corner) 目标 x 坐标(左上角)
+     * @param dsty The target y-coordinate (top left corner) 目标 y 坐标(左上角)
+     * @param dstWidth The target width 目标宽度
+     * @param dstHeight The target height 目标高度
+     * @param blending Whether to blend the result over the existing contents, instead of replacing them 是否将结果混合到现有内容上,而不是替换它们
      */
     public void drawScaled(Pixmap pixmap, int srcx, int srcy, int srcWidth, int srcHeight, int dstx, int dsty, int dstWidth, int dstHeight, boolean blending){
         if(srcWidth <= 0 || srcHeight <= 0 || dstWidth <= 0 || dstHeight <= 0) return;
@@ -499,6 +570,7 @@ public class Pixmap implements Disposable{
         float[][] xWeights = resampleWeights(srcWidth, dstWidth, xStart), yWeights = resampleWeights(srcHeight, dstHeight, yStart);
 
         //horizontal pass: every source row is reduced to dstWidth columns of premultiplied rgba (0-255 scale)
+        // 水平方向处理:每行源像素被缩减为 dstWidth 列预乘 RGBA(0-255 范围)
         float[] rows = new float[srcHeight * dstWidth * 4];
 
         for(int sy = 0; sy < srcHeight; sy++){
@@ -530,6 +602,7 @@ public class Pixmap implements Disposable{
         }
 
         //vertical pass, then un-premultiply and write
+        // 垂直方向处理,然后去预乘并写入
         for(int dy = 0; dy < dstHeight; dy++){
             int ty = dsty + dy;
             if(ty < 0 || ty >= height) continue;
@@ -567,8 +640,10 @@ public class Pixmap implements Disposable{
 
     /**
      * Computes how each of {@code dstSize} target pixels is built from a run of consecutive source pixels along one axis.
-     * @param starts filled with the index of the first source pixel of each run
-     * @return the weights of every pixel in each run; they always sum to 1
+     * <p>
+     * 计算沿某一轴的 {@code dstSize} 个目标像素各自如何由一段连续的源像素构成。
+     * @param starts filled with the index of the first source pixel of each run 填入每段连续源像素中第一个像素的索引
+     * @return the weights of every pixel in each run; they always sum to 1 每段中每个像素的权重;其总和始终为 1
      */
     private static float[][] resampleWeights(int srcSize, int dstSize, int[] starts){
         float[][] result = new float[dstSize][];
@@ -577,6 +652,7 @@ public class Pixmap implements Disposable{
         for(int d = 0; d < dstSize; d++){
             if(scale >= 1.0){
                 //shrinking: overlap of the source span [lo, hi) covered by this target pixel with each source pixel
+                // 缩小:该目标像素覆盖的源区间 [lo, hi) 与每个源像素的重叠部分
                 double lo = d * scale, hi = Math.min((d + 1) * scale, srcSize);
                 int first = Math.min((int)lo, srcSize - 1), last = Math.min((int)Math.ceil(hi) - 1, srcSize - 1);
                 last = Math.max(last, first);
@@ -590,6 +666,7 @@ public class Pixmap implements Disposable{
                 result[d] = weights;
             }else{
                 //enlarging: bilinear between the two source pixel centers surrounding this target pixel's center
+                // 放大:在该目标像素中心两侧的两个源像素中心之间做双线性插值
                 double center = (d + 0.5) * scale - 0.5;
                 int i0 = (int)Math.floor(center);
                 float f = (float)(center - i0);
@@ -606,10 +683,12 @@ public class Pixmap implements Disposable{
     /**
      * Fills a rectangle starting at x, y extending by width to the right and by height downwards (y-axis points downwards) using
      * the current color.
-     * @param x The x coordinate
-     * @param y The y coordinate
-     * @param width The width in pixels
-     * @param height The height in pixels
+     * <p>
+     * 从 x, y 开始向右延伸 width、向下延伸 height(y 轴向下),使用当前颜色填充矩形。
+     * @param x The x coordinate x 坐标
+     * @param y The y coordinate y 坐标
+     * @param width The width in pixels 宽度,以像素为单位
+     * @param height The height in pixels 高度,以像素为单位
      */
     public void fillRect(int x, int y, int width, int height, int color){
         int x2 = x + width - 1;
@@ -633,7 +712,9 @@ public class Pixmap implements Disposable{
 
     /**
      * Fills a circle with the center at x,y and a radius using the current color.
-     * @param radius The radius in pixels
+     * <p>
+     * 以 x,y 为圆心、给定半径,使用当前颜色填充圆形。
+     * @param radius The radius in pixels 半径,以像素为单位
      */
     public void fillCircle(int x, int y, int radius, int color){
         int f = 1 - radius;
@@ -662,42 +743,59 @@ public class Pixmap implements Disposable{
         }
     }
 
-    /** @return The pixel color in RGBA8888 format, or 0 if out of bounds. */
+    /**
+     * @return The pixel color in RGBA8888 format, or 0 if out of bounds. RGBA8888 格式的像素颜色,越界时为 0。
+     */
     public int get(int x, int y){
         return in(x, y) ? pixels.getInt((x + y * width) * 4) : 0;
     }
 
-    /** @return The pixel color in RGBA8888 format, clamped to image bounds. */
+    /**
+     * @return The pixel color in RGBA8888 format, clamped to image bounds. RGBA8888 格式的像素颜色,限制在图像边界内。
+     */
     public int getClamp(int x, int y){
         return getRaw(Math.max(Math.min(x, width - 1), 0), Math.max(Math.min(y, height - 1), 0));
     }
 
-    /** @return The pixel color in RGBA8888 format. No bounds checks are done! */
+    /**
+     * @return The pixel color in RGBA8888 format. No bounds checks are done! RGBA8888 格式的像素颜色。不做边界检查!
+     */
     public int getRaw(int x, int y){
         return pixels.getInt((x + y * width) * 4);
     }
 
-    /** @return The pixel alpha as a byte, 0-255. No bounds checks are done! */
+    /**
+     * @return The pixel alpha as a byte, 0-255. No bounds checks are done! 像素 alpha 值,字节类型,0-255。不做边界检查!
+     */
     public int getA(int x, int y){
         return pixels.get((x + y * width) * 4 + 3) & 0xff;
     }
 
-    /** @return whether the alpha at a position is 0. No bounds checks are done. */
+    /**
+     * @return whether the alpha at a position is 0. No bounds checks are done. 某位置的 alpha 是否为 0。不做边界检查。
+     */
     public boolean empty(int x, int y){
         return pixels.get((x + y * width) * 4 + 3) == 0;
     }
 
-    /** @return The width of the Pixmap in pixels. */
+    /**
+     * @return The width of the Pixmap in pixels. Pixmap 的宽度,以像素为单位。
+     */
     public int getWidth(){
         return width;
     }
 
-    /** @return The height of the Pixmap in pixels. */
+    /**
+     * @return The height of the Pixmap in pixels. Pixmap 的高度,以像素为单位。
+     */
     public int getHeight(){
         return height;
     }
 
-    /** Releases all resources associated with this Pixmap. */
+    /**
+     * Releases all resources associated with this Pixmap.
+     * 释放此 Pixmap 关联的所有资源。
+     */
     @Override
     public void dispose(){
         if(handle <= 0) return;
@@ -716,7 +814,9 @@ public class Pixmap implements Disposable{
 
     /**
      * Sets a pixel at the given location with the given color.
-     * @param color the color in RGBA8888 format.
+     * <p>
+     * 用给定颜色设置给定位置的像素。
+     * @param color the color in RGBA8888 format. RGBA8888 格式的颜色。
      */
     public void set(int x, int y, int color){
         if(in(x, y)){
@@ -726,7 +826,9 @@ public class Pixmap implements Disposable{
 
     /**
      * Sets a pixel at the given location with the given color. No bounds checks are done!
-     * @param color the color in RGBA8888 format.
+     * <p>
+     * 用给定颜色设置给定位置的像素。不做边界检查!
+     * @param color the color in RGBA8888 format. RGBA8888 格式的颜色。
      */
     public void setRaw(int x, int y, int color){
         pixels.putInt((x + y * width) * 4, color);
@@ -735,6 +837,8 @@ public class Pixmap implements Disposable{
     /**
      * Returns the OpenGL ES format of this Pixmap. Used as the seventh parameter to
      * {@link Gl#texImage2D(int, int, int, int, int, int, int, int, java.nio.Buffer)}.
+     * <p>
+     * 返回此 Pixmap 的 OpenGL ES 格式。用作 {@link Gl#texImage2D(int, int, int, int, int, int, int, int, java.nio.Buffer)} 的第七个参数。
      * @return GL_RGBA
      */
     public int getGLFormat(){
@@ -744,6 +848,8 @@ public class Pixmap implements Disposable{
     /**
      * Returns the OpenGL ES format of this Pixmap. Used as the third parameter to
      * {@link Gl#texImage2D(int, int, int, int, int, int, int, int, java.nio.Buffer)}.
+     * <p>
+     * 返回此 Pixmap 的 OpenGL ES 格式。用作 {@link Gl#texImage2D(int, int, int, int, int, int, int, int, java.nio.Buffer)} 的第三个参数。
      * @return GL_RGBA
      */
     public int getGLInternalFormat(){
@@ -753,13 +859,17 @@ public class Pixmap implements Disposable{
     /**
      * Returns the OpenGL ES type of this Pixmap. Used as the eighth parameter to
      * {@link Gl#texImage2D(int, int, int, int, int, int, int, int, java.nio.Buffer)}.
+     * <p>
+     * 返回此 Pixmap 的 OpenGL ES 类型。用作 {@link Gl#texImage2D(int, int, int, int, int, int, int, int, java.nio.Buffer)} 的第八个参数。
      * @return Gl.unsignedByte
      */
     public int getGLType(){
         return Gl.unsignedByte;
     }
 
-    /** @return the direct {@link ByteBuffer} holding the pixel data. */
+    /**
+     * @return the direct {@link ByteBuffer} holding the pixel data. 保存像素数据的直接 {@link ByteBuffer}。
+     */
     public ByteBuffer getPixels(){
         if(handle == 0) throw new ArcRuntimeException("Pixmap already disposed");
         return pixels;
@@ -809,7 +919,9 @@ public class Pixmap implements Disposable{
         }
     }
 
-    /** @return the blended result of the input colors */
+    /**
+     * @return the blended result of the input colors 输入颜色混合后的结果
+     */
     public static int blend(int src, int dst){
         int src_a = src & 0xff;
         if(src_a == 0) return dst;
@@ -834,9 +946,11 @@ public class Pixmap implements Disposable{
 
     private void load(byte[] encodedData, int offset, int len, String file){
         //use native implementation when possible
+        // 可能时使用原生实现
         if(ArcNativesLoader.loaded){
             try{
                 //read with stb_image, which is slightly faster for large images and supports more formats
+                // 使用 stb_image 读取,对大图略快且支持更多格式
                 long[] nativeData = new long[3];
                 pixels = loadJni(nativeData, encodedData, offset, len);
                 if(pixels == null) throw new ArcRuntimeException("Error loading pixmap from image data: " + getFailureReason() + (file == null ? "" : " (" + file + ")"));
@@ -847,12 +961,14 @@ public class Pixmap implements Disposable{
                 pixels.position(0).limit(pixels.capacity());
             }catch(ArcRuntimeException e){
                 //stb_image bug? some PNGs fail with "corrupt JPEG" as the error, try the Java implementation if so
+                // stb_image 的 bug?某些 PNG 会报 "corrupt JPEG" 错误,此时改用 Java 实现
                 if(e.getMessage() != null && e.getMessage().contains("Corrupt JPEG")){
                     try{
                         loadJava(encodedData, offset, len, file);
                         return;
                     }catch(Exception ignored){
                         //I did my best, fall through and throw the original exception
+                        // 已尽力了,继续执行并抛出原始异常
                     }
                 }
                 throw e;
@@ -864,6 +980,7 @@ public class Pixmap implements Disposable{
 
     private void loadJava(byte[] encodedData, int offset, int len, String file){
         //read with the pure java implementation
+        // 使用纯 Java 实现读取
         try{
             PngReader reader = new PngReader();
             pixels = reader.read(new ByteArrayInputStream(encodedData, offset, len));
@@ -878,6 +995,7 @@ public class Pixmap implements Disposable{
 
     private void load(int width, int height){
         //use native implementation when possible
+        // 可能时使用原生实现
         if(ArcNativesLoader.loaded){
             long[] nativeData = new long[3];
             pixels = createJni(nativeData, width, height);
@@ -889,7 +1007,9 @@ public class Pixmap implements Disposable{
             this.height = (int)nativeData[2];
         }else{
             //use DirectByteBuffer instead
+            // 改用 DirectByteBuffer
             this.handle = -1; //handle -1 means non-native buffer
+            // handle 为 -1 表示非原生缓冲区
             this.width = width;
             this.height = height;
             this.pixels = ByteBuffer.allocateDirect(width * height * 4);
@@ -903,6 +1023,7 @@ public class Pixmap implements Disposable{
 
     static void copyMem(ByteBuffer src, int srcOffset, ByteBuffer dst, int dstOffset, int len){
         //Java 16 supports direct byte buffer transfer without modifying state. Older versions (+Android/iOS) don't, and likely never will
+        // Java 16 支持直接字节缓冲区传输且不修改状态。旧版本(以及 Android/iOS)不支持,而且可能永远不会支持
         if(supportsBufferCopy){
             Java16Buffers.copy(src, srcOffset, dst, dstOffset, len);
         }else{
@@ -939,7 +1060,10 @@ public class Pixmap implements Disposable{
 
     */
 
-    /** Loads a pixmap from bytes and returns [address, width, height] in nativeData. */
+    /**
+     * Loads a pixmap from bytes and returns [address, width, height] in nativeData.
+     * 从字节数组加载像素图,并在 nativeData 中返回 [地址, 宽度, 高度]。
+     */
     static native ByteBuffer loadJni(long[] nativeData, byte[] buffer, int offset, int len); /*MANUAL
         const unsigned char* p_buffer = (const unsigned char*)env->GetPrimitiveArrayCritical(buffer, 0);
 
@@ -963,7 +1087,10 @@ public class Pixmap implements Disposable{
         return pixel_buffer;
      */
 
-    /** Creates a new pixmap and returns [address, width, height] in nativeData. */
+    /**
+     * Creates a new pixmap and returns [address, width, height] in nativeData.
+     * 创建新的像素图,并在 nativeData 中返回 [地址, 宽度, 高度]。
+     */
     static native ByteBuffer createJni(long[] nativeData, int width, int height); /*MANUAL
         const unsigned char* pixels = (unsigned char*)malloc(width * height * 4);
 

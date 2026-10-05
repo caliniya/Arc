@@ -9,7 +9,10 @@ import arc.util.*;
 import java.nio.*;
 import java.util.*;
 
-/** Various pixmap utilities. */
+/**
+ * Various pixmap utilities.
+ * 各种像素图工具。
+ */
 public class Pixmaps{
     private static final int[] offsets = {1, 0, 1, 1, 0, 1, -1, 1, -1, 0, -1, -1, 0, -1, 1, -1};
     private static Pixmap drawPixmap;
@@ -112,6 +115,7 @@ public class Pixmaps{
         out.draw(region.pixmap, padding, padding, region.x, region.y, width, height);
 
         //search one extra pixel beyond the outline radius so the edge can be feathered instead of cut off hard
+        // 在轮廓半径之外多搜索一个像素,使边缘可以羽化而不是被生硬截断
         int search = radius + 1;
         int searchSq = search * search;
 
@@ -121,9 +125,11 @@ public class Pixmaps{
                 int alphaHere = Structs.inBounds(sx, sy, width, height) ? region.getA(sx, sy) : 0;
 
                 //fully opaque source pixels are interior; nothing to outline there
+                // 完全不透明的源像素属于内部;无需对其描边
                 if(alphaHere >= 255) continue;
 
                 //find the distance (squared) to the nearest opaque-ish source pixel
+                // 找到到最近的不透明源像素的距离(平方)
                 int minDistSq = Integer.MAX_VALUE;
                 outer:
                 for(int rx = -search; rx <= search; rx++){
@@ -141,6 +147,7 @@ public class Pixmaps{
                 if(minDistSq == Integer.MAX_VALUE) continue;
 
                 //1px feather centered on the radius boundary: full strength inside `radius`, fading to 0 by `radius + 1`
+                // 以半径边界为中心的 1 像素羽化:在 `radius` 内完全不透明,到 `radius + 1` 处衰减为 0
                 float dist = (float)Math.sqrt(minDistSq);
                 float coverage = Mathf.clamp(radius + 1f - dist, 0f, 1f);
                 if(coverage <= 0f) continue;
@@ -149,13 +156,17 @@ public class Pixmaps{
                 int layer = (outlineColor & 0xffffff00) | layerAlpha;
 
                 //blend the (possibly semi-transparent) existing pixel over the feathered outline layer, rather than overwriting it
+                // 将(可能半透明的)现有像素混合到羽化轮廓层之上,而不是直接覆盖
                 out.setRaw(x, y, Pixmap.blend(out.getRaw(x, y), layer));
             }
         }
         return out;
     }
 
-    /** Outlines the input pixmap by 1 pixel. Useful for pixel art. */
+    /**
+     * Outlines the input pixmap by 1 pixel. Useful for pixel art.
+     * 为输入像素图添加 1 像素轮廓。对像素画很有用。
+     */
     public static Pixmap outline(Pixmap input, Color color){
         Pixmap pixmap = input.copy();
         int col = color.rgba();
@@ -284,7 +295,9 @@ public class Pixmaps{
     /**
      * Applies alpha bleeding to the target pixmap, but with only one iteration.
      * This is faster than standard iterative bleeding.
-     * @return the input pixmap with its pixels modified.
+     * <p>
+     * 对目标像素图应用 alpha 渗透,但只进行一次迭代。比标准迭代渗透更快。
+     * @return the input pixmap with its pixels modified. 修改了像素的输入像素图。
      * */
     public static Pixmap bleed(Pixmap image){
         int w = image.width, h = image.height;
@@ -297,6 +310,7 @@ public class Pixmaps{
                     int pi = (x + y*w)*4;
 
                     //grab for each direction
+                    // 依次获取每个方向
                     for(int i = 0; i < 16; i += 2){
                         int nx = x + offsets[i];
                         int ny = y + offsets[i + 1];
@@ -400,7 +414,9 @@ public class Pixmaps{
 
     /**
      * Applies alpha bleeding to the target pixmap.
-     * @return the input pixmap with its pixels modified.
+     * <p>
+     * 对目标像素图应用 alpha 渗透。
+     * @return the input pixmap with its pixels modified. 修改了像素的输入像素图。
      * */
     public static Pixmap bleed(Pixmap image, int maxIterations){
         int total = image.width * image.height;

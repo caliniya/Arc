@@ -14,6 +14,8 @@ import arc.graphics.gl.*;
  * course not extremely fast so use it with care.
  * <p>
  * A Texture must be disposed when it is no longer used.
+ * <p>
+ * Texture 包装标准 OpenGL ES 纹理。 <p> 必须通过 {@link Texture#bind()} 方法绑定 Texture 才能将其应用到几何体上。纹理将绑定到通过 glActiveTexture 指定的当前激活纹理单元。 <p> 可以随时将 {@link Pixmap} 绘制到纹理上,更改会自动上传到纹理内存。这当然不是特别快,请谨慎使用。 <p> Texture 不再使用时必须释放。
  * @author badlogicgames@gmail.com
  */
 public class Texture extends GLTexture{
@@ -78,9 +80,11 @@ public class Texture extends GLTexture{
     /**
      * Draws the given {@link Pixmap} to the texture at position x, y. No clipping is performed, so you have to make sure that you
      * draw only inside the texture region. Note that this will only draw to mipmap level 0!
-     * @param pixmap The Pixmap
-     * @param x The x coordinate in pixels
-     * @param y The y coordinate in pixels
+     * <p>
+     * 将给定 {@link Pixmap} 绘制到纹理的 x, y 位置。不进行裁剪,因此必须确保只绘制在纹理区域内。注意,这只会绘制到 mipmap 0 层!
+     * @param pixmap The Pixmap Pixmap 对象
+     * @param x The x coordinate in pixels x 坐标,以像素为单位
+     * @param y The y coordinate in pixels y 坐标,以像素为单位
      */
     public void draw(Pixmap pixmap, int x, int y){
         bind();

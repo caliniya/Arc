@@ -13,6 +13,8 @@ import java.nio.*;
 /**
  * Class with static helper methods that provide access to the default OpenGL FrameBuffer. These methods can be used to get the
  * entire screen content or a portion thereof.
+ * <p>
+ * 提供访问默认 OpenGL FrameBuffer 的静态辅助方法。这些方法可用于获取整个屏幕内容或其中一部分。
  * @author espitz
  */
 public final class ScreenUtils{
@@ -31,6 +33,8 @@ public final class ScreenUtils{
      * Returns the default framebuffer contents as a {@link TextureRegion} with a width and height equal to the current screen
      * size. The base {@link Texture} always has {@link Mathf#nextPowerOfTwo} dimensions and RGBA8888 {@link Format}.
      * The returned TextureRegion is flipped along the Y axis by default.
+     * <p>
+     * 以 {@link TextureRegion} 形式返回默认帧缓冲的内容,宽高等于当前屏幕尺寸。底层 {@link Texture} 始终具有 {@link Mathf#nextPowerOfTwo} 尺寸和 RGBA8888 {@link Format}。返回的 TextureRegion 默认沿 Y 轴翻转。
      */
     public static TextureRegion getFrameBufferTexture(){
         final int w = Core.graphics.getBackBufferWidth();
@@ -43,10 +47,12 @@ public final class ScreenUtils{
      * the same dimensions. The base {@link Texture} always has {@link Mathf#nextPowerOfTwo} dimensions and RGBA8888 {@link Format}.
      * manually on a context loss. If the width and height specified are larger than the framebuffer dimensions, the Texture will
      * be padded accordingly. Pixels that fall outside of the current screen will have RGBA values of 0.
-     * @param x the x position of the framebuffer contents to capture
-     * @param y the y position of the framebuffer contents to capture
-     * @param w the width of the framebuffer contents to capture
-     * @param h the height of the framebuffer contents to capture
+     * <p>
+     * 以 {@link TextureRegion} 形式返回默认帧缓冲中由 x、y、width 和 height 指定的一部分内容,尺寸相同。底层 {@link Texture} 始终具有 {@link Mathf#nextPowerOfTwo} 尺寸和 RGBA8888 {@link Format}。若指定的宽高大于帧缓冲尺寸,Texture 会相应填充。落在当前屏幕之外的像素 RGBA 值为 0。
+     * @param x the x position of the framebuffer contents to capture 要捕获的帧缓冲内容的 x 位置
+     * @param y the y position of the framebuffer contents to capture 要捕获的帧缓冲内容的 y 位置
+     * @param w the width of the framebuffer contents to capture 要捕获的帧缓冲内容的宽度
+     * @param h the height of the framebuffer contents to capture 要捕获的帧缓冲内容的高度
      */
     public static TextureRegion getFrameBufferTexture(int x, int y, int w, int h){
         final int potW = Mathf.nextPowerOfTwo(w);
@@ -85,7 +91,9 @@ public final class ScreenUtils{
      * always contain RGBA8888 data. Because of differences in screen and image origins the framebuffer contents should be flipped
      * along the Y axis if you intend save them to disk as a bitmap. Flipping is not a cheap operation, so use this functionality
      * wisely.
-     * @param flipY whether to flip pixels along Y axis
+     * <p>
+     * 以 byte[] 数组形式返回默认帧缓冲的内容,长度等于屏幕宽 * 高 * 4。byte[] 始终包含 RGBA8888 数据。由于屏幕和图像原点不同,若打算将内容保存为位图文件,应沿 Y 轴翻转帧缓冲内容。翻转开销不小,请谨慎使用。
+     * @param flipY whether to flip pixels along Y axis 是否沿 Y 轴翻转像素
      */
     public static byte[] getFrameBufferPixels(boolean flipY){
         final int w = Core.graphics.getBackBufferWidth();
@@ -100,7 +108,9 @@ public final class ScreenUtils{
      * screen will have RGBA values of 0. Because of differences in screen and image origins the framebuffer contents should be
      * flipped along the Y axis if you intend save them to disk as a bitmap. Flipping is not a cheap operation, so use this
      * functionality wisely.
-     * @param flipY whether to flip pixels along Y axis
+     * <p>
+     * 以 byte[] 数组形式返回默认帧缓冲中由 x、y、width 和 height 指定的一部分内容,长度等于指定的宽 * 高 * 4。byte[] 始终包含 RGBA8888 数据。若指定的宽高大于帧缓冲尺寸,Texture 会相应填充。落在当前屏幕之外的像素 RGBA 值为 0。由于屏幕和图像原点不同,若打算将内容保存为位图文件,应沿 Y 轴翻转帧缓冲内容。翻转开销不小,请谨慎使用。
+     * @param flipY whether to flip pixels along Y axis 是否沿 Y 轴翻转像素
      */
     public static byte[] getFrameBufferPixels(int x, int y, int w, int h, boolean flipY){
         Gl.pixelStorei(Gl.packAlignment, 1);

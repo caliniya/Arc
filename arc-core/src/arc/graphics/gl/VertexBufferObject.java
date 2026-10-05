@@ -19,6 +19,8 @@ import java.nio.*;
  * VertexBufferObjectWithVAO objects must be disposed via the {@link #dispose()} method when no longer needed
  * </p>
  * <p>
+ * <p>
+ * <p> 使用顶点缓冲区对象和顶点数组对象的 VertexData 实现。(OpenGL 3.0+ core profile 需要此实现。特别是默认 VAO 已被弃用,使用客户端内存传递顶点属性的方式同样如此。)使用 VAO 应能带来轻微的性能提升,因为不必在每次绘制时都绑定属性。 </p> <p> VertexBufferObjectWithVAO 对象不再使用时必须通过 {@link #dispose()} 方法释放 </p> <p>
  * @author mzechner, Dave Clayton <contact@redskyforge.com>, Nate Austin <nate.austin gmail>
  */
 public class VertexBufferObject implements Disposable{
@@ -38,8 +40,10 @@ public class VertexBufferObject implements Disposable{
 
     /**
      * Constructs a new interleaved VertexBufferObjectWithVAO.
-     * @param isStatic whether the vertex data is static.
-     * @param numVertices the maximum number of vertices
+     * <p>
+     * 构造新的交错式 VertexBufferObjectWithVAO。
+     * @param isStatic whether the vertex data is static. 顶点数据是否为静态。
+     * @param numVertices the maximum number of vertices 最大顶点数
      */
     public VertexBufferObject(boolean isStatic, int numVertices, Mesh mesh){
         this.isStatic = isStatic;
@@ -122,6 +126,7 @@ public class VertexBufferObject implements Disposable{
         bindAttributes(shader);
 
         //if our data has changed upload it
+        // 若数据已变化则上传
         bindData();
 
         isBound = true;

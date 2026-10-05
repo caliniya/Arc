@@ -21,12 +21,18 @@ public class GLProfiler implements GLProvider{
     public static int shaderSwitches;
     public static int stateChanges;
 
-    /** Enabled profiling with a logging listener. */
+    /**
+     * Enabled profiling with a logging listener.
+     * 使用日志监听器启用性能分析。
+     */
     public static void enable(){
         enable(GLErrorListener.loggingListener);
     }
 
-    /** Enables profiling with the specified error listener. */
+    /**
+     * Enables profiling with the specified error listener.
+     * 使用指定的错误监听器启用性能分析。
+     */
     public static void enable(GLErrorListener errorListener){
         if(enabled) return;
 
@@ -37,7 +43,10 @@ public class GLProfiler implements GLProvider{
         enabled = true;
     }
 
-    /** Disables profiling. */
+    /**
+     * Disables profiling.
+     * 禁用性能分析。
+     */
     public static void disable(){
         if(!enabled) return;
 
@@ -62,7 +71,10 @@ public class GLProfiler implements GLProvider{
         }
     }
 
-    /** Resets all statistics. Should generally be called at the end of a frame. */
+    /**
+     * Resets all statistics. Should generally be called at the end of a frame.
+     * 重置所有统计数据。通常应在帧末尾调用。
+     */
     public static void reset(){
         calls = 0;
         textureBindings = 0;
@@ -270,6 +282,7 @@ public class GLProfiler implements GLProvider{
     public int glGetError(){
         calls++;
         //Errors by glGetError are undetectable
+        // glGetError 产生的错误无法检测
         return glProvider.glGetError();
     }
 
@@ -1167,6 +1180,7 @@ public class GLProfiler implements GLProvider{
     }
 
     // GL30 Unique
+    // GL30 独有
 
     @Override
     public void glReadBuffer(int mode){

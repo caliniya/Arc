@@ -2,7 +2,10 @@ package arc.graphics;
 
 import arc.graphics.gl.*;
 
-/** Blending modes, can be instantiated to make custom blending. */
+/**
+ * Blending modes, can be instantiated to make custom blending.
+ * 混合模式,可实例化以创建自定义混合。
+ */
 public class Blending{
     public static final Blending
 
@@ -31,7 +34,10 @@ public class Blending{
         this.dstAlpha = dstAlpha;
     }
 
-    /** Enables/disables blending and sets the correct GL blend function. */
+    /**
+     * Enables/disables blending and sets the correct GL blend function.
+     * 启用/禁用混合并设置正确的 GL 混合函数。
+     */
     public void apply(){
         Gl.enable(Gl.blend);
         Gl.blendFuncSeparate(src, dst, srcAlpha, dstAlpha);

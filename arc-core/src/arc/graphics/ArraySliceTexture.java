@@ -82,6 +82,7 @@ public class ArraySliceTexture extends Texture{
     @Override
     public void dispose(){
         //slices shouldn't need to be disposed, dispose the whole array instead
+        // 切片不需要单独释放,应直接释放整个数组
     }
 
     @Override

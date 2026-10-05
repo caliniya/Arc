@@ -6,6 +6,8 @@ import arc.math.geom.*;
 /**
  * A color class, holding the r, g, b and alpha component as floats in the range [0,1]. All methods perform clamping on the
  * internal values after execution.
+ * <p>
+ * 颜色类,以 [0,1] 范围内的浮点数保存 r、g、b 和 alpha 分量。所有方法在执行后都会对内部值进行钳制。
  * @author mzechner
  */
 public class Color{
@@ -16,7 +18,10 @@ public class Color{
     public static final Color black = new Color(0, 0, 0, 1);
     public static final Color clear = new Color(0, 0, 0, 0);
 
-    /** Convenience for frequently used <code>WHITE.toFloatBits()</code> */
+    /**
+     * Convenience for frequently used <code>WHITE.toFloatBits()</code>
+     * 便捷方法,等价于常用的 <code>WHITE.toFloatBits()</code>
+     */
     public static final float whiteFloatBits = white.toFloatBits();
     public static final float clearFloatBits = clear.toFloatBits();
     public static final float blackFloatBits = black.toFloatBits();
@@ -62,10 +67,16 @@ public class Color{
 
     private static final float[] tmpHSV = new float[3];
 
-    /** the red, green, blue and alpha components **/
+    /**
+     * the red, green, blue and alpha components *
+     * 红、绿、蓝和 alpha 分量 *
+     */
     public float r, g, b, a;
 
-    /** Constructs a new Color with all components set to 0. */
+    /**
+     * Constructs a new Color with all components set to 0.
+     * 构造一个所有分量都为 0 的新 Color。
+     */
     public Color(){
     }
 
@@ -76,10 +87,12 @@ public class Color{
 
     /**
      * Constructor, sets the components of the color
-     * @param r the red component
-     * @param g the green component
-     * @param b the blue component
-     * @param a the alpha component
+     * <p>
+     * 构造函数,设置颜色的各分量
+     * @param r the red component 红色分量
+     * @param g the green component 绿色分量
+     * @param b the blue component 蓝色分量
+     * @param a the alpha component alpha 分量
      */
     public Color(float r, float g, float b, float a){
         this.r = r;
@@ -91,9 +104,11 @@ public class Color{
 
     /**
      * Constructor, sets the components of the color
-     * @param r the red component
-     * @param g the green component
-     * @param b the blue component
+     * <p>
+     * 构造函数,设置颜色的各分量
+     * @param r the red component 红色分量
+     * @param g the green component 绿色分量
+     * @param b the blue component 蓝色分量
      */
     public Color(float r, float g, float b){
         this(r, g, b, 1f);
@@ -101,7 +116,9 @@ public class Color{
 
     /**
      * Constructs a new color using the given color
-     * @param color the color
+     * <p>
+     * 使用给定颜色构造新颜色
+     * @param color the color 颜色
      */
     public Color(Color color){
         set(color);
@@ -109,6 +126,8 @@ public class Color{
 
     /**
      * Returns a new color from a hex string with the format RRGGBBAA.
+     * <p>
+     * 从 RRGGBBAA 格式的十六进制字符串创建新颜色。
      * @see #toString()
      */
     public static Color valueOf(String hex){
@@ -117,6 +136,8 @@ public class Color{
 
     /**
      * Returns a new color from a hex string with the format RRGGBBAA.
+     * <p>
+     * 从 RRGGBBAA 格式的十六进制字符串创建新颜色。
      * @see #toString()
      */
     public static Color valueOf(Color color, String hex){
@@ -141,11 +162,13 @@ public class Color{
     /**
      * Packs the color components into a 32-bit integer with the format ABGR and then converts it to a float. Note that no range
      * checking is performed for higher performance.
-     * @param r the red component, 0 - 255
-     * @param g the green component, 0 - 255
-     * @param b the blue component, 0 - 255
-     * @param a the alpha component, 0 - 255
-     * @return the packed color as a float
+     * <p>
+     * 将颜色分量以 ABGR 格式打包成 32 位整数,再转换为浮点数。注意,为提高性能不做范围检查。
+     * @param r the red component, 0 - 255 红色分量,0 - 255
+     * @param g the green component, 0 - 255 绿色分量,0 - 255
+     * @param b the blue component, 0 - 255 蓝色分量,0 - 255
+     * @param a the alpha component, 0 - 255 alpha 分量,0 - 255
+     * @return the packed color as a float 打包为浮点数的颜色
      * @see Color#intToFloatColor(int)
      */
     public static float toFloatBits(int r, int g, int b, int a){
@@ -155,7 +178,9 @@ public class Color{
 
     /**
      * Packs the color components into a 32-bit integer with the format ABGR and then converts it to a float.
-     * @return the packed color as a 32-bit float
+     * <p>
+     * 将颜色分量以 ABGR 格式打包成 32 位整数,再转换为浮点数。
+     * @return the packed color as a 32-bit float 打包为 32 位浮点数的颜色
      * @see Color#intToFloatColor(int)
      */
     public static float toFloatBits(float r, float g, float b, float a){
@@ -178,11 +203,13 @@ public class Color{
     /**
      * Packs the color components into a 32-bit integer with the format ABGR. Note that no range checking is performed for higher
      * performance.
-     * @param r the red component, 0 - 255
-     * @param g the green component, 0 - 255
-     * @param b the blue component, 0 - 255
-     * @param a the alpha component, 0 - 255
-     * @return the packed color as a 32-bit int
+     * <p>
+     * 将颜色分量以 ABGR 格式打包成 32 位整数。注意,为提高性能不做范围检查。
+     * @param r the red component, 0 - 255 红色分量,0 - 255
+     * @param g the green component, 0 - 255 绿色分量,0 - 255
+     * @param b the blue component, 0 - 255 蓝色分量,0 - 255
+     * @param a the alpha component, 0 - 255 alpha 分量,0 - 255
+     * @return the packed color as a 32-bit int 打包为 32 位整数的颜色
      */
     public static int abgr(int r, int g, int b, int a){
         return (a << 24) | (b << 16) | (g << 8) | r;
@@ -216,7 +243,9 @@ public class Color{
         return ((int)(a * 255) << 24) | ((int)(r * 255) << 16) | ((int)(g * 255) << 8) | (int)(b * 255);
     }
 
-    /** @return 4 0-255 RGBA components packed into an int. */
+    /**
+     * @return 4 0-255 RGBA components packed into an int. 打包为一个 int 的 4 个 0-255 RGBA 分量。
+     */
     public static int packRgba(int r, int g, int b, int a){
         return (r << 24) | (g << 16) | (b << 8) | (a);
     }
@@ -244,7 +273,9 @@ public class Color{
     /**
      * Sets the Color components using the specified integer value in the format RGB565. This is inverse to the rgb565(r, g, b)
      * method.
-     * @param value An integer color value in RGB565 format.
+     * <p>
+     * 使用 RGB565 格式的给定整数值设置 Color 分量。与 rgb565(r, g, b) 方法互为逆操作。
+     * @param value An integer color value in RGB565 format. RGB565 格式的整型颜色值。
      */
     public Color rgb565(int value){
         r = ((value & 0x0000F800) >>> 11) / 31f;
@@ -256,7 +287,9 @@ public class Color{
     /**
      * Sets the Color components using the specified integer value in the format RGBA4444. This is inverse to the rgba4444(r, g,
      * b, a) method.
-     * @param value An integer color value in RGBA4444 format.
+     * <p>
+     * 使用 RGBA4444 格式的给定整数值设置 Color 分量。与 rgba4444(r, g, b, a) 方法互为逆操作。
+     * @param value An integer color value in RGBA4444 format. RGBA4444 格式的整型颜色值。
      */
     public Color rgba4444(int value){
         r = ((value & 0x0000f000) >>> 12) / 15f;
@@ -269,7 +302,9 @@ public class Color{
     /**
      * Sets the Color components using the specified integer value in the format RGB888. This is inverse to the rgb888(r, g, b)
      * method.
-     * @param value An integer color value in RGB888 format.
+     * <p>
+     * 使用 RGB888 格式的给定整数值设置 Color 分量。与 rgb888(r, g, b) 方法互为逆操作。
+     * @param value An integer color value in RGB888 format. RGB888 格式的整型颜色值。
      */
     public Color rgb888(int value){
         r = ((value & 0x00ff0000) >>> 16) / 255f;
@@ -281,7 +316,9 @@ public class Color{
     /**
      * Sets the Color components using the specified integer value in the format RGBA8888. This is inverse to the rgba8888(r, g,
      * b, a) method.
-     * @param value An integer color value in RGBA8888 format.
+     * <p>
+     * 使用 RGBA8888 格式的给定整数值设置 Color 分量。与 rgba8888(r, g, b, a) 方法互为逆操作。
+     * @param value An integer color value in RGBA8888 format. RGBA8888 格式的整型颜色值。
      */
     public Color rgba8888(int value){
         r = ((value & 0xff000000) >>> 24) / 255f;
@@ -294,7 +331,9 @@ public class Color{
     /**
      * Sets the Color components using the specified integer value in the format ARGB8888. This is the inverse to the argb8888(a,
      * r, g, b) method
-     * @param value An integer color value in ARGB8888 format.
+     * <p>
+     * 使用 ARGB8888 格式的给定整数值设置 Color 分量。与 argb8888(a, r, g, b) 方法互为逆操作
+     * @param value An integer color value in ARGB8888 format. ARGB8888 格式的整型颜色值。
      */
     public Color argb8888(int value){
         a = ((value & 0xff000000) >>> 24) / 255f;
@@ -306,6 +345,8 @@ public class Color{
 
     /**
      * Sets the Color components using the specified float value in the format ABGB8888.
+     * <p>
+     * 使用 ABGB8888 格式的给定浮点值设置 Color 分量。
      */
     public Color abgr8888(float value){
         int c = floatToIntColor(value);
@@ -316,12 +357,18 @@ public class Color{
         return this;
     }
 
-    /** Creates a grayscale color. */
+    /**
+     * Creates a grayscale color.
+     * 创建一个灰度颜色。
+     */
     public static Color grays(float value){
         return new Color(value, value, value);
     }
 
-    /** Creates a color from 0-255 scaled RGB values. */
+    /**
+     * Creates a color from 0-255 scaled RGB values.
+     * 根据 0-255 缩放的 RGB 值创建颜色。
+     */
     public static Color rgb(int r, int g, int b){
         return new Color(r / 255f, g / 255f, b / 255f);
     }
@@ -330,6 +377,8 @@ public class Color{
      * Converts the color from a float ABGR encoding to an int ABGR encoding. The alpha is expanded from 0-254 in the float
      * encoding (see {@link #intToFloatColor(int)}) to 0-255, which means converting from int to float and back to int can be
      * lossy.
+     * <p>
+     * 将颜色从浮点 ABGR 编码转换为整型 ABGR 编码。alpha 会从浮点编码中的 0-254(见 {@link #intToFloatColor(int)})扩展为 0-255,这意味着从 int 转到 float 再转回 int 可能是有损的。
      */
     public static int floatToIntColor(float value){
         int intBits = Float.floatToRawIntBits(value);
@@ -341,6 +390,8 @@ public class Color{
      * Encodes the ABGR int color as a float. The alpha is compressed to 0-254 to avoid using bits in the NaN range (see
      * {@link Float#intBitsToFloat(int)} javadocs). Rendering which uses colors encoded as floats should expand the 0-254 back to
      * 0-255.
+     * <p>
+     * 将 ABGR 整型颜色编码为浮点数。alpha 被压缩到 0-254,以避免使用 NaN 范围内的浮点位(见 {@link Float#intBitsToFloat(int)} 的 javadoc)。使用浮点颜色编码的渲染应将 0-254 重新扩展回 0-255。
      */
     public static float intToFloatColor(int value){
         return Float.intBitsToFloat(value & 0xfeffffff);
@@ -356,19 +407,27 @@ public class Color{
         return this;
     }
 
-    /** Returns the difference of all the HSV components combined. */
+    /**
+     * Returns the difference of all the HSV components combined.
+     * 返回所有 HSV 分量的差值之和。
+     */
     public float diff(Color other){
         return Math.abs(hue() - other.hue()) / 360f + Math.abs(value() - other.value()) + Math.abs(saturation() - other.saturation());
     }
 
-    /** Shorthand for {@link #rgba8888()}.*/
+    /**
+     * Shorthand for {@link #rgba8888()}.
+     * {@link #rgba8888()} 的简写。
+     */
     public int rgba(){
         return rgba8888();
     }
 
     /**
      * Sets this color to the given color.
-     * @param color the Color
+     * <p>
+     * 将此颜色设置为给定颜色。
+     * @param color the Color Color 对象
      */
     public Color set(Color color){
         this.r = color.r;
@@ -384,8 +443,10 @@ public class Color{
 
     /**
      * Multiplies the this color and the given color
-     * @param color the color
-     * @return this color.
+     * <p>
+     * 将此颜色与给定颜色相乘
+     * @param color the color 颜色
+     * @return this color. 此颜色。
      */
     public Color mul(Color color){
         this.r *= color.r;
@@ -397,8 +458,10 @@ public class Color{
 
     /**
      * Multiplies RGB components of this Color with the given value.
-     * @param value the value
-     * @return this color
+     * <p>
+     * 将此 Color 的 RGB 分量乘以给定值。
+     * @param value the value 值
+     * @return this color 此颜色
      */
     public Color mul(float value){
         this.r *= value;
@@ -409,8 +472,10 @@ public class Color{
 
     /**
      * Multiplies RGBA components of this Color with the given value.
-     * @param value the value
-     * @return this color
+     * <p>
+     * 将此 Color 的 RGBA 分量乘以给定值。
+     * @param value the value 值
+     * @return this color 此颜色
      */
     public Color mula(float value){
         this.r *= value;
@@ -422,8 +487,10 @@ public class Color{
 
     /**
      * Adds the given color to this color.
-     * @param color the color
-     * @return this color
+     * <p>
+     * 将给定颜色加到此颜色上。
+     * @param color the color 颜色
+     * @return this color 此颜色
      */
     public Color add(Color color){
         this.r += color.r;
@@ -434,8 +501,10 @@ public class Color{
 
     /**
      * Subtracts the given color from this color
-     * @param color the color
-     * @return this color
+     * <p>
+     * 从此颜色中减去给定颜色
+     * @param color the color 颜色
+     * @return this color 此颜色
      */
     public Color sub(Color color){
         this.r -= color.r;
@@ -446,7 +515,9 @@ public class Color{
 
     /**
      * Clamps this Color's components to a valid range [0 - 1]
-     * @return this Color for chaining
+     * <p>
+     * 将此 Color 的分量钳制到有效范围 [0 - 1]
+     * @return this Color for chaining 此 Color,便于链式调用
      */
     public Color clamp(){
         if(r < 0)
@@ -469,11 +540,13 @@ public class Color{
 
     /**
      * Sets this Color's component values.
-     * @param r Red component
-     * @param g Green component
-     * @param b Blue component
-     * @param a Alpha component
-     * @return this Color for chaining
+     * <p>
+     * 设置此 Color 的分量值。
+     * @param r Red component 红色分量
+     * @param g Green component 绿色分量
+     * @param b Blue component 蓝色分量
+     * @param a Alpha component alpha 分量
+     * @return this Color for chaining 此 Color,便于链式调用
      */
     public Color set(float r, float g, float b, float a){
         this.r = r;
@@ -485,10 +558,12 @@ public class Color{
 
     /**
      * Sets this Color's component values.
-     * @param r Red component
-     * @param g Green component
-     * @param b Blue component
-     * @return this Color for chaining
+     * <p>
+     * 设置此 Color 的分量值。
+     * @param r Red component 红色分量
+     * @param g Green component 绿色分量
+     * @param b Blue component 蓝色分量
+     * @return this Color for chaining 此 Color,便于链式调用
      */
     public Color set(float r, float g, float b){
         this.r = r;
@@ -499,24 +574,31 @@ public class Color{
 
     /**
      * Sets this color's component values through an integer representation.
-     * @return this Color for chaining
+     * <p>
+     * 通过整型表示设置此颜色的分量值。
+     * @return this Color for chaining 此 Color,便于链式调用
      */
     public Color set(int rgba){
         return rgba8888(rgba);
     }
 
-    /** Returns the sum of the RGB values of this color.*/
+    /**
+     * Returns the sum of the RGB values of this color.
+     * 返回此颜色 RGB 值之和。
+     */
     public float sum(){
         return r + g + b;
     }
 
     /**
      * Adds the given color component values to this Color's values.
-     * @param r Red component
-     * @param g Green component
-     * @param b Blue component
-     * @param a Alpha component
-     * @return this Color for chaining
+     * <p>
+     * 将给定的颜色分量值加到此 Color 的值上。
+     * @param r Red component 红色分量
+     * @param g Green component 绿色分量
+     * @param b Blue component 蓝色分量
+     * @param a Alpha component alpha 分量
+     * @return this Color for chaining 此 Color,便于链式调用
      */
     public Color add(float r, float g, float b, float a){
         this.r += r;
@@ -528,10 +610,12 @@ public class Color{
 
     /**
      * Adds the given color component values to this Color's values.
-     * @param r Red component
-     * @param g Green component
-     * @param b Blue component
-     * @return this Color for chaining
+     * <p>
+     * 将给定的颜色分量值加到此 Color 的值上。
+     * @param r Red component 红色分量
+     * @param g Green component 绿色分量
+     * @param b Blue component 蓝色分量
+     * @return this Color for chaining 此 Color,便于链式调用
      */
     public Color add(float r, float g, float b){
         this.r += r;
@@ -542,11 +626,13 @@ public class Color{
 
     /**
      * Subtracts the given values from this Color's component values.
-     * @param r Red component
-     * @param g Green component
-     * @param b Blue component
-     * @param a Alpha component
-     * @return this Color for chaining
+     * <p>
+     * 从此 Color 的分量值中减去给定值。
+     * @param r Red component 红色分量
+     * @param g Green component 绿色分量
+     * @param b Blue component 蓝色分量
+     * @param a Alpha component alpha 分量
+     * @return this Color for chaining 此 Color,便于链式调用
      */
     public Color sub(float r, float g, float b, float a){
         this.r -= r;
@@ -558,10 +644,12 @@ public class Color{
 
     /**
      * Subtracts the given values from this Color's component values.
-     * @param r Red component
-     * @param g Green component
-     * @param b Blue component
-     * @return this Color for chaining
+     * <p>
+     * 从此 Color 的分量值中减去给定值。
+     * @param r Red component 红色分量
+     * @param g Green component 绿色分量
+     * @param b Blue component 蓝色分量
+     * @return this Color for chaining 此 Color,便于链式调用
      */
     public Color sub(float r, float g, float b){
         this.r -= r;
@@ -570,7 +658,10 @@ public class Color{
         return clamp();
     }
 
-    /** Inverts this color's RGB.*/
+    /**
+     * Inverts this color's RGB.
+     * 反转此颜色的 RGB。
+     */
     public Color inv(){
         r = 1f - r;
         g = 1f - g;
@@ -605,11 +696,13 @@ public class Color{
 
     /**
      * Multiplies this Color's color components by the given ones.
-     * @param r Red component
-     * @param g Green component
-     * @param b Blue component
-     * @param a Alpha component
-     * @return this Color for chaining
+     * <p>
+     * 将此 Color 的颜色分量乘以给定的分量值。
+     * @param r Red component 红色分量
+     * @param g Green component 绿色分量
+     * @param b Blue component 蓝色分量
+     * @param a Alpha component alpha 分量
+     * @return this Color for chaining 此 Color,便于链式调用
      */
     public Color mul(float r, float g, float b, float a){
         this.r *= r;
@@ -622,9 +715,11 @@ public class Color{
     /**
      * Linearly interpolates between this color and the target color by t which is in the range [0,1]. The result is stored in
      * this color.
-     * @param target The target color
-     * @param t The interpolation coefficient
-     * @return This color for chaining.
+     * <p>
+     * 在此颜色与目标颜色之间按 [0,1] 范围内的 t 进行线性插值。结果保存在此颜色中。
+     * @param target The target color 目标颜色
+     * @param t The interpolation coefficient 插值系数
+     * @return This color for chaining. 此颜色,便于链式调用。
      */
     public Color lerp(final Color target, final float t){
         this.r += t * (target.r - this.r);
@@ -637,12 +732,14 @@ public class Color{
     /**
      * Linearly interpolates between this color and the target color by t which is in the range [0,1]. The result is stored in
      * this color.
-     * @param r The red component of the target color
-     * @param g The green component of the target color
-     * @param b The blue component of the target color
-     * @param a The alpha component of the target color
-     * @param t The interpolation coefficient
-     * @return This color for chaining.
+     * <p>
+     * 在此颜色与目标颜色之间按 [0,1] 范围内的 t 进行线性插值。结果保存在此颜色中。
+     * @param r The red component of the target color 目标颜色的红色分量
+     * @param g The green component of the target color 目标颜色的绿色分量
+     * @param b The blue component of the target color 目标颜色的蓝色分量
+     * @param a The alpha component of the target color 目标颜色的 alpha 分量
+     * @param t The interpolation coefficient 插值系数
+     * @return This color for chaining. 此颜色,便于链式调用。
      */
     public Color lerp(final float r, final float g, final float b, final float a, final float t){
         this.r += t * (r - this.r);
@@ -652,7 +749,10 @@ public class Color{
         return clamp();
     }
 
-    /** Multiplies the RGB values by the alpha. */
+    /**
+     * Multiplies the RGB values by the alpha.
+     * 将 RGB 值乘以 alpha。
+     */
     public Color premultiplyAlpha(){
         r *= a;
         g *= a;
@@ -660,7 +760,9 @@ public class Color{
         return this;
     }
 
-    /** @return Euclidean distance from the other color, based on RGB components. */
+    /**
+     * @return Euclidean distance from the other color, based on RGB components. 基于 RGB 分量与其他颜色的欧氏距离。
+     */
     public float dst(Color other){
         return Vec3.dst(r, g, b, other.r, other.g, other.b);
     }
@@ -746,7 +848,9 @@ public class Color{
     /**
      * Packs the color components into a 32-bit integer with the format ABGR and then converts it to a float. Alpha is compressed
      * from 0-255 to 0-254 to avoid using float bits in the NaN range (see {@link Color#intToFloatColor(int)}).
-     * @return the packed color as a 32-bit float
+     * <p>
+     * 将颜色分量以 ABGR 格式打包成 32 位整数,再转换为浮点数。alpha 从 0-255 压缩到 0-254,以避免使用 NaN 范围内的浮点位(见 {@link Color#intToFloatColor(int)})。
+     * @return the packed color as a 32-bit float 打包为 32 位浮点数的颜色
      */
     public float toFloatBits(){
         int color = ((int)(255 * a) << 24) | ((int)(255 * b) << 16) | ((int)(255 * g) << 8) | ((int)(255 * r));
@@ -759,13 +863,18 @@ public class Color{
 
     /**
      * Packs the color components into a 32-bit integer with the format ABGR.
-     * @return the packed color as a 32-bit int.
+     * <p>
+     * 将颜色分量以 ABGR 格式打包成 32 位整数。
+     * @return the packed color as a 32-bit int. 打包为 32 位整数的颜色。
      */
     public int abgr(){
         return ((int)(255 * a) << 24) | ((int)(255 * b) << 16) | ((int)(255 * g) << 8) | ((int)(255 * r));
     }
 
-    /** Returns the color encoded as hex string with the format RRGGBBAA. */
+    /**
+     * Returns the color encoded as hex string with the format RRGGBBAA.
+     * 返回以 RRGGBBAA 格式十六进制字符串编码的颜色。
+     */
     public String toString(){
         StringBuilder value = new StringBuilder();
         toString(value);
@@ -781,10 +890,12 @@ public class Color{
     /**
      * Sets the RGB Color components using the specified Hue-Saturation-Value. Note that HSV components are voluntary not clamped
      * to preserve high range color and can range beyond typical values.
-     * @param h The Hue in degree from 0 to 360
-     * @param s The Saturation from 0 to 1
-     * @param v The Value (brightness) from 0 to 1
-     * @return The modified Color for chaining.
+     * <p>
+     * 使用给定的色相-饱和度-明度设置 RGB 颜色分量。注意,HSV 分量特意不做钳制,以保留高动态范围的颜色,可以超出常规取值。
+     * @param h The Hue in degree from 0 to 360 色相,0 到 360
+     * @param s The Saturation from 0 to 1 饱和度,0 到 1
+     * @param v The Value (brightness) from 0 to 1 明度(亮度),0 到 1
+     * @return The modified Color for chaining. 修改后的 Color,便于链式调用。
      */
     public Color fromHsv(float h, float s, float v){
         float x = (h / 60f + 6) % 6;
@@ -831,8 +942,10 @@ public class Color{
     /**
      * Sets RGB components using the specified Hue-Saturation-Value. This is a convenient method for
      * {@link #fromHsv(float, float, float)}. This is the inverse of {@link #toHsv(float[])}.
-     * @param hsv The Hue, Saturation and Value components in that order.
-     * @return The modified Color for chaining.
+     * <p>
+     * 使用给定的色相-饱和度-明度设置 RGB 分量。这是 {@link #fromHsv(float, float, float)} 的便捷方法,与 {@link #toHsv(float[])} 互为逆操作。
+     * @param hsv The Hue, Saturation and Value components in that order. 色相、饱和度和明度分量,依此顺序。
+     * @return The modified Color for chaining. 修改后的 Color,便于链式调用。
      */
     public Color fromHsv(float[] hsv){
         return fromHsv(hsv[0], hsv[1], hsv[2]);
@@ -840,8 +953,10 @@ public class Color{
 
     /**
      * Extract Hue-Saturation-Value. This is the inverse of {@link #fromHsv(float[])}.
-     * @param hsv The HSV array to be modified.
-     * @return HSV components for chaining.
+     * <p>
+     * 提取色相-饱和度-明度。与 {@link #fromHsv(float[])} 互为逆操作。
+     * @param hsv The HSV array to be modified. 待修改的 HSV 数组。
+     * @return HSV components for chaining. HSV 分量,便于链式调用。
      */
     public float[] toHsv(float[] hsv){
         float max = Math.max(Math.max(r, g), b);
@@ -871,10 +986,12 @@ public class Color{
     /**
      * Converts HSV to RGB
      *
-     * @param h     hue 0-360
-     * @param s     saturation 0-100
-     * @param v     value 0-100
-     * @param alpha 0-1
+     * <p>
+     * 将 HSV 转换为 RGB
+     * @param h     hue 0-360 色相 0-360
+     * @param s     saturation 0-100 饱和度 0-100
+     * @param v     value 0-100 明度 0-100
+     * @param alpha 0-1 0-1
      */
     public static Color HSVtoRGB(float h, float s, float v, float alpha) {
         Color c = HSVtoRGB(h, s, v);
@@ -885,9 +1002,11 @@ public class Color{
     /**
      * Converts HSV color system to RGB
      *
-     * @param h hue 0-360
-     * @param s saturation 0-100
-     * @param v value 0-100
+     * <p>
+     * 将 HSV 颜色系统转换为 RGB
+     * @param h hue 0-360 色相 0-360
+     * @param s saturation 0-100 饱和度 0-100
+     * @param v value 0-100 明度 0-100
      */
     public static Color HSVtoRGB(float h, float s, float v) {
         Color c = new Color(1, 1, 1, 1);
@@ -898,10 +1017,12 @@ public class Color{
     /**
      * Converts HSV color system to RGB
      *
-     * @param h           hue 0-360
-     * @param s           saturation 0-100
-     * @param v           value 0-100
-     * @param targetColor color that result will be stored in
+     * <p>
+     * 将 HSV 颜色系统转换为 RGB
+     * @param h           hue 0-360 色相 0-360
+     * @param s           saturation 0-100 饱和度 0-100
+     * @param v           value 0-100 明度 0-100
+     * @param targetColor color that result will be stored in 存储结果的颜色对象
      * @return targetColor
      */
     public static Color HSVtoRGB(float h, float s, float v, Color targetColor) {
@@ -959,7 +1080,9 @@ public class Color{
     /**
      * Converts {@link Color} to HSV color system
      *
-     * @return 3 element int array with hue (0-360), saturation (0-100) and value (0-100)
+     * <p>
+     * 将 {@link Color} 转换为 HSV 颜色系统
+     * @return 3 element int array with hue (0-360), saturation (0-100) and value (0-100) 包含色相 (0-360)、饱和度 (0-100) 和明度 (0-100) 的 3 元素整型数组
      */
     public static int[] RGBtoHSV(Color c) {
         return RGBtoHSV(c.r, c.g, c.b);
@@ -968,10 +1091,12 @@ public class Color{
     /**
      * Converts RGB to HSV color system
      *
-     * @param r red 0-1
-     * @param g green 0-1
-     * @param b blue 0-1
-     * @return 3 element int array with hue (0-360), saturation (0-100) and value (0-100)
+     * <p>
+     * 将 RGB 转换为 HSV 颜色系统
+     * @param r red 0-1 红 0-1
+     * @param g green 0-1 绿 0-1
+     * @param b blue 0-1 蓝 0-1
+     * @return 3 element int array with hue (0-360), saturation (0-100) and value (0-100) 包含色相 (0-360)、饱和度 (0-100) 和明度 (0-100) 的 3 元素整型数组
      */
     public static int[] RGBtoHSV(float r, float g, float b) {
         float h, s, v;
@@ -1013,7 +1138,9 @@ public class Color{
         return new int[]{Mathf.round(h), Mathf.round(s), Mathf.round(v)};
     }
 
-    /** @return a copy of this color */
+    /**
+     * @return a copy of this color 此颜色的副本
+     */
     public Color cpy(){
         return new Color(this);
     }
@@ -1032,27 +1159,38 @@ public class Color{
         return Math.min(Math.max((int)value, 0), 255);
     }
 
-    /** @return R value of a RGBA packed color. */
+    /**
+     * @return R value of a RGBA packed color. RGBA 打包颜色的 R 值。
+     */
     public static int ri(int rgba){
         return (rgba & 0xff000000) >>> 24;
     }
 
-    /** @return G value of a RGBA packed color. */
+    /**
+     * @return G value of a RGBA packed color. RGBA 打包颜色的 G 值。
+     */
     public static int gi(int rgba){
         return (rgba & 0x00ff0000) >>> 16;
     }
 
-    /** @return B value of a RGBA packed color. */
+    /**
+     * @return B value of a RGBA packed color. RGBA 打包颜色的 B 值。
+     */
     public static int bi(int rgba){
         return (rgba & 0x0000ff00) >>> 8;
     }
 
-    /** @return A value of a RGBA packed color. */
+    /**
+     * @return A value of a RGBA packed color. RGBA 打包颜色的 A 值。
+     */
     public static int ai(int rgba){
         return (rgba & 0x000000ff);
     }
 
-    /** Multiplies 2 RGBA colors together. */
+    /**
+     * Multiplies 2 RGBA colors together.
+     * 将两个 RGBA 颜色相乘。
+     */
     public static int muli(int ca, int cb){
         int
         r = ((ca & 0xff000000) >>> 24),
@@ -1066,7 +1204,10 @@ public class Color{
         return (clampf(r * r2 / 255f) << 24) | (clampf(g * g2 / 255f) << 16) | (clampf(b * b2 / 255f) << 8) | (clampf(a * a2 / 255f));
     }
 
-    /** Multiplies a RGBA color by a float. Alpha channels are not multiplied. */
+    /**
+     * Multiplies a RGBA color by a float. Alpha channels are not multiplied.
+     * 将 RGBA 颜色乘以一个浮点数。alpha 通道不参与相乘。
+     */
     public static int muli(int rgba, float value){
         int
         r = ((rgba & 0xff000000) >>> 24),

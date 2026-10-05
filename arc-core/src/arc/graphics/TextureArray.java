@@ -5,6 +5,8 @@ import arc.graphics.gl.*;
 
 /**
  * OpenGL ES wrapper for TextureArray
+ * <p>
+ * TextureArray 的 OpenGL ES 封装
  * @author Tomski
  */
 public class TextureArray extends GLTexture{
@@ -72,11 +74,14 @@ public class TextureArray extends GLTexture{
 
     /**
      * Resizes the texture array to the new depth, preserving existing layers via FBO blit.
+     * <p>
+     * 将纹理数组调整到新深度,并通过 FBO 块拷贝保留现有图层。
      */
     public void resizeDepth(int newDepth){
         if(newDepth == depth) return;
 
         //this is extremely slow and requires a 2-pass solution to keep the handle the same.
+        // 这非常慢,且需要两遍处理才能保持句柄不变。
         int newTex = Gl.genTexture();
         Gl.bindTexture(Gl.texture2dArray, newTex);
         Gl.texImage3D(Gl.texture2dArray, 0, Gl.rgba8, width, height, depth, 0, Gl.rgba, Gl.unsignedByte, null);

@@ -6,14 +6,21 @@ import java.io.*;
 import java.nio.charset.*;
 import java.util.zip.*;
 
-/** Reads Aseprite files - https://github.com/aseprite/aseprite/blob/main/docs/ase-file-specs.md. Supports RGBA and indexed (8bpp, palette-based) color modes. No grayscale or tilemaps. */
+/**
+ * Reads Aseprite files - https://github.com/aseprite/aseprite/blob/main/docs/ase-file-specs.md. Supports RGBA and indexed (8bpp, palette-based) color modes. No grayscale or tilemaps.
+ * 读取 Aseprite 文件 - https://github.com/aseprite/aseprite/blob/main/docs/ase-file-specs.md。支持 RGBA 和索引(8bpp、基于调色板)颜色模式。不支持灰度或瓦片地图。
+ */
 public class Aseprite{
 
-    /** Reads an Aseprite file from a stream. Does not close the stream. The stream is wrapped in a buffered stream. */
+    /**
+     * Reads an Aseprite file from a stream. Does not close the stream. The stream is wrapped in a buffered stream.
+     * 从流中读取 Aseprite 文件。不关闭流。该流会被包装在缓冲流中。
+     */
     public static AseImage read(InputStream stream) throws IOException{
         AseInput in = new AseInput(new BufferedInputStream(stream));
 
         in.u32(); //file size
+        // 文件大小
 
         if(in.u16() != 0xA5E0) throw new IOException("Invalid header, not an ASE file?");
 
@@ -26,21 +33,32 @@ public class Aseprite{
         int bytesPerPixel = indexed ? 1 : 4;
 
         in.u16(); //speed, deprecated
+        // 速度,已弃用
         in.u32(); //0
         in.u32(); //0
 
         int transparentIndex = in.u8(); //palette entry representing transparent color, only meaningful for indexed sprites
+        // 表示透明颜色的调色板条目,仅对索引模式的精灵有意义
         in.skipFully(3); //ignore
+        // 忽略
 
         in.u16(); //color number
+        // 颜色编号
         in.u8(); //width of a pixel
+        // 像素宽度
         in.u8(); //height of a pixel
+        // 像素高度
         in.i16(); //grid X
+        // 网格 X
         in.i16(); //grid Y
+        // 网格 Y
         in.u16(); //grid width
+        // 网格宽度
         in.u16(); //grid height
+        // 网格高度
 
         in.skipFully(84); //header padding
+        // 文件头填充
 
         Ar<AseLayer> layers = new Ar<>(), rootLayers = new Ar<>(), groupStack = new Ar<>();
         Ar<AseTag> tags = new Ar<>();
@@ -49,18 +67,22 @@ public class Aseprite{
         int readTagIndex = 0, lastDepth = 0;
 
         //palette for indexed sprites. Capped at 256 entries, since pixel indices are a single byte.
+        // 索引模式精灵的调色板。上限 256 项,因为像素索引只有一个字节。
         //Packed as RGBA8888, i.e. (r << 24) | (g << 16) | (b << 8) | a.
+        // 以 RGBA8888 打包,即 (r << 24) | (g << 16) | (b << 8) | a。
         int[] palette = new int[256];
         boolean hasNewPalette = false;
 
         for(int frameId = 0; frameId < frameCount; frameId++){
             in.u32(); //frame total bytes
+            // 帧总字节数
 
             if(in.u16() != 0xF1FA) throw new IOException("Invalid frame magic (corrupt file?)");
 
             int chunksOld = in.u16(), durationMs = in.u16();
 
             in.u16(); //unused
+            // 未使用
 
             int chunksNew = in.u32(), chunks = chunksNew == 0 ? chunksOld : chunksNew;
 
@@ -72,21 +94,26 @@ public class Aseprite{
                 int chunkSize = in.u32(), chunkType = in.u16();
 
                 if(chunkType == 0x2004){ //layer
+                // 图层
                     justReadTags = false;
 
                     int flags = in.u16(), layerType = in.u16(), childLevel = in.u16();
 
                     in.u32(); //width/height, ignored
+                    // 宽/高,已忽略
                     in.u16(); //blend mode, ignored
+                    // 混合模式,已忽略
 
                     int opacity = in.u8();
 
                     in.skipFully(3); //skip 3 bytes, unused
+                    // 跳过 3 字节,未使用
 
                     String name = in.string();
 
                     if(layerType == 2){
                         in.u32(); //tileset index, don't care
+                        // 瓦片集索引,不关心
                     }
 
                     AseLayer layer = new AseLayer();
@@ -117,6 +144,7 @@ public class Aseprite{
                     }
 
                 }else if(chunkType == 0x2018){ //tags
+                // 标签
                     justReadTags = true;
 
                     int count = in.u16();
@@ -129,15 +157,18 @@ public class Aseprite{
                         tag.repeat = in.u16();
 
                         in.skipFully(10); //unused
+                        // 未使用
 
                         tag.name = in.string();
 
                         tags.add(tag);
                     }
                 }else if(chunkType == 0x2020 && (layers.size > 0 || justReadTags)){ //user data (horrible implementation)
+                // 用户数据(实现很糟糕)
                     int flags = in.u32();
 
                     if((flags & 1) == 1){ //text
+                    // 文本
                         String text = in.string();
                         if(!justReadTags){
                             layers.peek().userData = text;
@@ -147,6 +178,7 @@ public class Aseprite{
                     }
 
                     if((flags & 2) == 2){ //color
+                    // 颜色
                         int color = in.u32();
                         if(!justReadTags){
                             layers.peek().userColor = color;
@@ -156,11 +188,13 @@ public class Aseprite{
                     }
 
                     //other flags not supported! will crash!
+                    // 不支持其他标志!会崩溃!
 
                     if(justReadTags){
                         readTagIndex++;
                     }
                 }else if(chunkType == 0x2019){ //new palette chunk
+                // 新调色板块
                     justReadTags = false;
 
                     int newSize = in.u32(), from = in.u32(), to = in.u32();
@@ -181,8 +215,10 @@ public class Aseprite{
                         }
 
                         if((entryFlags & 1) == 1) in.string(); //color name, unused
+                        // 颜色名称,未使用
                     }
                 }else if((chunkType == 0x0004 || chunkType == 0x0011) && !hasNewPalette){ //old palette chunks, only used if no new palette chunk is present
+                // 旧调色板块,仅在没有新调色板块时使用
                     justReadTags = false;
 
                     boolean sixBit = chunkType == 0x0011;
@@ -213,18 +249,22 @@ public class Aseprite{
                         }
                     }
                 }else if(chunkType == 0x2005){ //cel (image data)
+                // cel(图像数据)
                     justReadTags = false;
                     readImage = true;
 
                     int layerIndex = in.u16(), x = in.i16(), y = in.i16(), opacity = in.u8(), celType = in.u16();
 
                     in.skipFully(7); //reserved
+                    // 保留
 
                     //TODO figure out links later
+                    // TODO 稍后处理链接
                     if(celType != 2) throw new IOException("Only compressed image data is allowed - tilemaps, links and raw images are not supported.");
 
                     int pixWidth = in.u16(), pixHeight = in.u16();
                     //base size - 6 byte header - 2 byte index - 4 bytes xy - 1 byte opacity - 2 bytes type - 4 bytes size - 7 bytes padding
+                    // 基础大小 - 6 字节文件头 - 2 字节索引 - 4 字节 xy 坐标 - 1 字节不透明度 - 2 字节类型 - 4 字节大小 - 7 字节填充
                     byte[] compressed = new byte[chunkSize - 6 - 2 - 4 - 1 - 2 - 4 - 7];
 
                     in.readFully(compressed);
@@ -248,12 +288,14 @@ public class Aseprite{
 
                     frame.layers.add(cel);
                 }else{ //unknown chunk, skipping - I don't support tilemaps, so they do not matter
+                // 未知块,跳过 - 不支持瓦片地图,所以无关紧要
                     in.skipFully(chunkSize - 6);
                 }
             }
 
             if(!readImage){
                 //add dummy empty 0x0 cel for every layer
+                // 为每个图层添加一个空的 0x0 占位 cel
                 for(int i = 0; i < layers.size; i++){
                     AseCel cel = new AseCel();
                     cel.layerIndex = i;
@@ -319,7 +361,10 @@ public class Aseprite{
         return out;
     }
 
-    /** Little-endian reads, as used by the ASE format. */
+    /**
+     * Little-endian reads, as used by the ASE format.
+     * 小端序读取,ASE 格式即采用这种方式。
+     */
     static class AseInput extends DataInputStream{
 
         AseInput(InputStream in){
@@ -347,6 +392,7 @@ public class Aseprite{
                 int skipped = skipBytes(len);
                 if(skipped <= 0){
                     readByte(); //throws at EOF
+                    // 到达文件末尾时抛出异常
                     skipped = 1;
                 }
                 len -= skipped;
@@ -382,15 +428,24 @@ public class Aseprite{
         public int userColor;
     }
 
-    /** One animation frame, containing the cel (image) data for every layer that has one in this frame. */
+    /**
+     * One animation frame, containing the cel (image) data for every layer that has one in this frame.
+     * 一个动画帧,包含该帧中每个拥有图像数据的图层的 cel(图像)数据。
+     */
     public static class AseFrame{
         public int duration;
         public Ar<AseCel> layers = new Ar<>();
     }
 
-    /** A single layer's image data within one frame. */
+    /**
+     * A single layer's image data within one frame.
+     * 一帧中单个图层的图像数据。
+     */
     public static class AseCel{
-        /** Index into AseImage#layers identifying which layer this cel belongs to. */
+        /**
+         * Index into AseImage#layers identifying which layer this cel belongs to.
+         * 指向 AseImage#layers 的索引,标识此 cel 属于哪个图层。
+         */
         public int layerIndex;
         public byte[] data;
         public int width, height;
@@ -420,9 +475,15 @@ public class Aseprite{
         public Ar<AseFrame> frames;
         public int width, height;
         public int colorDepth;
-        /** Only populated for indexed (8bpp) sprites; packed as RGBA8888. Unused for RGBA sprites. */
+        /**
+         * Only populated for indexed (8bpp) sprites; packed as RGBA8888. Unused for RGBA sprites.
+         * 仅对索引模式(8bpp)精灵填充;以 RGBA8888 打包。RGBA 精灵不使用。
+         */
         public int[] palette;
-        /** Palette entry index representing transparent color in non-background layers. Only meaningful for indexed sprites. */
+        /**
+         * Palette entry index representing transparent color in non-background layers. Only meaningful for indexed sprites.
+         * 表示非背景图层透明颜色的调色板条目索引。仅对索引模式的精灵有意义。
+         */
         public int transparentIndex;
     }
 }
