@@ -5,6 +5,8 @@ import arc.fx.*;
 
 /**
  * HDR filter.
+ * <p>
+ * HDR 滤镜。
  * @author Toni Sagrista
  */
 public final class HdrFilter extends FxFilter{
@@ -26,6 +28,7 @@ public final class HdrFilter extends FxFilter{
     @Override
     public void setParams(){
         // reimplement super to batch every parameter
+        // 重新实现父类方法,以便批量设置每个参数
         shader.setUniformi("u_texture0", u_texture0);
         shader.setUniformf("u_exposure", exposure);
         shader.setUniformf("u_gamma", gamma);

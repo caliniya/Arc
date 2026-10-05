@@ -4,12 +4,15 @@ import arc.fx.util.*;
 
 /**
  * Encapsulates a separable 2D convolution kernel filter
+ * <p>
+ * 封装一个可分离的 2D 卷积核滤镜
  * @author bmanuel
  * @author metaphore
  */
 public final class Convolve2dFilter extends MultipassVfxFilter{
     public final int radius;
     public final int length; // NxN taps filter, w/ N=length
+    // NxN 采样点(taps)滤镜,N 即 length
     public final float[] weights, offsetsHor, offsetsVert;
     public Convolve1dFilter hor, vert;
 

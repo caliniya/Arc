@@ -70,11 +70,14 @@ public class BloomFilter extends FxFilter{
         Core.graphics.clear(Color.clear);
 
         // Threshold / high-pass filter
+        // 阈值 / 高通滤波器
         // Only areas with pixels >= threshold are blit to smaller FBO
+        // 只有像素 >= 阈值的区域才会被 blit 到更小的 FBO 中
         threshold.setInput(texSrc).setOutput(buffer.getDstBuffer()).render();
         buffer.swap();
 
         // Blur pass
+        // 模糊处理
         blur.render(buffer);
 
         buffer.end();
@@ -84,6 +87,7 @@ public class BloomFilter extends FxFilter{
         }
 
         // Mix original scene and blurred threshold, modulate via set(Base|BloomEffect)(Saturation|Intensity)
+        // 混合原始场景与模糊后的阈值结果,通过 set(Base|BloomEffect)(Saturation|Intensity) 进行调节
         combine.setInput(texSrc, buffer.getDstTexture())
         .setOutput(dst)
         .render();

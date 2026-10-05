@@ -7,6 +7,8 @@ import arc.math.geom.*;
 
 /**
  * Lens flare effect.
+ * <p>
+ * 镜头光晕特效。
  * @author Toni Sagrista
  **/
 public final class LensFlareFilter extends FxFilter{

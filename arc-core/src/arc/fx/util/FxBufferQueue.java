@@ -4,7 +4,10 @@ import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 
-/** Provides looped access to an array of Framebuffers. */
+/**
+ * Provides looped access to an array of Framebuffers.
+ * 提供对 FrameBuffer 数组的循环访问。
+ */
 public class FxBufferQueue implements Disposable{
     private final Ar<FrameBuffer> buffers;
     private int currentIdx = 0;
@@ -39,11 +42,14 @@ public class FxBufferQueue implements Disposable{
 
     /**
      * Restores buffer OpenGL parameters. Could be useful in case of OpenGL context loss.
+     * <p>
+     * 恢复缓冲区的 OpenGL 参数。在 OpenGL 上下文丢失的情况下可能有用。
      */
     public void rebind(){
         for(int i = 0; i < buffers.size; i++){
             FrameBuffer wrapper = buffers.get(i);
             // FBOs might be null if the instance wasn't initialized with #resize(int, int) yet.
+            // 如果实例尚未通过 #resize(int, int) 初始化,FBO 可能为 null。
             if(wrapper == null) continue;
 
             Texture texture = wrapper.texture;

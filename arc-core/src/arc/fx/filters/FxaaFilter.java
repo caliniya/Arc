@@ -6,6 +6,8 @@ import arc.math.geom.*;
 
 /**
  * Fast approximate anti-aliasing filter.
+ * <p>
+ * 快速近似抗锯齿滤镜。
  * @author Toni Sagrista
  */
 public final class FxaaFilter extends FxFilter{

@@ -8,6 +8,9 @@ import arc.util.*;
  * The base class for any multi-pass filter.
  * Usually a multi-pass filter will make use of one or more single-pass filters,
  * promoting composition over inheritance.
+ * <p>
+ * 任意多通道(multi-pass)滤镜的基类。
+ * 多通道滤镜通常会使用一个或多个单通道滤镜,以组合代替继承。
  */
 public abstract class MultipassVfxFilter implements Disposable{
 

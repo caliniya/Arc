@@ -66,6 +66,7 @@ public class TcpConnection{
             socket.setTcpNoDelay(true);
             // socket.setTrafficClass(IPTOS_LOWDELAY);
             socket.connect(remoteAddress, timeout); // Connect using blocking mode for simplicity.
+            // 为简单起见,使用阻塞模式进行连接。
             socketChannel.configureBlocking(false);
             this.socketChannel = socketChannel;
 
@@ -86,6 +87,7 @@ public class TcpConnection{
 
         if(currentObjectLength == 0){
             // Read the length of the next object from the socket.
+            // 从套接字读取下一个对象的长度。
             int lengthLength = serialization.getLengthLength();
             if(readBuffer.remaining() < lengthLength){
                 readBuffer.compact();
@@ -112,6 +114,7 @@ public class TcpConnection{
         int length = currentObjectLength;
         if(readBuffer.remaining() < length){
             // Fill the tcpInputStream.
+            // 填充 tcpInputStream。
             readBuffer.compact();
             int bytesRead = socketChannel.read(readBuffer);
             readBuffer.flip();
@@ -147,6 +150,7 @@ public class TcpConnection{
         synchronized(writeLock){
             if(writeToSocket()){
                 // Write successful, clear OP_WRITE.
+                // 写入成功,清除 OP_WRITE。
                 selectionKey.interestOps(SelectionKey.OP_READ);
             }
             lastWriteTime = System.currentTimeMillis();
@@ -171,6 +175,8 @@ public class TcpConnection{
 
     /**
      * This method is thread safe.
+     * <p>
+     * 此方法是线程安全的。
      */
     public int send(Object object) throws IOException{
         SocketChannel socketChannel = this.socketChannel;
@@ -182,9 +188,11 @@ public class TcpConnection{
 
             try{
                 // Leave room for length.
+                // 为长度留出空间。
                 writeBuffer.position(writeBuffer.position() + lengthLength);
 
                 // Write data.
+                // 写入数据。
                 serialization.write(writeBuffer, object);
             }catch(Throwable ex){
                 throw new ArcNetException("Error serializing object of type: " + object.getClass().getName(), ex);
@@ -192,17 +200,22 @@ public class TcpConnection{
             int end = writeBuffer.position();
 
             // Write data length.
+            // 写入数据长度。
             writeBuffer.position(start);
             serialization.writeLength(writeBuffer, end - lengthLength - start);
             writeBuffer.position(end);
 
             // Write to socket if no data was queued.
+            // 如果没有排队的数据,则写入套接字。
             if(start == 0 && !writeToSocket()){
                 // A partial write, set OP_WRITE to be notified when more
+                // 部分写入,设置 OP_WRITE,以便在可以
                 // writing can occur.
+                // 继续写入时得到通知。
                 selectionKey.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
             }else{
                 // Full write, wake up selector so idle event will be fired.
+                // 完整写入,唤醒选择器以触发空闲事件。
                 selectionKey.selector().wakeup();
             }
 
@@ -214,6 +227,9 @@ public class TcpConnection{
     /**
      * Writes a pre-serialized, length-prefixed buffer directly into this connection's write buffer.
      * Note that this cannot use a raw buffer like UDP, it must contain length!
+     * <p>
+     * 将预序列化、带长度前缀的缓冲区直接写入此连接的写缓冲区。
+     * 注意,这不能像 UDP 那样使用原始缓冲区,它必须包含长度!
      */
     public int sendBuffer(ByteBuffer buffer) throws IOException{
         SocketChannel socketChannel = this.socketChannel;

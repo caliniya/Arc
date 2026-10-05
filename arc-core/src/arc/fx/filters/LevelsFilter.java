@@ -5,6 +5,8 @@ import arc.fx.*;
 
 /**
  * Controls levels of brightness and contrast
+ * <p>
+ * 控制亮度和对比度级别
  * @author tsagrista
  */
 public class LevelsFilter extends FxFilter{

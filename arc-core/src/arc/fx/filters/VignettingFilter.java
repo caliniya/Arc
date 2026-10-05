@@ -38,6 +38,8 @@ public final class VignettingFilter extends FxFilter{
 
     /**
      * Sets the texture with which gradient mapping will be performed.
+     * <p>
+     * 设置用于渐变映射的纹理。
      */
     public void setLut(Texture texture){
         lutTexture = texture;
@@ -46,6 +48,7 @@ public final class VignettingFilter extends FxFilter{
         if(lutEnabled){
             lutStep = 1f / (float)texture.height;
             lutStepOffset = lutStep / 2f; // center texel
+            // 中心纹素
         }
     }
 

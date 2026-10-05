@@ -1,6 +1,8 @@
 /*
  * This file is a modified class of dnsjava, an implementation of the dns protocol in java.
  * Licensed under the BSD-3-Clause.
+ * 本文件是 dnsjava(一个用 Java 实现的 DNS 协议库)的修改版类。
+ * 采用 BSD-3-Clause 许可。
  */
 package arc.net.dns;
 
@@ -17,6 +19,8 @@ import static arc.net.dns.ArcDns.dnsResolverPort;
 /**
  * Resolver config provider that tries to extract the system's DNS servers from the
  * <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/jndi/jndi-dns.html">JNDI DNS Service Provider</a>.
+ * <p>
+ * 解析器配置提供者,尝试从 <a href="https://docs.oracle.com/javase/8/docs/technotes/guides/jndi/jndi-dns.html">JNDI DNS 服务提供者</a> 中提取系统的 DNS 服务器。
  */
 public final class JndiContextNameserverProvider implements NameserverProvider{
 
@@ -35,6 +39,7 @@ public final class JndiContextNameserverProvider implements NameserverProvider{
     }
 
     //loading a class fails if it refers to unknown classes (javax.naming is not available on some platforms), so put it in a separate inner class
+    // 如果类引用了未知的类,加载会失败(某些平台上没有 javax.naming),因此将其放在单独的内部类中
     static class Inner implements NameserverProvider{
 
         @Override
@@ -63,6 +68,7 @@ public final class JndiContextNameserverProvider implements NameserverProvider{
                         String host = serverUri.getHost();
                         if(host == null || host.isEmpty()){
                             // skip the fallback server to localhost
+                            // 跳过回退到 localhost 的服务器
                             continue;
                         }
 

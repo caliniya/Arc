@@ -13,6 +13,7 @@ public class BlurFilter extends FxFilter{
     public Blending blending = Blending.disabled;
 
     // To keep track of the first render call.
+    // 用于记录第一次渲染调用。
     private boolean firstRender = true;
 
     public BlurFilter(){
@@ -54,6 +55,7 @@ public class BlurFilter extends FxFilter{
     public void render(FrameBuffer src, FrameBuffer dst){
         if(blur.getPasses() < 1){
             // Do not apply blur filter.
+            // 不应用模糊滤镜。
             copy.setInput(src).setOutput(dst).render();
             return;
         }
@@ -64,7 +66,9 @@ public class BlurFilter extends FxFilter{
         copy.setInput(src).setOutput(pingPongBuffer.getDstBuffer()).render();
         pingPongBuffer.swap();
         // Blur filter performs multiple passes of mixing ping-pong buffers and expects src and dst to have valid data.
+        // 模糊滤镜会执行多次乒乓缓冲区混合,并要求 src 和 dst 中有有效数据。
         // So for the first run we just make both src and dst buffers identical.
+        // 因此第一次运行时,我们只是让 src 和 dst 缓冲区的内容一致。
         if(firstRender){
             firstRender = false;
             copy.setInput(src).setOutput(pingPongBuffer.getDstBuffer()).render();

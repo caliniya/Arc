@@ -6,6 +6,8 @@ import arc.math.geom.*;
 
 /**
  * Normal filtered anti-aliasing filter.
+ * <p>
+ * 法线过滤抗锯齿滤镜。
  * @author Toni Sagrista
  */
 public final class NfaaFilter extends FxFilter{

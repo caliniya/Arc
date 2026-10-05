@@ -5,6 +5,8 @@ import arc.fx.*;
 
 /**
  * Fisheye distortion filter
+ * <p>
+ * 鱼眼畸变滤镜
  * @author tsagrista
  */
 public class FisheyeDistortionFilter extends FxFilter{

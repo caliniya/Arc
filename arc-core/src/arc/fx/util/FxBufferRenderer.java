@@ -8,6 +8,7 @@ import arc.util.*;
 /**
  * Simple renderer that is capable of drawing textures onto the screen or into another buffer.
  * <p>
+ * 简单的渲染器,能够将纹理绘制到屏幕上或另一个缓冲区中。
  */
 public class FxBufferRenderer implements Disposable{
     private final Shader shader;

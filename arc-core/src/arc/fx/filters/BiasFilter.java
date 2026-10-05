@@ -5,6 +5,8 @@ import arc.fx.*;
 
 /**
  * Bias filter.
+ * <p>
+ * 偏置(Bias)滤镜。
  * @author Toni Sagrista
  */
 public final class BiasFilter extends FxFilter{

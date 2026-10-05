@@ -15,6 +15,8 @@ import java.util.concurrent.*;
 /**
  * Manages TCP and optionally UDP connections from many {@linkplain Client
  * Clients}.
+ * <p>
+ * 管理来自多个 {@linkplain Client Clients} 的 TCP 连接,可选 UDP 连接。
  * @author Nathan Sweet <misc@n4te.com>
  */
 public class Server implements EndPoint{
@@ -71,26 +73,26 @@ public class Server implements EndPoint{
     /**
      * @param writeBufferSize One buffer of this size is allocated for each connected
      * client. Objects are serialized to the write buffer where the
-     * bytes are queued until they can be written to the TCP socket.
+     * bytes are queued until they can be written to the TCP socket. 为每个已连接的客户端分配一个此大小的缓冲区。对象会被序列化到写入缓冲区,字节在其中排队,直到可以写入 TCP 套接字。
      * <p>
      * Normally the socket is writable and the bytes are written
      * immediately. If the socket cannot be written to and enough
      * serialized objects are queued to overflow the buffer, then the
-     * connection will be closed.
+     * connection will be closed. 通常套接字是可写的,字节会立即被写入。如果套接字不可写,且排队的已序列化对象多到溢出缓冲区,则连接将被关闭。
      * <p>
      * The write buffer should be sized at least as large as the
      * largest object that will be sent, plus some head room to allow
      * for some serialized objects to be queued in case the buffer is
      * temporarily not writable. The amount of head room needed is
      * dependent upon the size of objects being sent and how often
-     * they are sent.
+     * they are sent. 写入缓冲区的大小至少应能容纳将要发送的最大对象,并留出一些余量,以便在缓冲区暂时不可写时仍能排队一些已序列化的对象。所需余量取决于所发送对象的大小及其发送频率。
      * @param objectBufferSize One (using only TCP) or three (using both TCP and UDP) buffers
      * of this size are allocated. These buffers are used to hold the
      * bytes for a single object graph until it can be sent over the
-     * network or deserialized.
+     * network or deserialized. 分配一个(仅用 TCP 时)或三个(同时用 TCP 和 UDP 时)此大小的缓冲区。这些缓冲区用于保存单个对象图的字节,直到它可以通过网络发送或被反序列化。
      * <p>
      * The object buffers should be sized at least as large as the
-     * largest object that will be sent or received.
+     * largest object that will be sent or received. 对象缓冲区的大小至少应能容纳将要发送或接收的最大对象。
      */
     public Server(int writeBufferSize, int objectBufferSize, NetSerializer serializer){
         this.writeBufferSize = writeBufferSize;
@@ -131,7 +133,9 @@ public class Server implements EndPoint{
 
     /**
      * Opens a TCP only server.
-     * @throws IOException if the server could not be opened.
+     * <p>
+     * 仅打开 TCP 服务端。
+     * @throws IOException if the server could not be opened. 若服务端无法打开。
      */
     public void bind(int tcpPort) throws IOException{
         bind(new InetSocketAddress(tcpPort), null);
@@ -140,14 +144,16 @@ public class Server implements EndPoint{
     /**
      * Opens a TCP and UDP server. All clients must also have a TCP and an UDP
      * port.
-     * @throws IOException if the server could not be opened.
+     * <p>
+     * 打开 TCP 和 UDP 服务端。所有客户端也必须同时具有 TCP 和 UDP 端口。
+     * @throws IOException if the server could not be opened. 若服务端无法打开。
      */
     public void bind(int tcpPort, int udpPort) throws IOException{
         bind(new InetSocketAddress(tcpPort), new InetSocketAddress(udpPort));
     }
 
     /**
-     * @param udpPort May be null.
+     * @param udpPort May be null. 可以为 null。
      */
     public void bind(InetSocketAddress tcpPort, InetSocketAddress udpPort) throws IOException{
         close();
@@ -180,16 +186,21 @@ public class Server implements EndPoint{
     /**
      * Accepts any new connections and reads or writes any pending data for the
      * current connections.
+     * <p>
+     * 接受新连接,并读取或写入当前连接的所有待处理数据。
      * @param timeout Wait for up to the specified milliseconds for a connection to
      * be ready to process. May be zero to return immediately if
-     * there are no connections to process.
+     * there are no connections to process. 最多等待指定的毫秒数,直到连接准备好处理。若没有要处理的连接,可为 0 以立即返回。
      */
     @Override
     public void update(int timeout) throws IOException{
         updateThread = Thread.currentThread();
         synchronized(updateLock){ // Blocks to avoid a select while the
+        // 阻塞,以避免在选择器
             // selector is used to bind the server
+            // 被用于绑定服务端
             // connection.
+            // 连接时进行 select。
         }
         long startTime = System.currentTimeMillis();
         int select;
@@ -203,7 +214,9 @@ public class Server implements EndPoint{
             if(emptySelects == 100){
                 emptySelects = 0;
                 // NIO freaks and returns immediately with 0 sometimes, so try
+                // NIO 有时会不正常地立即返回 0,因此要
                 // to keep from hogging the CPU.
+                // 尽量避免让 CPU 空转。
                 long elapsedTime = System.currentTimeMillis() - startTime;
                 try{
                     if(elapsedTime < 25) Thread.sleep(25 - elapsedTime);
@@ -223,7 +236,9 @@ public class Server implements EndPoint{
                         int ops = selectionKey.readyOps();
 
                         if(fromConnection != null){ // Must be a TCP read or
+                        // 必须是 TCP 读取或
                             // write operation.
+                            // 写入操作。
                             if(udp != null && fromConnection.udpRemoteAddress == null){
                                 fromConnection.close(DcReason.error);
                                 continue;
@@ -266,6 +281,7 @@ public class Server implements EndPoint{
                         }
 
                         // Must be a UDP read operation.
+                        // 必须是 UDP 读取操作。
                         if(udp == null){
                             selectionKey.channel().close();
                             continue;
@@ -293,8 +309,11 @@ public class Server implements EndPoint{
                         if(object instanceof FrameworkMessage){
                             if(object instanceof RegisterUDP){
                                 // Store the fromAddress on the connection and
+                                // 在连接上保存 fromAddress,并
                                 // reply over TCP with a RegisterUDP to indicate
+                                // 通过 TCP 回复一个 RegisterUDP 以表示
                                 // success.
+                                // 成功。
                                 int fromConnectionID = ((RegisterUDP)object).connectionID;
                                 Connection connection = pendingConnections
                                 .remove(fromConnectionID);
@@ -413,7 +432,9 @@ public class Server implements EndPoint{
 
     private int generateId(){
         int[] id = {0}; //java lambda as just amazing aren't they????
+        // Java lambda 真是太棒了,不是吗????
         Rand rand = new Rand(); //not really concerned about allocating an object with two longs
+        // 并不太在意为包含两个 long 的对象分配内存
         do{
             id[0] = rand.nextInt();
         }while(pendingConnections.containsKey(id[0]) || Structs.contains(connections, c -> c.id == id[0]));
@@ -423,6 +444,8 @@ public class Server implements EndPoint{
     /**
      * Allows the connections used by the server to be subclassed. This can be
      * useful for storage per connection without an additional lookup.
+     * <p>
+     * 允许对服务端使用的连接进行子类化。这对于无需额外查找即可进行每连接存储很有用。
      */
     protected Connection newConnection(){
         return new Connection();
@@ -490,7 +513,10 @@ public class Server implements EndPoint{
         }
     }
 
-    /** Sends the object over TCP to every connection in the list, serializing it only once. */
+    /**
+     * Sends the object over TCP to every connection in the list, serializing it only once.
+     * 通过 TCP 将对象发送给列表中的每个连接,且只序列化一次。
+     */
     public void sendToAllTCP(Object object, Iterable<Connection> connections){
         synchronized(bulkWriteLock){
             ByteBuffer buffer;
@@ -532,6 +558,7 @@ public class Server implements EndPoint{
                     con.sendUDPBuffer(buffer);
                 }catch(Exception e){
                     //note: 'vanilla' kryonet doesn't do this, but mindustry does this in ArcConnection#send upon error, so it's probably best to close upon error here as well and not let it propagate
+                    // 注意:'原版' kryonet 不这样做,但 mindustry 在 ArcConnection#send 出错时会这样做,所以这里最好也在出错时关闭连接,而不让异常继续传播
                     ArcNet.handleError(e);
                     con.close(DcReason.error);
                 }
@@ -564,7 +591,10 @@ public class Server implements EndPoint{
         }
     }
 
-    /** Sends the object over UDP to every connection in the list, serializing it only once. */
+    /**
+     * Sends the object over UDP to every connection in the list, serializing it only once.
+     * 通过 UDP 将对象发送给列表中的每个连接,且只序列化一次。
+     */
     public void sendToAllUDP(Object object, Iterable<Connection> connections){
         if(udp == null) return;
 
@@ -579,6 +609,7 @@ public class Server implements EndPoint{
 
             for(Connection con : connections){
                 if(!con.isConnected()) continue; //note: since this method accepts a list of connections, there may be stale connections, so filter for that (not possible otherwise)
+                // 注意:由于此方法接受连接列表,其中可能存在失效的连接,因此需要对此进行过滤(否则无法实现)
                 try{
                     con.sendUDPBuffer(buffer);
                 }catch(Exception e){
@@ -589,7 +620,10 @@ public class Server implements EndPoint{
         }
     }
 
-    /** Writes an object to the bulk-write buffer for TCP, including the length prefix. */
+    /**
+     * Writes an object to the bulk-write buffer for TCP, including the length prefix.
+     * 将对象写入 TCP 批量写缓冲区,包含长度前缀。
+     */
     private ByteBuffer serializeTCP(Object object){
         synchronized(bulkWriteLock){
             bulkWriteBuffer.clear();
@@ -609,7 +643,10 @@ public class Server implements EndPoint{
         }
     }
 
-    /** Writes an object to the bulk-write buffer. No length prefix. */
+    /**
+     * Writes an object to the bulk-write buffer. No length prefix.
+     * 将对象写入批量写缓冲区。不含长度前缀。
+     */
     private ByteBuffer serializeUDP(Object object){
         synchronized(bulkWriteLock){
             bulkWriteBuffer.clear();
@@ -627,6 +664,8 @@ public class Server implements EndPoint{
      * {@inheritDoc}
      * <p>
      * Should be called before connect().
+     * <p>
+     * 应在 connect() 之前调用。
      */
     @Override
     public void addListener(NetListener listener){
@@ -667,6 +706,8 @@ public class Server implements EndPoint{
 
     /**
      * Closes all open connections and the server port(s).
+     * <p>
+     * 关闭所有打开的连接以及服务端端口。
      */
     @Override
     public void close(){
@@ -696,8 +737,10 @@ public class Server implements EndPoint{
 
         synchronized(updateLock){
             // Blocks to avoid a select while the selector is used to bind the server connection.
+            // 阻塞,以避免在选择器被用于绑定服务端连接时进行 select。
         }
         // Select one last time to complete closing the socket.
+        // 最后再 select 一次,以完成套接字的关闭。
         selector.wakeup();
         try{
             selector.selectNow();
@@ -707,6 +750,8 @@ public class Server implements EndPoint{
 
     /**
      * Releases the resources used by this server, which may no longer be used.
+     * <p>
+     * 释放此服务端使用的资源,此后可能不能再使用。
      */
     public void dispose() throws IOException{
         close();
@@ -721,6 +766,8 @@ public class Server implements EndPoint{
     /**
      * Returns the current connections. The array returned should not be
      * modified.
+     * <p>
+     * 返回当前的连接。返回的数组不应被修改。
      */
     public Connection[] getConnections(){
         return connections;

@@ -1,6 +1,8 @@
 /*
  * This file is a modified class of dnsjava, an implementation of the dns protocol in java.
  * Licensed under the BSD-3-Clause.
+ * 本文件是 dnsjava(一个用 Java 实现的 DNS 协议库)的修改版类。
+ * 采用 BSD-3-Clause 许可。
  */
 package arc.net.dns;
 
@@ -20,8 +22,10 @@ public final class ResolvConfNameserverProvider implements NameserverProvider{
     public Ar<InetSocketAddress> getNameservers(){
         Ar<InetSocketAddress> out = new Ar<>();
         // first try the default unix config path
+        // 首先尝试默认的 Unix 配置路径
         if(!tryParseResolveConf("/etc/resolv.conf", out)){
             // then fallback to netware
+            // 然后回退到 netware
             tryParseResolveConf("sys:/etc/resolv.cfg", out);
         }
         return out;

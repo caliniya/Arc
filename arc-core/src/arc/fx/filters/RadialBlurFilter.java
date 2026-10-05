@@ -30,6 +30,8 @@ public final class RadialBlurFilter extends FxFilter{
 
     /**
      * Specify the zoom origin in {@link Align} bits.
+     * <p>
+     * 以 {@link Align} 位的形式指定缩放原点。
      * @see Align
      */
     public void setOrigin(int align){
@@ -54,8 +56,10 @@ public final class RadialBlurFilter extends FxFilter{
 
     /**
      * Specify the zoom origin in normalized screen coordinates.
-     * @param originX horizontal origin [0..1].
-     * @param originY vertical origin [0..1].
+     * <p>
+     * 以归一化屏幕坐标指定缩放原点。
+     * @param originX horizontal origin [0..1]. 水平原点 [0..1]。
+     * @param originY vertical origin [0..1]. 垂直原点 [0..1]。
      */
     public void setOrigin(float originX, float originY){
         this.originX = originX;

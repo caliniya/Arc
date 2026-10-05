@@ -7,6 +7,8 @@ import arc.graphics.*;
 
 /**
  * Motion blur filter that draws the last frame (motion filter included) with a lower opacity.
+ * <p>
+ * 运动模糊滤镜,以较低的不透明度绘制上一帧(包含运动滤镜)。
  * @author Toni Sagrista
  */
 public class MotionBlurFilter extends FxFilter{
@@ -25,7 +27,9 @@ public class MotionBlurFilter extends FxFilter{
 
         localBuffer = new FxBufferQueue(Format.defaultColor,
         // On WebGL (GWT) we cannot render from/into the same texture simultaneously.
+        // 在 WebGL(GWT)上,我们无法同时从同一纹理渲染或向其渲染。
         // Will use ping-pong approach to avoid "writing into itself".
+        // 将使用乒乓方式来避免"写入自身"。
         Core.app.getType() == Application.ApplicationType.web ? 2 : 1);
 
         rebind();
@@ -76,7 +80,10 @@ public class MotionBlurFilter extends FxFilter{
         copyFilter.setInput(prevFrame).setOutput(dst).render();
     }
 
-    /** Defines which function will be used to mix the two frames to produce motion blur effect. */
+    /**
+     * Defines which function will be used to mix the two frames to produce motion blur effect.
+     * 定义使用哪个函数来混合两帧以产生运动模糊特效。
+     */
     public enum BlurFunction{
         MAX("motionblur-max"),
         MIX("motionblur-mix");

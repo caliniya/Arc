@@ -72,6 +72,7 @@ public class UdpConnection{
 
         if(!datagramChannel.isConnected())
             return (InetSocketAddress)datagramChannel.receive(readBuffer); //always null on Android >= 5.0
+            // 在 Android >= 5.0 上始终为 null
         datagramChannel.read(readBuffer);
         return connectedAddress;
     }
@@ -95,7 +96,10 @@ public class UdpConnection{
         }
     }
 
-    /** Serializes the specified object. This method is thread safe. */
+    /**
+     * Serializes the specified object. This method is thread safe.
+     * 序列化指定的对象。此方法是线程安全的。
+     */
     public int send(Object object, SocketAddress address) throws IOException{
         DatagramChannel datagramChannel = this.datagramChannel;
         if(datagramChannel == null)
@@ -120,12 +124,16 @@ public class UdpConnection{
         }
     }
 
-    /** Directly sends an entire buffer to this address. No serialization is performed. */
+    /**
+     * Directly sends an entire buffer to this address. No serialization is performed.
+     * 直接将整个缓冲区发送到该地址。不进行序列化。
+     */
     public int sendBuffer(ByteBuffer buffer, SocketAddress address) throws IOException{
         DatagramChannel datagramChannel = this.datagramChannel;
         if(datagramChannel == null) throw new SocketException("Connection is closed.");
 
         //note: writeBuffer is not used and thus writeLock is not needed
+        // 注意:不使用 writeBuffer,因此不需要 writeLock
         buffer.rewind();
         int length = buffer.remaining();
         datagramChannel.send(buffer, address);

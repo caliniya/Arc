@@ -61,6 +61,7 @@ public class GaussianBlurFilter extends MultipassVfxFilter{
             this.type = type;
 
             // Instantiate new matching convolve filter instance.
+            // 实例化新的匹配卷积滤镜实例。
             if(convolve != null){
                 convolve.dispose();
             }
@@ -70,12 +71,18 @@ public class GaussianBlurFilter extends MultipassVfxFilter{
         }
     }
 
-    /** Warning: Not all blur types support custom amounts at this time */
+    /**
+     * Warning: Not all blur types support custom amounts at this time
+     * 警告:目前并非所有模糊类型都支持自定义 amount
+     */
     public float getAmount(){
         return amount;
     }
 
-    /** Warning: Not all blur types support custom amounts at this time */
+    /**
+     * Warning: Not all blur types support custom amounts at this time
+     * 警告:目前并非所有模糊类型都支持自定义 amount
+     */
     public void setAmount(float amount){
         this.amount = amount;
         computeBlurWeightings();
@@ -108,15 +115,20 @@ public class GaussianBlurFilter extends MultipassVfxFilter{
 
             case gaussian3x3b:
                 // Weights and offsets are computed from a binomial distribution
+                // 权重和偏移由二项分布计算得出,
                 // and reduced to be used *only* with bilinearly-filtered texture lookups
+                // 并经约简后*仅*用于双线性过滤的纹理查找,
                 // with radius = 1f
+                // 半径 radius = 1f
 
                 // Weights
+                // 权重
                 outWeights[0] = 0.352941f;
                 outWeights[1] = 0.294118f;
                 outWeights[2] = 0.352941f;
 
                 // Horizontal offsets
+                // 水平偏移
                 outOffsetsH[0] = -1.33333f;
                 outOffsetsH[1] = 0f;
                 outOffsetsH[2] = 0f;
@@ -125,6 +137,7 @@ public class GaussianBlurFilter extends MultipassVfxFilter{
                 outOffsetsH[5] = 0f;
 
                 // Vertical offsets
+                // 垂直偏移
                 outOffsetsV[0] = 0f;
                 outOffsetsV[1] = -1.33333f;
                 outOffsetsV[2] = 0f;
@@ -133,6 +146,7 @@ public class GaussianBlurFilter extends MultipassVfxFilter{
                 outOffsetsV[5] = 1.33333f;
 
                 // Scale offsets from binomial space to screen space
+                // 将偏移从二项分布空间缩放到屏幕空间
                 for(int i = 0; i < convolve.length * 2; i++){
                     outOffsetsH[i] *= dx;
                     outOffsetsV[i] *= dy;
@@ -143,10 +157,14 @@ public class GaussianBlurFilter extends MultipassVfxFilter{
             case gaussian5x5b:
 
                 // Weights and offsets are computed from a binomial distribution
+                // 权重和偏移由二项分布计算得出,
                 // and reduced to be used *only* with bilinearly-filtered texture lookups
+                // 并经约简后*仅*用于双线性过滤的纹理查找,
                 // with radius = 2f
+                // 半径 radius = 2f
 
                 // weights
+                // 权重
                 outWeights[0] = 0.0702703f;
                 outWeights[1] = 0.316216f;
                 outWeights[2] = 0.227027f;
@@ -154,6 +172,7 @@ public class GaussianBlurFilter extends MultipassVfxFilter{
                 outWeights[4] = 0.0702703f;
 
                 // Horizontal offsets
+                // 水平偏移
                 outOffsetsH[0] = -3.23077f;
                 outOffsetsH[1] = 0f;
                 outOffsetsH[2] = -1.38462f;
@@ -166,6 +185,7 @@ public class GaussianBlurFilter extends MultipassVfxFilter{
                 outOffsetsH[9] = 0f;
 
                 // Vertical offsets
+                // 垂直偏移
                 outOffsetsV[0] = 0f;
                 outOffsetsV[1] = -3.23077f;
                 outOffsetsV[2] = 0f;
@@ -178,6 +198,7 @@ public class GaussianBlurFilter extends MultipassVfxFilter{
                 outOffsetsV[9] = 3.23077f;
 
                 // Scale offsets from binomial space to screen space
+                // 将偏移从二项分布空间缩放到屏幕空间
                 for(int i = 0; i < convolve.length * 2; i++){
                     outOffsetsH[i] *= dx;
                     outOffsetsV[i] *= dy;
@@ -247,7 +268,9 @@ public class GaussianBlurFilter extends MultipassVfxFilter{
 
     public enum BlurType{
         gaussian3x3(Tap.tap3x3), gaussian3x3b(Tap.tap3x3), // R=5 (11x11, policy "higher-then-discard")
+        // R=5(11x11,策略 "higher-then-discard")
         gaussian5x5(Tap.tap5x5), gaussian5x5b(Tap.tap5x5), // R=9 (19x19, policy "higher-then-discard")
+        // R=9(19x19,策略 "higher-then-discard")
         ;
 
         public final Tap tap;
