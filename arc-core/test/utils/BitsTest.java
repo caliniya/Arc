@@ -19,7 +19,9 @@ public class BitsTest{
         assertEquals(b1, b2);
 
         //temporarily setting/clearing a single bit causing
+        // 临时设置/清除单个位,
         //the backing array to grow
+        // 会导致底层数组扩容
         b2.set(420);
         b2.clear(420);
 
@@ -41,6 +43,7 @@ public class BitsTest{
         b2.set(200);
 
         // b1:s array should grow to accommodate b2
+        // b1 的数组应当扩容以容纳 b2
         b1.xor(b2);
 
         assertTrue(b1.get(200));
@@ -59,6 +62,7 @@ public class BitsTest{
         b2.set(200);
 
         // b1:s array should grow to accommodate b2
+        // b1 的数组应当扩容以容纳 b2
         b1.or(b2);
 
         assertTrue(b1.get(200));
@@ -77,6 +81,7 @@ public class BitsTest{
 
         b2.set(200);
         // b1 should cancel b2:s bit
+        // b1 应当清除 b2 的该位
         b2.and(b1);
 
         assertFalse(b2.get(200));

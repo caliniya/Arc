@@ -53,7 +53,10 @@ public class QueueTest{
         assertEquals("Clear did not clear properly", 0, q.size);
     }
 
-    /** Same as resizableQueueTest, but in reverse */
+    /**
+     * Same as resizableQueueTest, but in reverse
+     * 与 resizableQueueTest 相同,但方向相反
+     */
     @Test
     public void resizableDequeTest(){
         final Queue<Integer> q = new Queue<>(8);
@@ -115,6 +118,7 @@ public class QueueTest{
             }
             q.removeFirst();
             assert q.size == 0; // Failing this means broken test
+            // 若此断言失败,说明测试已失效
             try{
                 q.get(0);
                 fail("get() on empty queue did not throw");
@@ -129,6 +133,7 @@ public class QueueTest{
         final Queue<Integer> q = new Queue<>();
 
         // Test head < tail.
+        // 测试 head < tail 的情况。
         for(int j = 0; j <= 6; j++)
             q.addLast(j);
         assertValues(q, 0, 1, 2, 3, 4, 5, 6);
@@ -142,6 +147,7 @@ public class QueueTest{
         assertValues(q, 1, 3, 5);
 
         // Test head >= tail and index >= head.
+        // 测试 head >= tail 且 index >= head 的情况。
         q.clear();
         for(int j = 2; j >= 0; j--)
             q.addFirst(j);
@@ -154,6 +160,7 @@ public class QueueTest{
         assertValues(q, 2, 3, 4, 5, 6);
 
         // Test head >= tail and index < tail.
+        // 测试 head >= tail 且 index < tail 的情况。
         q.clear();
         for(int j = 2; j >= 0; j--)
             q.addFirst(j);
@@ -171,12 +178,14 @@ public class QueueTest{
         final Queue<Integer> q = new Queue<>();
 
         // Test head < tail.
+        // 测试 head < tail 的情况。
         for(int j = 0; j <= 6; j++)
             q.addLast(j);
         for(int j = 0; j <= 6; j++)
             assertEquals(q.indexOf(j, false), j);
 
         // Test head >= tail.
+        // 测试 head >= tail 的情况。
         q.clear();
         for(int j = 2; j >= 0; j--)
             q.addFirst(j);
@@ -191,6 +200,7 @@ public class QueueTest{
         final Queue<Integer> q = new Queue<>();
 
         // Test head < tail.
+        // 测试 head < tail 的情况。
         for(int j = 0; j <= 6; j++)
             q.addLast(j);
         Iterator<Integer> iter = q.iterator();
@@ -214,6 +224,7 @@ public class QueueTest{
         assertValues(q, 2, 4, 5);
 
         // Test head >= tail.
+        // 测试 head >= tail 的情况。
         q.clear();
         for(int j = 2; j >= 0; j--)
             q.addFirst(j);
@@ -242,9 +253,11 @@ public class QueueTest{
 
     @Test
     public void iteratorRemoveEdgeCaseTest(){//See #4300
+        //参见 #4300
         Queue<Integer> queue = new Queue<>();
 
         //Simulate normal usage
+        // 模拟正常使用
         for(int i = 0; i < 100; i++){
             queue.addLast(i);
             if(i > 50)

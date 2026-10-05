@@ -10,7 +10,10 @@ import arc.util.*;
 
 import java.util.concurrent.*;
 
-/** Global references to all of Arc's core modules. */
+/**
+ * Global references to all of Arc's core modules.
+ * 对 Arc 所有核心模块的全局引用。
+ */
 public class Core{
     public static Application app;
     public static Graphics graphics;
@@ -27,6 +30,9 @@ public class Core{
     public static TextureAtlas atlas;
     public static ExecutorService executor = Threads.executor("Main Executor", OS.cores);
 
-    /** This class should never be used directly - use {@link Gl} instead. */
+    /**
+     * This class should never be used directly - use {@link Gl} instead.
+     * 不应直接使用此类 - 请改用 {@link Gl}。
+     */
     public static GLProvider glProvider;
 }

@@ -11,6 +11,7 @@ public class PixmapTest{
     public void pixmapCreate(){
 
         //test with no natives
+        // 在不加载本地库的情况下测试
         Pixmap pix = new Pixmap(100, 100);
         pix.fillCircle(50, 50, 30, Color.red.rgba());
 

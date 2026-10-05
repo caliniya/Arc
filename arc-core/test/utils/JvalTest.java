@@ -25,6 +25,7 @@ public class JvalTest{
     @Test
     public void parseUnquotedComma(){
         //unlike the official spec, this JVal implementation discards commas in unquoted strings
+        // 与官方规范不同,此 JVal 实现会丢弃无引号字符串中的逗号
         Jval val = Jval.read("[\n" +
         "O, T,\n" +
         "]");
@@ -63,6 +64,7 @@ public class JvalTest{
     @Test
     public void parseJson(){
         //taken from hjson site
+        // 取自 hjson 网站
         Jval val = Jval.read("\n" +
         "\n" +
         "  // Live demo.\n" +
@@ -224,6 +226,7 @@ public class JvalTest{
         assertEquals(9223372036854775807L, val.get("maxLong").asLong());
         assertEquals(Long.MIN_VALUE, val.get("minLong").asLong());
         assertEquals(1.0E20, val.getDouble("overflow", 0), 1e15); // too big for long, falls back to double
+        // 对 long 来说太大,回退为 double
         assertEquals(0.0000001, val.getDouble("tiny", 0), 1e-12);
     }
 

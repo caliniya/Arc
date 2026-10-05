@@ -7,6 +7,7 @@ public abstract class ApplicationCore implements ApplicationListener{
 
     public void add(ApplicationListener module){
         //use an array instead of a seq/list, for faster iteration; modules do not get added often, so a resize each time is acceptable
+        // 使用数组而非 seq/列表,以获得更快的遍历速度;模块不会经常添加,因此每次扩容是可以接受的
         ApplicationListener[] news = new ApplicationListener[modules.length + 1];
         news[news.length - 1] = module;
         System.arraycopy(modules, 0, news, 0, modules.length);

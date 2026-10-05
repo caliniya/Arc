@@ -21,7 +21,10 @@ public class BezierTest{
     private static float epsilonApprimations = 1e-6f;
     @Parameter(0)
     public ImportType type;
-    /** use constructor or setter */
+    /**
+     * use constructor or setter
+     * 使用构造函数还是 setter
+     */
     @Parameter(1)
     public boolean useSetter;
     private Bezier<Vec2> bezier;

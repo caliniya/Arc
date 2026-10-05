@@ -49,6 +49,7 @@ public class StringsTest{
     @Test
     public void testInvalidFloat(){
         //parseFloat uses parseDouble and casts, so make sure the default value is returned correctly
+        // parseFloat 使用 parseDouble 并进行强制转换,因此要确保正确返回默认值
         for(float f : new float[]{Float.NaN, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, Float.MAX_VALUE, Float.MIN_VALUE}){
             assertEquals("For value: " + f, f, Strings.parseFloat("garbage", f), 0.001f);
         }
@@ -62,27 +63,35 @@ public class StringsTest{
         "2000.00004", "-0.5", "1e10", "1e154", "1.5e3", "1.32e-6", "6e10",
 
         //decimal + exponent together
+        // 小数与指数同时出现
         "1.5e10", "-1.5e10", "1.5E10", "-1.5E-10", "3.14e2", "-3.14e-2", "2.5e0", "0.5e5", "-0.5e-5",
 
         //trailing dot combined with exponent / suffix
+        // 末尾点号与指数/后缀的组合
         "1.e5", "-1.e5", "5.e-3", "3.f", "-3.f", "10.F",
 
         //leading-dot combined with exponent
+        // 前导点号与指数的组合
         ".5e3", "-.5e3", "+.5e-3",
 
         //plain signed integers/decimals
+        // 普通的带符号整数/小数
         "+123.456", "+5", "5", "-5", "1234567890.123456", "-1234567890.123456",
 
         //zero variants
+        // 零的各种变体
         "0e0", "-0e0", "0.0e0", "0e10", "0.000e5",
 
         //small/negative exponents
+        // 较小的/负的指数
         "1.32E-6", "9.999e-3", "-9.999e-3",
 
         //multi-digit exponents
+        // 多位的指数
         "1.234e12", "-1.234e12", "5.5e20", "-5.5e20",
 
         //ridiculous precision values
+        // 精度极高的值
         "4.000000000000000000000000000000000000000005",
         "3.32798573289759823759832759382758392753275975239",
         "1.5e99999", "000123.4500",
@@ -102,6 +111,7 @@ public class StringsTest{
             expectedLong = Long.parseLong(value);
         }catch(Exception e){
             //out-of-range values should fail, so retain the placedholder 'wrong' value (essentially, checks if both failed)
+            // 超出范围的值应当解析失败,因此保留占位的 'wrong' 值(本质上是检查两者是否都失败)
         }
 
         assertEquals("Long parse: " + value, expectedLong, Strings.parseLong(value, 67));
@@ -111,6 +121,7 @@ public class StringsTest{
             expected = Integer.parseInt(value);
         }catch(Exception e){
             //ditto
+            // 同上
         }
 
         assertEquals("Int parse: " + value, expected, Strings.parseInt(value, 67));
