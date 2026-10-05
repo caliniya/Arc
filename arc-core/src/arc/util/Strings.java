@@ -86,6 +86,15 @@ public class Strings{
         return total;
     }
 
+    public static String repeat(String str, int count){
+        if(count <= 0) return "";
+        StringBuilder builder = new StringBuilder(str.length() * count);
+        for(int i = 0; i < count; i++){
+            builder.append(str);
+        }
+        return builder.toString();
+    }
+
     public static String truncate(String s, int length){
         return s.length() <= length ? s : s.substring(0, length);
     }
