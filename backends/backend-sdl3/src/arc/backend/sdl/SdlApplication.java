@@ -79,7 +79,10 @@ public class SdlApplication implements Application{
         }
     }
 
-    /** Used for Scene text fields. */
+    /**
+     * Used for Scene text fields.
+     * 用于 Scene 的文本框。
+     */
     private void addTextInputListener(){
         addListener(new ApplicationListener(){
             TextField lastFocus;
@@ -140,6 +143,7 @@ public class SdlApplication implements Application{
 
         if(OS.isLinux && !OS.hasEnvFlag("MINDUSTRY_FORCE_WAYLAND")){
             //Prefer x11, as Wayland seems to be broken: https://github.com/Anuken/Mindustry/issues/11657
+            // 优先使用 x11,因为 Wayland 似乎有问题:https://github.com/Anuken/Mindustry/issues/11657
             if("wayland".equalsIgnoreCase(System.getenv("XDG_SESSION_TYPE"))){
                 Log.warn("[Core] Forcing x11 due to Wayland being broken - see https://github.com/Anuken/Mindustry/issues/11657. Set MINDUSTRY_FORCE_WAYLAND=1 to disable this behavior.");
                 SDL_SetHint(SDL_HINT_VIDEO_DRIVER, "x11,wayland");
@@ -179,6 +183,7 @@ public class SdlApplication implements Application{
         check(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1));
 
         //this doesn't seem to do anything, but at least I tried
+        // 这似乎不起作用,但至少我尝试过了
         if(config.samples > 0){
             check(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1));
             check(SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, config.samples));
@@ -199,6 +204,7 @@ public class SdlApplication implements Application{
 
         for(int[] attemptedVersion : config.glVersions){
             //windows uses GLES 3.0, don't set it here
+            // Windows 使用 GLES 3.0,不要在这里设置
             if(!useAngle){
                 check(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, attemptedVersion[0]));
                 check(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, attemptedVersion[1]));
@@ -214,6 +220,7 @@ public class SdlApplication implements Application{
                 finalError = error;
                 Log.err("Failed to initialize OpenGL @.@: @", attemptedVersion[0], attemptedVersion[1], Strings.getSimpleMessage(error));
                 if(useAngle) break; //windows only gets one chance since it uses ANGLE, don't try other versions
+                // Windows 因为使用 ANGLE 只有一次机会,不要尝试其他版本
             }
         }
 
@@ -349,6 +356,7 @@ public class SdlApplication implements Application{
     public boolean openURI(String url){
 
         //make sure it's a valid URI
+        // 确保它是有效的 URI
         if(url.isEmpty()) return false;
         try{
             URI.create(url);
@@ -446,7 +454,10 @@ public class SdlApplication implements Application{
         }
     }
 
-    /** MacOS doesn't work when -XstartOnFirstThread is not passed, this will restart the program with that argument if it isn't already present. */
+    /**
+     * MacOS doesn't work when -XstartOnFirstThread is not passed, this will restart the program with that argument if it isn't already present.
+     * 未传入 -XstartOnFirstThread 时 MacOS 无法运行,若该参数不存在,将使用该参数重启程序。
+     */
     @SuppressWarnings("unchecked")
     private void restartMac(){
         try{
@@ -456,8 +467,10 @@ public class SdlApplication implements Application{
             String id = ((String)beanClass.getMethod("getName").invoke(bean)).split("@")[0];
 
             if(!OS.hasEnv("JAVA_STARTED_ON_FIRST_THREAD_" + id) || OS.env("JAVA_STARTED_ON_FIRST_THREAD_" + id).equals("0")){ //check if equal to 0 just in case
+            // 以防万一,检查是否等于 0
                 Log.warn("Applying -XstartOnFirstThread for macOS support.");
                 String javaPath = //attempt to locate java
+                // 尝试定位 java
                     new Fi(OS.prop("java.home")).child("bin/java").exists() ? new Fi(OS.prop("java.home")).child("bin/java").absolutePath() :
                     Core.files.local("jre/bin/java").exists() ? Core.files.local("jre/bin/java").absolutePath() :
                     "java";
@@ -471,10 +484,12 @@ public class SdlApplication implements Application{
                     Process proc = new ProcessBuilder(launchOptions.toArray(String.class)).inheritIO().start();
                     System.exit(proc.waitFor());
                 }catch(IOException | URISyntaxException e){ //some part of this failed, likely failed to find java
+                // 其中某步失败了,很可能是没找到 java
                     Log.err(e);
                     Log.err("Failed to apply the -XstartOnFirstThread argument, it is required in order to work on mac.");
                 }catch(InterruptedException ignored){}
             }
         }catch(Exception ignored){} //likely using bundled java, do nothing as the arg is already added
+        // 可能正在使用自带的 java,参数已添加,无需处理
     }
 }

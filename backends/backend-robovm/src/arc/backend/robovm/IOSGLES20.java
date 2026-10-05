@@ -5,7 +5,10 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 public class IOSGLES20{
-    /** last viewport set, needed because MGLKView resets the viewport on each call to render... amazing **/
+    /**
+     * last viewport set, needed because MGLKView resets the viewport on each call to render... amazing
+     * 最后设置的视口,因为 MGLKView 每次调用 render 都会重置视口……真是绝了
+     */
     public static int x, y, width, height;
 
     public IOSGLES20(){

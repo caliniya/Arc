@@ -21,9 +21,12 @@ import java.util.*;
 
 /**
  * An implementation of the {@link Input} interface for Android.
+ * <p>
+ * Android 上 {@link Input} 接口的实现。
  * @author mzechner
  */
 //uses legacy APIs for vibration and key input that have no good equivalent
+// 使用旧版 API 处理振动和按键输入,它们没有好的等价替代
 @SuppressWarnings("deprecation")
 public class AndroidInput extends Input implements OnKeyListener, OnTouchListener, OnGenericMotionListener{
     static final int maxTouches = 20;
@@ -149,6 +152,7 @@ public class AndroidInput extends Input implements OnKeyListener, OnTouchListene
             }
             if(!info.multiline) input.setSingleLine();
             //haha yes
+            // 哈哈,没错
             try{
                 input.setSelection(info.text.length());
             }catch(Exception ignored){}
@@ -483,8 +487,11 @@ public class AndroidInput extends Input implements OnKeyListener, OnTouchListene
             if(keyListeners.get(i).onKey(v, keyCode, e)) return true;
 
         // If the key is held sufficiently long that it repeats, then the initial down is followed
+        // 如果按键按住的时间足够长而触发重复,初始按下事件之后会跟着
         // additional key events with ACTION_DOWN and a non-zero value for getRepeatCount().
+        // 带有 ACTION_DOWN 且 getRepeatCount() 非零的额外按键事件。
         // We are only interested in the first key down event here and must ignore all others
+        // 这里我们只关心第一个按键按下事件,必须忽略其他所有事件
         if(e.getAction() == android.view.KeyEvent.ACTION_DOWN && e.getRepeatCount() > 0)
             return caughtKeys.contains(AndroidInputMap.getKeyCode(keyCode).ordinal());
 
@@ -506,6 +513,7 @@ public class AndroidInput extends Input implements OnKeyListener, OnTouchListene
 
             char character = (char)e.getUnicodeChar();
             // Android doesn't report a unicode char for back space. hrm...
+            // Android 不为退格键报告 unicode 字符。唉...
             if(keyCode == 67) character = '\b';
             if(e.getKeyCode() < 0){
                 return false;
@@ -522,6 +530,7 @@ public class AndroidInput extends Input implements OnKeyListener, OnTouchListene
                     event.type = KeyEvent.KEY_DOWN;
 
                     // Xperia hack for circle key. gah...
+                    // 针对 Xperia 圆形键的 hack。唉...
                     if(keyCode == android.view.KeyEvent.KEYCODE_BACK && e.isAltPressed()){
                         keyCode = 255;
                         event.keyCode = KeyCode.buttonCircle;
@@ -537,6 +546,7 @@ public class AndroidInput extends Input implements OnKeyListener, OnTouchListene
                     event.keyCode = code;
                     event.type = KeyEvent.KEY_UP;
                     // Xperia hack for circle key. gah...
+                    // 针对 Xperia 圆形键的 hack。唉...
                     if(keyCode == android.view.KeyEvent.KEYCODE_BACK && e.isAltPressed()){
                         keyCode = 255;
                         event.keyCode = KeyCode.buttonCircle;
@@ -554,6 +564,7 @@ public class AndroidInput extends Input implements OnKeyListener, OnTouchListene
         }
 
         // circle button on Xperia Play shouldn't need catchBack == true
+        // Xperia Play 上的圆形按钮不需要 catchBack == true
         if(keyCode == 255) return true;
         return caughtKeys.contains(AndroidInputMap.getKeyCode(keyCode).ordinal());
     }
@@ -599,6 +610,7 @@ public class AndroidInput extends Input implements OnKeyListener, OnTouchListene
             SensorManager.getRotationMatrixFromVector(R, rotationVectorValues);
         }else if(!SensorManager.getRotationMatrix(R, null, accelerometerValues, magneticFieldValues)){
             return; // compass + accelerometer in free fall
+            // 罗盘 + 加速度计(自由落体)
         }
         SensorManager.getOrientation(R, orientation);
         azimuth = (float)Math.toDegrees(orientation[0]);
@@ -611,12 +623,15 @@ public class AndroidInput extends Input implements OnKeyListener, OnTouchListene
      * "http://developer.android.com/reference/android/hardware/SensorManager.html#getRotationMatrix(float[], float[], float[], float[])"
      * >SensorManager#getRotationMatrix(float[], float[], float[], float[])</a>. Does not manipulate the matrix if the platform
      * does not have an accelerometer and compass, or a rotation vector sensor.
+     * <p>
+     * 返回描述设备旋转的旋转矩阵,依据 SensorManager#getRotationMatrix(float[], float[], float[], float[]) 的定义。如果平台没有加速度计和罗盘,或没有旋转矢量传感器,则不会修改该矩阵。
      */
     @Override
     public void getRotationMatrix(float[] matrix){
         if(rotationVectorAvailable)
             SensorManager.getRotationMatrixFromVector(matrix, rotationVectorValues);
         else // compass + accelerometer
+        // 罗盘 + 加速度计
             SensorManager.getRotationMatrix(matrix, null, accelerometerValues, magneticFieldValues);
     }
 
@@ -654,6 +669,7 @@ public class AndroidInput extends Input implements OnKeyListener, OnTouchListene
             if(!rotationVectorSensors.isEmpty()){
                 rotationVectorListener = new SensorListener();
                 for(Sensor sensor : rotationVectorSensors){ // favor AOSP sensor
+                // 优先使用 AOSP 传感器
                     if(sensor.getVendor().equals("Google Inc.") && sensor.getVersion() == 3){
                         rotationVectorAvailable = manager.registerListener(rotationVectorListener, sensor,
                         config.sensorDelay);
@@ -817,9 +833,11 @@ public class AndroidInput extends Input implements OnKeyListener, OnTouchListene
         unregisterSensorListeners();
 
         // erase pointer ids. this sucks donkeyballs...
+        // 清除指针 id。这实在是太糟糕了...
         Arrays.fill(realId, -1);
 
         // erase touched state. this also sucks donkeyballs...
+        // 清除触摸状态。这同样很糟糕...
         Arrays.fill(touched, false);
     }
 
@@ -859,6 +877,8 @@ public class AndroidInput extends Input implements OnKeyListener, OnTouchListene
      * Our implementation of SensorEventListener. Because Android doesn't like it when we register more than one Sensor to a single
      * SensorEventListener, we add one of these for each Sensor. Could use an anonymous class, but I don't see any harm in
      * explicitly defining it here. Correct me if I am wrong.
+     * <p>
+     * 我们的 SensorEventListener 实现。由于 Android 不允许将多个 Sensor 注册到同一个 SensorEventListener,我们为每个 Sensor 添加一个这样的实例。本可以使用匿名类,但在这里显式定义我看不出有什么坏处。如果我理解有误请指正。
      */
     private class SensorListener implements SensorEventListener{
 
@@ -923,6 +943,7 @@ public class AndroidInput extends Input implements OnKeyListener, OnTouchListene
                     x = (int)event.getX();
                     y = (int)event.getY();
                     if((x != mouseLastX) || (y != mouseLastY)){ // Avoid garbage events
+                    // 避免产生垃圾事件
                         postTouchEvent(TouchEvent.TOUCH_MOVED, x, y, 0, 0, timeStamp);
 
                         touchX[pointer] = x;

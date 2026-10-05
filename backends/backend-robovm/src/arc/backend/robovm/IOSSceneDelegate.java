@@ -56,9 +56,11 @@ public class IOSSceneDelegate extends UIWindowSceneDelegateAdapter{
         if(userLauncher != null){
             userLauncher.sceneDidDisconnect(scene);
             // we call willTerminate manually since we kill the process below
+            // 我们手动调用 willTerminate,因为下面会杀死进程
             userLauncher.willTerminate(UIApplication.getSharedApplication());
         }
         // OS can disconnect and reconnect scenes to free resources; Arc doesn't support graphics recreation, so just exit
+        // 操作系统可能断开并重连场景以释放资源;Arc 不支持图形重建,所以直接退出
         System.exit(0);
     }
 

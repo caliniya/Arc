@@ -6,7 +6,9 @@ import org.robovm.apple.foundation.*;
 
 public class IOSFiles implements Files{
     // TODO: Use NSSearchPathForDirectoriesInDomains instead?
+    // TODO:改用 NSSearchPathForDirectoriesInDomains?
     // $HOME should point to the app root dir.
+    // $HOME 应指向应用程序根目录。
     static final String appDir = System.getenv("HOME");
     static final String externalPath = appDir + "/Documents/";
     static final String localPath = appDir + "/Library/local/";

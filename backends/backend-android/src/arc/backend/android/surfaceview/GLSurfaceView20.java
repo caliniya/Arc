@@ -38,6 +38,8 @@ import javax.microedition.khronos.egl.*;
  * <p/>
  * - The class must select the surface's format, then choose an EGLConfig that matches it exactly (with regards to
  * red/green/blue/alpha channels bit depths). Failure to do so would result in an EGL_BAD_MATCH error.
+ * <p>
+ * 一个简单的 GLSurfaceView 子类,演示如何将 OpenGL ES 2.0 渲染到 GL 表面。请注意以下重要细节:<p/> - 该类必须使用自定义上下文工厂以启用 2.0 渲染。参见下方的 ContextFactory 类定义。<p/> - 该类必须使用自定义 EGLConfigChooser,才能选择支持 2.0 的 EGLConfig。这是通过向 eglChooseConfig() 提供含 EGL10.ELG_RENDERABLE_TYPE 属性(设置 EGL_OPENGL_ES2_BIT 标志)的配置规格来实现的。参见下方的 ConfigChooser 类定义。<p/> - 该类必须先选定表面的格式,再选择与之完全匹配的 EGLConfig(就红/绿/蓝/alpha 通道位深而言)。否则将导致 EGL_BAD_MATCH 错误。
  */
 public class GLSurfaceView20 extends GLSurfaceView{
     private static final boolean DEBUG = false;
@@ -79,6 +81,7 @@ public class GLSurfaceView20 extends GLSurfaceView{
     public InputConnection onCreateInputConnection(EditorInfo outAttrs){
 
         // add this line, the IME can show the selectable words when use chinese input method editor.
+        // 添加这一行后,使用中文输入法编辑器时,IME 可以显示候选词。
         if(outAttrs != null){
             outAttrs.imeOptions = outAttrs.imeOptions | EditorInfo.IME_FLAG_NO_EXTRACT_UI;
         }
@@ -109,6 +112,7 @@ public class GLSurfaceView20 extends GLSurfaceView{
          * By default, GLSurfaceView() creates a RGB_565 opaque surface. If we want a translucent one, we should change the
          * surface's format here, using PixelFormat.TRANSLUCENT for GL Surfaces is interpreted as any 32-bit surface with alpha by
          * SurfaceFlinger.
+         * 默认情况下,GLSurfaceView() 会创建 RGB_565 不透明表面。如果想要半透明表面,应在此处更改表面格式;对 GL 表面使用 PixelFormat.TRANSLUCENT 会被 SurfaceFlinger 解释为任意带 alpha 的 32 位表面。
          */
         if(translucent){
             this.getHolder().setFormat(PixelFormat.TRANSLUCENT);
@@ -116,17 +120,19 @@ public class GLSurfaceView20 extends GLSurfaceView{
 
         /*
          * Setup the context factory for 2.0 rendering. See ContextFactory class definition below
+         * 为 2.0 渲染设置上下文工厂。参见下方的 ContextFactory 类定义
          */
         setEGLContextFactory(new ContextFactory());
 
         /*
          * We need to choose an EGLConfig that matches the format of our surface exactly. This is going to be done in our custom
          * config chooser. See ConfigChooser class definition below.
+         * 我们需要选择一个与表面格式完全匹配的 EGLConfig。这将由我们的自定义配置选择器完成。参见下方的 ConfigChooser 类定义。
          */
         setEGLConfigChooser(translucent ? new ConfigChooser(8, 8, 8, 8, depth, stencil) : new ConfigChooser(8, 8, 8, 0, depth,
         stencil));
 
-        /* Set the renderer responsible for frame rendering */
+        /* Set the renderer responsible for frame rendering  设置负责帧渲染的渲染器 */
     }
 
     static class ContextFactory implements GLSurfaceView.EGLContextFactory{
@@ -159,11 +165,13 @@ public class GLSurfaceView20 extends GLSurfaceView{
         /*
          * This EGL config specification is used to specify 2.0 rendering. We use a minimum size of 4 bits for red/green/blue, but
          * will perform actual matching in chooseConfig() below.
+         * 此 EGL 配置规格用于指定 2.0 渲染。我们对红/绿/蓝使用最小 4 位,但实际匹配将在下方的 chooseConfig() 中进行。
          */
         private static int EGL_OPENGL_ES2_BIT = 4;
         private static int[] s_configAttribs2 = {EGL10.EGL_RED_SIZE, 4, EGL10.EGL_GREEN_SIZE, 4, EGL10.EGL_BLUE_SIZE, 4,
         EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT, EGL10.EGL_NONE};
         // Subclasses can adjust these values:
+        // 子类可以调整这些值:
         protected int mRedSize;
         protected int mGreenSize;
         protected int mBlueSize;
@@ -185,6 +193,7 @@ public class GLSurfaceView20 extends GLSurfaceView{
 
             /*
              * Get the number of minimally matching EGL configurations
+             * 获取最小匹配的 EGL 配置数量
              */
             int[] num_config = new int[1];
             egl.eglChooseConfig(display, s_configAttribs2, null, 0, num_config);
@@ -197,6 +206,7 @@ public class GLSurfaceView20 extends GLSurfaceView{
 
             /*
              * Allocate then read the array of minimally matching EGL configs
+             * 先分配再读取最小匹配的 EGL 配置数组
              */
             EGLConfig[] configs = new EGLConfig[numConfigs];
             egl.eglChooseConfig(display, s_configAttribs2, configs, numConfigs, num_config);
@@ -206,6 +216,7 @@ public class GLSurfaceView20 extends GLSurfaceView{
             }
             /*
              * Now return the "best" one
+             * 现在返回"最佳"的那个
              */
             return chooseConfig(egl, display, configs);
         }
@@ -216,9 +227,11 @@ public class GLSurfaceView20 extends GLSurfaceView{
                 int s = findConfigAttrib(egl, display, config, EGL10.EGL_STENCIL_SIZE, 0);
 
                 // We need at least mDepthSize and mStencilSize bits
+                // 我们至少需要 mDepthSize 和 mStencilSize 位
                 if(d < mDepthSize || s < mStencilSize) continue;
 
                 // We want an *exact* match for red/green/blue/alpha
+                // 我们希望红/绿/蓝/alpha *完全*匹配
                 int r = findConfigAttrib(egl, display, config, EGL10.EGL_RED_SIZE, 0);
                 int g = findConfigAttrib(egl, display, config, EGL10.EGL_GREEN_SIZE, 0);
                 int b = findConfigAttrib(egl, display, config, EGL10.EGL_BLUE_SIZE, 0);

@@ -19,6 +19,7 @@ import java.nio.channels.FileChannel;
  */
 public class AndroidFi extends Fi{
     // The asset manager, or null if this is not an internal file.
+    // 资源管理器;如果这不是内部文件则为 null。
     private final AssetManager assets;
 
     AndroidFi(AssetManager assets, String fileName, FileType type){
@@ -43,6 +44,7 @@ public class AndroidFi extends Fi{
         name = name.replace('\\', '/');
         if(file.getPath().length() == 0) throw new ArcRuntimeException("Cannot get the sibling of the root.");
         return Core.files.get(new File(file.getParent(), name).getPath(), type); //this way we can find the sibling even if it's inside the obb
+        // 这样即使兄弟文件在 obb 内,我们也能找到它
     }
 
     @Override
@@ -203,9 +205,11 @@ public class AndroidFi extends Fi{
             String fileName = file.getPath();
             try{
                 assets.open(fileName).close(); // Check if file exists.
+                // 检查文件是否存在。
                 return true;
             }catch(Exception ex){
                 // This is SUPER slow! but we need it for directories.
+                // 这超级慢!但目录需要用到它。
                 try{
                     return assets.list(fileName).length > 0;
                 }catch(Exception ignored){
@@ -234,8 +238,8 @@ public class AndroidFi extends Fi{
     }
 
     /**
-     * @return an AssetFileDescriptor for this file or null if the file is not of type Internal
-     * @throws IOException - thrown by AssetManager.openFd()
+     * @return an AssetFileDescriptor for this file or null if the file is not of type Internal 此文件的 AssetFileDescriptor;若文件不是 Internal 类型则为 null
+     * @throws IOException - thrown by AssetManager.openFd() 由 AssetManager.openFd() 抛出
      */
     public AssetFileDescriptor getAssetFileDescriptor() throws IOException{
         return assets != null ? assets.openFd(path()) : null;

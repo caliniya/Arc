@@ -141,9 +141,11 @@ public class IOSGraphics extends Graphics{
         ppcY = ppiY / 2.54f;
         Log.info(tag, "Display: ppi=" + ppi + ", density=" + density);
         // time + FPS
+        // 时间 + FPS
         lastFrameTime = System.nanoTime();
         framesStart = lastFrameTime;
         // enable OpenGL
+        // 启用 OpenGL
         makeCurrent();
         // OpenGL glViewport() function expects backbuffer coordinates instead of logical coordinates
         Core.glProvider.glViewport(0, 0, screenBounds.backBufferWidth, screenBounds.backBufferHeight);
@@ -182,11 +184,15 @@ public class IOSGraphics extends Graphics{
     public void draw(MGLKView view, CGRect rect){
         makeCurrent();
         // massive hack, MGLKView resets the viewport on each draw call, so IOSGLES20
+        // 大 hack,MGLKView 在每次绘制调用时都会重置视口,所以 IOSGLES20
         // stores the last known viewport and we reset it here...
+        // 存储最后已知的视口,我们在这里重置它……
         Core.glProvider.glViewport(IOSGLES20.x, IOSGLES20.y, IOSGLES20.width, IOSGLES20.height);
 
         // For default framebuffer, we render a dummy frame during initialization before create
+        // 对于默认帧缓冲,我们会在创建之前的初始化阶段渲染一个虚拟帧
         // Return early so listener does not process
+        // 提前返回,让监听器不再处理
         if(firstFrame){
             firstFrame = false;
             return;
@@ -230,7 +236,9 @@ public class IOSGraphics extends Graphics{
         makeCurrent();
         app.processRunnables();
         // pause the MGLKViewController render loop if we are no longer continuous
+        // 如果不再连续渲染,暂停 MGLKViewController 渲染循环
         // and if we haven't requested a frame in the last loop iteration
+        // 并且上一次循环迭代中我们没有请求渲染帧
         if(!isContinuous && !isFrameRequested){
             viewController.setPaused(true);
         }
@@ -349,6 +357,7 @@ public class IOSGraphics extends Graphics{
         if(isContinuous != this.isContinuous){
             this.isContinuous = isContinuous;
             // start the MGLKViewController if we go from non-continuous -> continuous
+            // 如果从非连续切换到连续,启动 MGLKViewController
             if(isContinuous) viewController.setPaused(false);
         }
     }
@@ -357,7 +366,9 @@ public class IOSGraphics extends Graphics{
     public void requestRendering(){
         isFrameRequested = true;
         // start the MGLKViewController if we are in non-continuous mode
+        // 如果处于非连续模式,启动 MGLKViewController
         // (we should already be started in continuous mode)
+        // (我们应该已经在连续渲染模式下启动)
         if(!isContinuous) viewController.setPaused(false);
     }
 

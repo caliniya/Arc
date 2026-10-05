@@ -295,10 +295,13 @@ public class AndroidGLProvider implements GLProvider{
     @Override
     public String glGetActiveAttrib(int program, int index, IntBuffer size, IntBuffer type){
         //length
+        // 长度
         ints[0] = 0;
         //size
+        // 大小
         ints2[0] = size.get(0);
         //type
+        // 类型
         ints3[0] = type.get(0);
 
         GLES20.glGetActiveAttrib(program, index, buffer.length, ints, 0, ints2, 0, ints3, 0, buffer, 0);
@@ -308,10 +311,13 @@ public class AndroidGLProvider implements GLProvider{
     @Override
     public String glGetActiveUniform(int program, int index, IntBuffer size, IntBuffer type){
         //length
+        // 长度
         ints[0] = 0;
         //size
+        // 大小
         ints2[0] = size.get(0);
         //type
+        // 类型
         ints3[0] = type.get(0);
 
         GLES20.glGetActiveUniform(program, index, buffer.length, ints, 0, ints2, 0, ints3, 0, buffer, 0);

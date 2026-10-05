@@ -24,6 +24,8 @@ import javax.microedition.khronos.opengles.*;
 
 /**
  * An implementation of {@link Graphics} for Android.
+ * <p>
+ * Android 上 {@link Graphics} 的实现。
  * @author mzechner
  */
 @SuppressWarnings("deprecation")
@@ -36,6 +38,8 @@ public class AndroidGraphics extends Graphics implements Renderer{
      * be called in the GLThread while {@link #pause()} is sleeping in the Android UI Thread which will cause the
      * {@link AndroidGraphics#pause} variable never be set to false. As a result, the {@link AndroidGraphics#pause()} method will
      * kill the current process to avoid ANR
+     * <p>
+     * 当 {@link AndroidApplication#onPause()} 调用 {@link AndroidGraphics#pause()} 时,它们<b>必须</b>强制使用连续渲染。否则,当 {@link #pause()} 在 Android UI 线程中休眠时,{@link #onDrawFrame(GL10)} 将不会在 GLThread 中被调用,这会导致 {@link AndroidGraphics#pause} 变量永远不会被置为 false。结果,{@link AndroidGraphics#pause()} 方法将杀死当前进程以避免 ANR
      */
     protected final AndroidApplicationConfiguration config;
     final GLSurfaceView20 view;
@@ -127,7 +131,10 @@ public class AndroidGraphics extends Graphics implements Renderer{
         return height;
     }
 
-    /** This instantiates the GL20 and GL30 instances. */
+    /**
+     * This instantiates the GL20 and GL30 instances.
+     * 这里实例化 GL20 和 GL30。
+     */
     protected void setupGL(GL10 gl){
         String versionString = gl.glGetString(GL10.GL_VERSION);
         String vendorString = gl.glGetString(GL10.GL_VENDOR);
@@ -215,6 +222,7 @@ public class AndroidGraphics extends Graphics implements Renderer{
 
     void resume(){
         //do not call resume() on the first resume, which is called on application start
+        // 不要在第一次 resume 时调用 resume(),它在应用程序启动时被调用
         if(!firstResume){
             view.onResume();
             view.queueEvent(() -> {
@@ -228,6 +236,7 @@ public class AndroidGraphics extends Graphics implements Renderer{
                     }
                 }
                 //additional reset is needed for whatever reason
+                // 无论出于何种原因,都需要额外的重置
                 Gl.reset();
                 Log.infoTag(logTag, "[resume]");
             });
@@ -258,6 +267,7 @@ public class AndroidGraphics extends Graphics implements Renderer{
             Ar<ApplicationListener> listeners = app.getListeners();
             synchronized(listeners){
                 //call pause first
+                // 先调用 pause
                 for(int i = 0, n = listeners.size; i < n; ++i){
                     listeners.get(i).pause();
                 }
@@ -267,6 +277,7 @@ public class AndroidGraphics extends Graphics implements Renderer{
                         listeners.get(i).dispose();
                     }catch(Exception e){
                         //suppress dispose errors
+                        // 抑制 dispose 错误
                         Log.err(e);
                     }
                 }
@@ -275,6 +286,7 @@ public class AndroidGraphics extends Graphics implements Renderer{
             app.dispose();
             Log.infoTag(logTag, "[destroy]");
             //force exit to reset statics and free resources
+            // 强制退出以重置静态状态并释放资源
             System.exit(0);
         });
     }
@@ -286,6 +298,7 @@ public class AndroidGraphics extends Graphics implements Renderer{
         lastFrameTime = time;
 
         //After pause deltaTime can have somewhat huge value that destabilizes the mean, so let's cut it off
+        // 暂停后 deltaTime 可能会相当大,导致均值不稳定,因此我们将其截断
         if(resumed){
             deltaTime = 0;
             resumed = false;

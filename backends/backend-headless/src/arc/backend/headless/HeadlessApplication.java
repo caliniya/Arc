@@ -8,6 +8,8 @@ import arc.util.*;
 
 /**
  * a headless implementation of an application primarily intended to be used in servers
+ * <p>
+ * 应用程序的无头(headless)实现,主要面向服务器使用
  * @author Jon Renner
  */
 public class HeadlessApplication implements Application{
@@ -90,6 +92,7 @@ public class HeadlessApplication implements Application{
                 graphics.updateTime();
 
                 // If one of the runnables set running to false, for example after an exit().
+                // 如果某个 runnable 将 running 设为 false,例如调用 exit() 之后。
                 if(!running) break;
             }
         }

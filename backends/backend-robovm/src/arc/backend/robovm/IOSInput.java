@@ -37,6 +37,7 @@ public class IOSInput extends Input{
     float[] pressures = new float[MAX_TOUCHES];
     boolean pressureSupported;
     // we store the pointer to the UITouch struct here, or 0
+    // 我们在这里存储指向 UITouch 结构的指针,或 0
     long[] touchDown = new long[MAX_TOUCHES];
     int numTouched = 0;
     boolean justTouched = false;
@@ -56,6 +57,7 @@ public class IOSInput extends Input{
     boolean softkeyboardActive = false;
     boolean showingTextInput;
     // Issue 773 indicates this may solve a premature GC issue
+    // Issue 773 表明这可能会解决一个过早 GC 的问题
     UIAlertViewDelegate delegate;
     private long currentEventTimeStamp;
     private UITextField textfield = null;
@@ -92,6 +94,7 @@ public class IOSInput extends Input{
         @Override
         public boolean shouldEndEditing(UITextField textField){
             // Text field needs to have at least one symbol - so we can use backspace
+            // 文本框需要至少有一个字符,这样我们才能使用退格
             textField.setText("x");
             Core.graphics.requestRendering();
 
@@ -143,7 +146,10 @@ public class IOSInput extends Input{
         });
     }
 
-    /** Stops accelerometer updates. Safe to call even if the accelerometer was never started, or already stopped. */
+    /**
+     * Stops accelerometer updates. Safe to call even if the accelerometer was never started, or already stopped.
+     * 停止加速度计更新。即使加速度计从未启动或已停止,调用也是安全的。
+     */
     public void disposeAccelerometer(){
         if(motionManager != null){
             motionManager.stopAccelerometerUpdates();
@@ -151,12 +157,18 @@ public class IOSInput extends Input{
         }
     }
 
-    /** Pauses accelerometer updates without discarding config, e.g. when entering the background. */
+    /**
+     * Pauses accelerometer updates without discarding config, e.g. when entering the background.
+     * 暂停加速度计更新但不丢弃配置,例如进入后台时。
+     */
     public void pauseAccelerometer(){
         if(motionManager != null) motionManager.stopAccelerometerUpdates();
     }
 
-    /** Resumes accelerometer updates after {@link #pauseAccelerometer()}, e.g. when returning to the foreground. */
+    /**
+     * Resumes accelerometer updates after {@link #pauseAccelerometer()}, e.g. when returning to the foreground.
+     * 在 {@link #pauseAccelerometer()} 之后恢复加速度计更新,例如回到前台时。
+     */
     public void resumeAccelerometer(){
         if(motionManager != null && config.useAccelerometer) startAccelerometerUpdates();
     }
@@ -397,8 +409,11 @@ public class IOSInput extends Input{
     }
 
     // hack for software keyboard support
+    // 支持软键盘的权宜之计(hack)
     // uses a hidden textfield to capture input
+    // 使用隐藏文本框捕获输入
     // see: http://www.badlogicgames.com/forum/viewtopic.php?f=17&t=11788
+    // 参见:http://www.badlogicgames.com/forum/viewtopic.php?f=17&t=11788
 
     @Override
     public void setOnscreenKeyboardVisible(boolean visible){
@@ -414,7 +429,9 @@ public class IOSInput extends Input{
 
     /**
      * Set the keyboard to close when the UITextField return key is pressed
-     * @param shouldClose Whether or not the keyboard should close on return key press
+     * <p>
+     * 设置按下 UITextField 回车键时收起键盘
+     * @param shouldClose Whether or not the keyboard should close on return key press 按下回车键时键盘是否应关闭
      */
     public void setKeyboardCloseOnReturnKey(boolean shouldClose){
         keyboardCloseOnReturn = shouldClose;
@@ -428,7 +445,9 @@ public class IOSInput extends Input{
     private void createDefaultTextField(){
         textfield = new UITextField(new CGRect(10, 10, 100, 50));
         //Parameters
+        // 参数
         // Setting parameters
+        // 设置参数
         textfield.setKeyboardType(UIKeyboardType.Default);
         textfield.setReturnKeyType(UIReturnKeyType.Done);
         textfield.setAutocapitalizationType(UITextAutocapitalizationType.None);
@@ -436,6 +455,7 @@ public class IOSInput extends Input{
         textfield.setSpellCheckingType(UITextSpellCheckingType.No);
         textfield.setHidden(true);
         // Text field needs to have at least one symbol - so we can use backspace
+        // 文本框需要至少有一个字符,这样我们才能使用退格
         textfield.setText("x");
         app.getUIViewController().getView().addSubview(textfield);
     }
@@ -464,6 +484,7 @@ public class IOSInput extends Input{
     @Override
     public int getRotation(){
         // we measure orientation counter clockwise, just like on Android
+        // 我们按逆时针方向测量朝向,与 Android 一致
         switch(app.uiWindowScene.getInterfaceOrientation()){
             case LandscapeLeft:
                 return 270;
@@ -525,6 +546,7 @@ public class IOSInput extends Input{
                     default:
                         String characters = key.getCharacters();
                         // special keys return constants like "UIKeyInputF5", so we check for length 1
+                        // 特殊按键返回诸如 "UIKeyInputF5" 的常量,所以我们检查长度是否为 1
                         character = (characters != null && characters.length() == 1) ? characters.charAt(0) : 0;
                 }
 
@@ -583,7 +605,9 @@ public class IOSInput extends Input{
                         break;
                     case KeyEvent.KEY_TYPED:
                         // don't process key typed events if soft keyboard is active
+                        // 如果软键盘处于活动状态,则不处理按键输入事件
                         // the soft keyboard hook already catches the changes
+                        // 软键盘钩子已经捕获了这些变化
                         if(!softkeyboardActive) inputMultiplexer.keyTyped(e.keyChar);
                 }
 
@@ -610,6 +634,7 @@ public class IOSInput extends Input{
             if(touchDown[i] == ptr) return i;
         }
         // If pointer is not found
+        // 如果未找到指针
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < touchDown.length; i++){
             sb.append(i).append(":").append(touchDown[i]).append(" ");
@@ -627,6 +652,7 @@ public class IOSInput extends Input{
             UITouch touch = UI_TOUCH_WRAPPER.wrap(touchHandle);
             final int locX, locY;
             // Get and map the location to our drawing space
+            // 获取位置并映射到我们的绘图空间
             CGPoint loc = touch.getLocationInView(app.graphics.view);
             if(config.hdpiMode == HdpiUtils.HdpiMode.pixels){
                 locX = (int)((loc.getX() - screenBounds.x) * app.pixelsPerPoint);
@@ -638,6 +664,7 @@ public class IOSInput extends Input{
 
 
             // if its not supported, we will simply use 1.0f when touch is present
+            // 如果不支持,当存在触摸时我们直接使用 1.0f
             float pressure = 1.0f;
             if(pressureSupported){
                 pressure = (float)touch.getForce();

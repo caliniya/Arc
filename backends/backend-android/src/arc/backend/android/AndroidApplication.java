@@ -22,6 +22,8 @@ import java.net.*;
  * An implementation of the {@link Application} interface for Android. Create an {@link Activity} that derives from this class. In
  * the {@link Activity#onCreate(Bundle)} method call the {@link #initialize(ApplicationListener)} method specifying the
  * configuration for the GLSurfaceView.
+ * <p>
+ * Android 上 {@link Application} 接口的实现。创建一个继承自该类的 {@link Activity},并在 {@link Activity#onCreate(Bundle)} 方法中调用 {@link #initialize(ApplicationListener)} 方法,同时指定 GLSurfaceView 的配置。
  * @author mzechner
  */
 public class AndroidApplication extends Activity implements Application{
@@ -51,7 +53,9 @@ public class AndroidApplication extends Activity implements Application{
     /**
      * This method has to be called in the {@link Activity#onCreate(Bundle)} method. It sets up all the things necessary to get
      * input, render via OpenGL and so on. Uses a default {@link AndroidApplicationConfiguration}.
-     * @param listener the {@link ApplicationListener} implementing the program logic
+     * <p>
+     * 必须在 {@link Activity#onCreate(Bundle)} 方法中调用此方法。它会完成获取输入、通过 OpenGL 渲染等所有必要的设置。使用默认的 {@link AndroidApplicationConfiguration}。
+     * @param listener the {@link ApplicationListener} implementing the program logic 实现程序逻辑的 {@link ApplicationListener}
      **/
     public void initialize(ApplicationListener listener){
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
@@ -62,9 +66,11 @@ public class AndroidApplication extends Activity implements Application{
      * This method has to be called in the {@link Activity#onCreate(Bundle)} method. It sets up all the things necessary to get
      * input, render via OpenGL and so on. You can configure other aspects of the application with the rest of the fields in the
      * {@link AndroidApplicationConfiguration} instance.
-     * @param listener the {@link ApplicationListener} implementing the program logic
-     * @param config the {@link AndroidApplicationConfiguration}, defining various settings of the application (use accelerometer,
-     * etc.).
+     * <p>
+     * 必须在 {@link Activity#onCreate(Bundle)} 方法中调用此方法。它会完成获取输入、通过 OpenGL 渲染等所有必要的设置。你可以使用 {@link AndroidApplicationConfiguration} 实例中的其余字段配置应用程序的其他方面。
+     * @param listener the {@link ApplicationListener} implementing the program logic 实现程序逻辑的 {@link ApplicationListener}
+     * @param config the {@link AndroidApplicationConfiguration}, defining various settings of the application (use accelerometer, 定义应用程序的各项设置(是否使用加速度计
+     * etc.). 等)。
      */
     public void initialize(ApplicationListener listener, AndroidApplicationConfiguration config){
         init(listener, config, false);
@@ -75,8 +81,10 @@ public class AndroidApplication extends Activity implements Application{
      * input, render via OpenGL and so on. Uses a default {@link AndroidApplicationConfiguration}.
      * <p>
      * Note: you have to add the returned view to your layout!
-     * @param listener the {@link ApplicationListener} implementing the program logic
-     * @return the GLSurfaceView of the application
+     * <p>
+     * 必须在 {@link Activity#onCreate(Bundle)} 方法中调用此方法。它会完成获取输入、通过 OpenGL 渲染等所有必要的设置。使用默认的 {@link AndroidApplicationConfiguration}。<p> 注意:你必须将返回的视图添加到你的布局中!
+     * @param listener the {@link ApplicationListener} implementing the program logic 实现程序逻辑的 {@link ApplicationListener}
+     * @return the GLSurfaceView of the application 应用程序的 GLSurfaceView
      */
     public View initializeForView(ApplicationListener listener){
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
@@ -89,10 +97,12 @@ public class AndroidApplication extends Activity implements Application{
      * {@link AndroidApplicationConfiguration} instance.
      * <p>
      * Note: you have to add the returned view to your layout!
-     * @param listener the {@link ApplicationListener} implementing the program logic
-     * @param config the {@link AndroidApplicationConfiguration}, defining various settings of the application (use accelerometer,
-     * etc.).
-     * @return the GLSurfaceView of the application
+     * <p>
+     * 必须在 {@link Activity#onCreate(Bundle)} 方法中调用此方法。它会完成获取输入、通过 OpenGL 渲染等所有必要的设置。你可以使用 {@link AndroidApplicationConfiguration} 实例中的其余字段配置应用程序的其他方面。<p> 注意:你必须将返回的视图添加到你的布局中!
+     * @param listener the {@link ApplicationListener} implementing the program logic 实现程序逻辑的 {@link ApplicationListener}
+     * @param config the {@link AndroidApplicationConfiguration}, defining various settings of the application (use accelerometer, 定义应用程序的各项设置(是否使用加速度计
+     * etc.). 等)。
+     * @return the GLSurfaceView of the application 应用程序的 GLSurfaceView
      */
     public View initializeForView(ApplicationListener listener, AndroidApplicationConfiguration config){
         init(listener, config, true);
@@ -107,6 +117,7 @@ public class AndroidApplication extends Activity implements Application{
         input = new AndroidInput(this, this, graphics.view, config);
 
         this.getFilesDir(); // workaround for Android bug #10515463
+        // 针对 Android bug #10515463 的变通方案
         files = new AndroidFiles(this.getAssets(), this.getFilesDir().getAbsolutePath());
         settings = new Settings();
         addListener(listener);
@@ -146,6 +157,7 @@ public class AndroidApplication extends Activity implements Application{
         }
 
         // detect an already connected bluetooth keyboardAvailable
+        // 检测已连接的蓝牙键盘 keyboardAvailable
         if(getResources().getConfiguration().keyboard != Configuration.KEYBOARD_NOKEYS){
             input.keyboardAvailable = true;
         }
@@ -177,18 +189,21 @@ public class AndroidApplication extends Activity implements Application{
     @Override
     public void getDnsServers(Ar<InetSocketAddress> out){
         if(getVersion() < 23) return; //needs API level 21
+        // 需要 API 级别 21
 
         try{
             ConnectivityManager cm = getSystemService(ConnectivityManager.class);
             Network network = cm.getActiveNetwork();
             if(network == null){
                 // if the device is offline, there's no active network
+                // 如果设备离线,则没有活动网络
                 return;
             }
 
             LinkProperties lp = cm.getLinkProperties(network);
             if(lp == null){
                 // can be null for an unknown network, which may happen if networks change
+                // 对于未知网络可能为 null,网络变化时可能出现这种情况
                 return;
             }
 
@@ -247,6 +262,7 @@ public class AndroidApplication extends Activity implements Application{
     protected void onDestroy(){
         super.onDestroy();
         //force exit to reset statics and free resources
+        // 强制退出以重置静态状态并释放资源
         System.exit(0);
     }
 
@@ -334,6 +350,7 @@ public class AndroidApplication extends Activity implements Application{
         super.onActivityResult(requestCode, resultCode, data);
 
         // forward events to our listeners if there are any installed
+        // 如果安装了监听器,则将事件转发给它们
         synchronized(eventListeners){
             if(eventListeners.containsKey(requestCode)){
                 eventListeners.get(requestCode).onActivityResult(resultCode, data);
@@ -353,7 +370,10 @@ public class AndroidApplication extends Activity implements Application{
         }
     }
 
-    /** Adds an event listener for Android specific event such as onActivityResult(...). */
+    /**
+     * Adds an event listener for Android specific event such as onActivityResult(...).
+     * 为诸如 onActivityResult(...) 之类的 Android 特定事件添加事件监听器。
+     */
     public void addResultListener(Intc runner, AndroidEventListener listener){
         synchronized(eventListeners){
             int id = lastEventNumber++;
@@ -370,11 +390,16 @@ public class AndroidApplication extends Activity implements Application{
     /**
      * A listener for special Android events such onActivityResult(...). This can be used by e.g. extensions to plug into the Android
      * system.
+     * <p>
+     * 用于诸如 onActivityResult(...) 等特定 Android 事件的监听器。例如扩展可以通过它接入 Android 系统。
      * @author noblemaster
      */
     public interface AndroidEventListener{
 
-        /** Will be called if the application's onActivityResult(...) method is called. */
+        /**
+         * Will be called if the application's onActivityResult(...) method is called.
+         * 当应用程序的 onActivityResult(...) 方法被调用时调用。
+         */
         void onActivityResult(int resultCode, Intent data);
     }
 }

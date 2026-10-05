@@ -19,7 +19,9 @@ public class IOSUIViewController extends MGLKViewController{
     public void viewWillAppear(boolean animated){
         super.viewWillAppear(animated);
         // start GLKViewController even though we may only draw a single frame
+        // 即使我们可能只绘制一帧,也要启动 GLKViewController
         // (we may be in non-continuous mode)
+        // (我们可能处于非连续渲染模式)
         setPaused(false);
     }
 
@@ -59,10 +61,12 @@ public class IOSUIViewController extends MGLKViewController{
     public void viewDidLayoutSubviews(){
         super.viewDidLayoutSubviews();
         // get the view size and update graphics
+        // 获取视图大小并更新图形
         final IOSScreenBounds oldBounds = graphics.screenBounds;
         final IOSScreenBounds newBounds = app.computeBounds();
         graphics.screenBounds = newBounds;
         // Layout may happen without bounds changing, don't trigger resize in that case
+        // 布局可能在边界未变化时发生,这种情况下不要触发 resize
         if(newBounds.width != oldBounds.width || newBounds.height != oldBounds.height){
             graphics.makeCurrent();
             graphics.updateSafeInsets();

@@ -1336,6 +1336,7 @@ class SdlGLESProvider implements GLProvider{
     @Override
     public void glProgramParameteri(int program, int pname, int value){
         //not implemented, and it's a hint anyway
+        // 未实现,反正这只是个提示
     }
 
     @Override

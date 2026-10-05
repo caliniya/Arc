@@ -502,6 +502,7 @@ class SdlGLProvider implements GLProvider{
     @Override
     public void glReleaseShaderCompiler(){
         // nothing to do here
+        // 这里无事可做
     }
 
     @Override

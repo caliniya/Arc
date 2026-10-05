@@ -18,6 +18,7 @@ public class SdlInput extends Input{
     private Ar<EditEvent> stringEditEvents = new Ar<>();
 
     //handle encoded input data
+    // 处理编码后的输入数据
     void handleInput(SDL_Event event){
         int type = event.type();
         if(type == SDLEvents.SDL_EVENT_KEY_DOWN || type == SDLEvents.SDL_EVENT_KEY_UP){
@@ -26,6 +27,7 @@ public class SdlInput extends Input{
 
             KeyCode key = SdlScanmap.getCode(keycode);
             //only process non-repeats
+            // 只处理非重复事件
             if(!event.key().repeat()){
                 if(down){
                     queue.keyDown(key);
@@ -35,6 +37,7 @@ public class SdlInput extends Input{
             }
 
             //special keys
+            // 特殊按键
             if(down){
                 if(key == KeyCode.backspace) queue.keyTyped((char)8);
                 if(key == KeyCode.tab) queue.keyTyped('\t');
@@ -100,6 +103,7 @@ public class SdlInput extends Input{
     }
 
     //note: start and length parameters seem useless, ignore those
+    // 注意:start 和 length 参数似乎没用,忽略它们
     void handleFieldCandidate(EditEvent e){
         class ImeData{
             String lastSetText;
@@ -115,10 +119,12 @@ public class SdlInput extends Input{
                 ImeData data = (ImeData)field.imeData;
 
                 //text modified externally, which means this data is invalid, kill it
+                // 文本被外部修改,意味着此数据已失效,丢弃它
                 if(data.lastSetText != field.getText()){
                     field.imeData = null;
                 }else if(text.length() == 0){
                     //cancel or end composition
+                    // 取消或结束输入组合
                     field.imeData = null;
                     field.setText(data.realText);
                     field.clearSelection();
@@ -127,11 +133,13 @@ public class SdlInput extends Input{
             }
 
             //there seem to be stray IME events with zero length, ignore those?
+            // 似乎存在长度为零的多余 IME 事件,忽略它们?
             if(text.length() == 0){
                 return;
             }
 
             //re-initialize when invalidated or just beginning
+            // 失效或刚开始时重新初始化
             if(field.imeData == null){
                 field.imeData = new ImeData(){{
                     cursor = field.getCursorPosition();
@@ -146,7 +154,9 @@ public class SdlInput extends Input{
             field.setText(targetText.substring(0, Math.min(insertPos, targetText.length())) + text + targetText.substring(Math.min(insertPos, targetText.length())));
             field.setSelection(insertPos, insertPos + text.length());
             //fixme: setCursor will clearSelection, but the IME cursor can inside selection.
+            // fixme:setCursor 会执行 clearSelection,但 IME 光标可能位于选区内。
             //  And TextField seems not to support that.
+            // 而且 TextField 似乎不支持这一点。
             //field.setCursorPosition(insertPos+e.start);
 
             data.lastSetText = field.getText();
@@ -154,6 +164,7 @@ public class SdlInput extends Input{
     }
 
     //called before main loop
+    // 在主循环之前调用
     void update(){
         queue.setProcessor(inputMultiplexer);
         queue.drain();
@@ -165,6 +176,7 @@ public class SdlInput extends Input{
     }
 
     //called after main loop
+    // 在主循环之后调用
     void postUpdate(){
         keyboard.postUpdate();
         deltaX = deltaY = 0;

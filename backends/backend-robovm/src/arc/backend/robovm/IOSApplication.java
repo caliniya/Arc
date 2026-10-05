@@ -42,6 +42,7 @@ public class IOSApplication implements Application{
         this.uiApp = uiApp;
 
         // enable or disable screen dimming
+        // 启用或禁用屏幕变暗
         UIApplication.getSharedApplication().setIdleTimerDisabled(config.preventScreenDimming);
 
         Log.info("[IOSApplication] iOS version: " + UIDevice.getCurrentDevice().getSystemVersion());
@@ -59,7 +60,10 @@ public class IOSApplication implements Application{
         return true;
     }
 
-    /** called once a UIWindowScene has connected; this is where graphics, window and listeners are set up */
+    /**
+     * called once a UIWindowScene has connected; this is where graphics, window and listeners are set up
+     * 在 UIWindowScene 连接后调用;图形、窗口和监听器都在这里设置
+     */
     final void handleSceneConnection(UIWindowScene scene){
         this.uiWindowScene = scene;
         this.uiWindow = new UIWindow(scene);
@@ -75,6 +79,7 @@ public class IOSApplication implements Application{
         this.input.setupPeripherals();
         this.graphics.updateSafeInsets();
         // Trigger first render, special case that is caught and returned
+        // 触发首次渲染,这是会被捕获并返回的特殊情况
         this.graphics.view.display();
         for(ApplicationListener list : listeners){
             list.init();
@@ -83,12 +88,15 @@ public class IOSApplication implements Application{
             list.resize(graphics.getWidth(), graphics.getHeight());
         }
         // make sure the OpenGL view has contents before displaying it
+        // 确保 OpenGL 视图在显示前已有内容
         this.graphics.view.display();
     }
 
     /**
      * Return the UI view controller of IOSApplication
-     * @return the view controller of IOSApplication
+     * <p>
+     * 返回 IOSApplication 的 UI 视图控制器
+     * @return the view controller of IOSApplication IOSApplication 的视图控制器
      */
     public UIViewController getUIViewController(){
         return graphics.viewController;
@@ -96,7 +104,9 @@ public class IOSApplication implements Application{
 
     /**
      * Return the UI Window of IOSApplication
-     * @return the window
+     * <p>
+     * 返回 IOSApplication 的 UI 窗口
+     * @return the window 窗口
      */
     public UIWindow getUIWindow(){
         return uiWindow;
@@ -105,7 +115,9 @@ public class IOSApplication implements Application{
     /**
      * GL View spans whole screen, that is, even under the status bar. iOS can also rotate the screen, which is not handled
      * consistently over iOS versions. This method returns, in pixels, rectangle in which Arc draws.
-     * @return dimensions of space we draw to, adjusted for device orientation
+     * <p>
+     * GL 视图覆盖整个屏幕,即包括状态栏下方。iOS 还会旋转屏幕,而各 iOS 版本对此处理不一致。此方法返回 Arc 绘制的矩形区域(以像素为单位)。
+     * @return dimensions of space we draw to, adjusted for device orientation 绘制区域的大小,已根据设备方向调整
      */
     protected IOSScreenBounds computeBounds(){
         CGRect screenBounds = uiWindow.getBounds();
@@ -133,12 +145,18 @@ public class IOSApplication implements Application{
         return lastScreenBounds = new IOSScreenBounds(offsetX, offsetY, width, height, backBufferWidth, backBufferHeight);
     }
 
-    /** @return area of screen in UIKit points on which Arc draws, with 0,0 being upper left corner */
+    /**
+     * @return area of screen in UIKit points on which Arc draws, with 0,0 being upper left corner
+     * Arc 绘制的屏幕区域(以 UIKit 点为单位),左上角为 0,0
+     */
     public IOSScreenBounds getScreenBounds () {
         return lastScreenBounds == null ? computeBounds() : lastScreenBounds;
     }
 
-    /** Returns device ppi using a best guess approach when device is unknown. Overwrite to customize strategy. */
+    /**
+     * Returns device ppi using a best guess approach when device is unknown. Overwrite to customize strategy.
+     * 设备未知时,以最佳猜测的方式返回设备 ppi。可重写此方法以自定义策略。
+     */
     protected int guessUnknownPpi () {
         return UIDevice.getCurrentDevice().getUserInterfaceIdiom() == UIUserInterfaceIdiom.Pad ?
         132 * (int)pixelsPerPoint : 164 * (int)pixelsPerPoint;
@@ -165,6 +183,7 @@ public class IOSApplication implements Application{
     final void willTerminate(UIApplication uiApp){
         Log.info("[IOSApplication] disposed");
         // willTerminate can be called before a scene is connected and graphics initialized
+        // willTerminate 可能在场景连接、图形初始化之前被调用
         if(graphics != null) graphics.makeCurrent();
         input.disposeAccelerometer();
         Ar<ApplicationListener> listeners = this.listeners;
@@ -260,7 +279,9 @@ public class IOSApplication implements Application{
 
     /**
      * Add a listener to handle events from the root view controller
-     * @param listener The {#link IOSViewControllerListener} to add
+     * <p>
+     * 添加监听器以处理来自根视图控制器的事件
+     * @param listener The {#link IOSViewControllerListener} to add 要添加的 {#link IOSViewControllerListener}
      */
     public void addViewControllerListener(IOSViewControllerListener listener){
         viewControllerListener = listener;
@@ -274,11 +295,13 @@ public class IOSApplication implements Application{
         @Override
         public boolean didFinishLaunching(UIApplication application, UIApplicationLaunchOptions options){
             // TODO remove once MobiVM ships @CustomClass "preload"; forces RoboVM to preload the scene delegate class
+            // TODO 待 MobiVM 提供 @CustomClass "preload" 后移除;强制 RoboVM 预加载场景委托类
             try{
                 Class.forName(IOSSceneDelegate.class.getName());
             }catch(ClassNotFoundException ignored){
             }
             application.addStrongRef(this); // Prevent this from being GCed until the ObjC UIApplication is deallocated
+            // 防止此对象在 ObjC UIApplication 释放前被 GC
             this.app = createApplication();
 
             boolean result = app.didFinishLaunching(application, options);
@@ -297,6 +320,7 @@ public class IOSApplication implements Application{
         public UISceneConfiguration getConfigurationForConnectingSceneSession(UIApplication application,
                                                                               UISceneSession connectingSceneSession, UISceneConnectionOptions options){
             // ignore screen mirroring/external display sessions, see https://developer.apple.com/forums/thread/815376
+            // 忽略屏幕镜像/外接显示器会话,参见 https://developer.apple.com/forums/thread/815376
             if(Foundation.getMajorSystemVersion() < 16){
                 if(connectingSceneSession.getRole() == UISceneSessionRole.ExternalDisplay) return null;
             }else{

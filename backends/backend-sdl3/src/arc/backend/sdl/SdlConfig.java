@@ -16,11 +16,20 @@ public class SdlConfig{
     public boolean maximized = false;
     public boolean fullscreen = false;
     public boolean disableAudio = false;
-    /** For MacOS, this is always forced to 'true'. */
+    /**
+     * For MacOS, this is always forced to 'true'.
+     * 在 MacOS 上,此项始终强制为 'true'。
+     */
     public boolean coreProfile = false;
-    /** Requested OpenGL versions, in order of priority. */
+    /**
+     * Requested OpenGL versions, in order of priority.
+     * 请求的 OpenGL 版本,按优先级排序。
+     */
     public int[][] glVersions = {{3, 0}};
-    /** If true, ANGLE is used on Windows. */
+    /**
+     * If true, ANGLE is used on Windows.
+     * 如果为 true,则在 Windows 上使用 ANGLE。
+     */
     public boolean useAngle = true;
 
     public String title = "Arc Application";

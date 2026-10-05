@@ -20,6 +20,8 @@ public class IOSDevice{
     }
 
     /** The devices information can be obtained from https://github.com/lmirosevic/GBDeviceInfo or
+     * <p>
+     * 设备信息可从 https://github.com/lmirosevic/GBDeviceInfo 或 https://gist.github.com/adamawolf/3048717 获取
      * https://gist.github.com/adamawolf/3048717 */
     static ObjectMap<String, IOSDevice> populateWithKnownDevices(){
         ObjectMap<String, IOSDevice> deviceMap = new ObjectMap<>();
