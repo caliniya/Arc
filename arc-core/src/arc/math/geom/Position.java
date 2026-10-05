@@ -3,7 +3,10 @@ package arc.math.geom;
 import arc.math.Angles;
 import arc.math.Mathf;
 
-/** Represents a point in 2-D space. */
+/**
+ * Represents a point in 2-D space.
+ * 表示 2D 空间中的一个点。
+ */
 public interface Position{
     float getX();
 

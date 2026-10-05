@@ -2,12 +2,17 @@ package arc.math;
 
 /**
  * Takes a Linear value in the range of 0-1 and outputs a (usually) non-Linear, interpolated value.
+ * <p>
+ * 接收 0-1 范围内的线性值,输出(通常)非线性的插值。
  * @author Nathan Sweet
  */
 public interface Interp{
     Interp linear = a -> a;
     Interp reverse = a -> 1f - a;
-    /** Aka "smoothstep". */
+    /**
+     * Aka "smoothstep".
+     * 又名 “smoothstep”(平滑阶梯)。
+     */
     Interp smooth = a -> a * a * (3 - 2 * a);
 
     //
@@ -21,14 +26,23 @@ public interface Interp{
     Interp slope = Mathf::slope;
 
     //
-    /** By Ken Perlin. */
+    /**
+     * By Ken Perlin.
+     * 出自 Ken Perlin。
+     */
     Interp smoother = a -> a * a * a * (a * (a * 6 - 15) + 10);
     Interp fade = smoother;
     Pow pow2 = new Pow(2);
-    /** Slow, then fast. */
+    /**
+     * Slow, then fast.
+     * 先慢后快。
+     */
     PowIn pow2In = new PowIn(2);
     PowIn slowFast = pow2In;
-    /** Fast, then slow. */
+    /**
+     * Fast, then slow.
+     * 先快后慢。
+     */
     PowOut pow2Out = new PowOut(2);
     PowOut fastSlow = pow2Out;
     Interp pow2InInverse = a -> (float)Math.sqrt(a);
@@ -79,10 +93,16 @@ public interface Interp{
     BounceIn bounceIn = new BounceIn(4);
     BounceOut bounceOut = new BounceOut(4);
 
-    /** @param a Alpha value between 0 and 1. */
+    /**
+     * @param a Alpha value between 0 and 1.
+     * 0 到 1 之间的 alpha 值。
+     */
     float apply(float a);
 
-    /** @param a Alpha value between 0 and 1. */
+    /**
+     * @param a Alpha value between 0 and 1.
+     * 0 到 1 之间的 alpha 值。
+     */
     default float apply(float start, float end, float a){
         return start + (end - start) * apply(a);
     }

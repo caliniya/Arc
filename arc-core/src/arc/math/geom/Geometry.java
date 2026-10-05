@@ -5,14 +5,20 @@ import arc.math.*;
 import arc.struct.*;
 
 public final class Geometry{
-    /** Points representing cardinal directions, starting at the left and going counter-clockwise. */
+    /**
+     * Points representing cardinal directions, starting at the left and going counter-clockwise.
+     * 表示基本方向的点,从左开始逆时针排列。
+     */
     public final static Point2[] d4 = {
         new Point2(1, 0),
         new Point2(0, 1),
         new Point2(-1, 0),
         new Point2(0, -1)
     };
-    /** Points representing cardinal directions, starting at the left and going counter-clockwise. Also contains a center point: 0,0. */
+    /**
+     * Points representing cardinal directions, starting at the left and going counter-clockwise. Also contains a center point: 0,0.
+     * 表示基本方向的点,从左开始逆时针排列。还包含中心点:0,0。
+     */
     public final static Point2[] d4c = {
         new Point2(1, 0),
         new Point2(0, 1),
@@ -162,6 +168,7 @@ public final class Geometry{
         IntAr ints = new IntAr();
 
         //add edges (bottom left corner)
+        // 添加边(左下角)
         for(int x = -1; x < size + 1; x++){
             for(int y = -1; y < size + 1; y++){
                 if((checker.solid(index, x, y) || checker.solid(index, x - 1, y) || checker.solid(index, x, y - 1) || checker.solid(index, x - 1, y - 1)) &&
@@ -174,8 +181,10 @@ public final class Geometry{
         Ar<Vec2> path = new Ar<>();
 
         //size = 3 needs special sorting due to conflicts
+        // size = 3 时因冲突需要特殊排序
         if(size == 3){
             //int arrays don't support sorting with custom comparators, so box them.
+            // int 数组不支持使用自定义比较器排序,因此装箱处理。
             Ar<Integer> boxed = new Ar<>();
             ints.each(boxed::add);
             boxed.sort(i -> Angles.angle(i % (size + 1), i / (size + 1), index, index));
@@ -191,6 +200,7 @@ public final class Geometry{
             ints.removeIndex(cindex);
 
             //find nearby edge
+            // 寻找附近的边
             for(int i = 0; i < ints.size; i++){
 
                 int x2 = ints.get(i) % (size + 1);
@@ -206,7 +216,10 @@ public final class Geometry{
         return path.toArray(Vec2.class);
     }
 
-    /** returns a regular polygon with {amount} sides */
+    /**
+     * returns a regular polygon with {amount} sides
+     * 返回具有 {amount} 条边的正多边形
+     */
     public static float[] regPoly(int amount, float size){
         float[] v = new float[amount * 2];
         Vec2 vec = new Vec2(1, 1);
@@ -342,6 +355,8 @@ public final class Geometry{
     /**
      * Checks for collisions between two rectangles, and returns the correct delta vector of A.
      * Note: The same vector instance is returned each time!
+     * <p>
+     * 检查两个矩形之间的碰撞,并返回 A 的正确增量向量。注意:每次返回的都是同一个向量实例!
      */
     public static Vec2 overlap(Rect a, Rect b, boolean x){
         float penetration = 0f;
@@ -350,33 +365,41 @@ public final class Geometry{
         float ay = a.y + a.height / 2, by = b.y + b.height / 2;
 
         //Vector from A to B
+        // 从 A 到 B 的向量
         float nx = ax - bx,
         ny = ay - by;
 
         // Calculate half extends along x axis
+        // 计算 x 轴方向的半宽
         float aex = a.width / 2,
         bex = b.width / 2;
 
         // Overlap on x axis
+        // x 轴上的重叠量
         float xoverlap = aex + bex - Math.abs(nx);
         if(Math.abs(xoverlap) > 0){
 
             // Calculate half extends along y axis
+            // 计算 y 轴方向的半高
             float aey = a.height / 2,
             bey = b.height / 2;
 
             // Overlap on x axis
+            // x 轴上的重叠量
             float yoverlap = aey + bey - Math.abs(ny);
             if(Math.abs(yoverlap) > 0){
 
                 // Find out which axis is the axis of least penetration
+                // 找出穿透量最小的轴
                 if(Math.abs(xoverlap) < Math.abs(yoverlap)){
                     // Point towards B knowing that n points from A to B
+                    // 已知从 A 到 B 之间有 n 个点,朝向 B
                     tmp1.x = nx < 0 ? 1 : -1;
                     tmp1.y = 0;
                     penetration = xoverlap;
                 }else{
                     // Point towards B knowing that n points from A to B
+                    // 已知从 A 到 B 之间有 n 个点,朝向 B
                     tmp1.x = 0;
                     tmp1.y = ny < 0 ? 1 : -1;
                     penetration = yoverlap;
@@ -387,6 +410,7 @@ public final class Geometry{
         float m = Math.max(penetration, 0.0f);
 
         // Apply correctional impulse
+        // 施加修正冲量
         float cx = m * tmp1.x,
         cy = m * tmp1.y;
 
@@ -409,7 +433,9 @@ public final class Geometry{
      * float x = u * aa.x + barycentric.x * bb.x + barycentric.y * cc.x;
      * float y = u * aa.y + barycentric.x * bb.y + barycentric.y * cc.y;
      * </pre>
-     * @return barycentricOut
+     * <p>
+     * 计算三角形内指定点的重心坐标 v、w。 <p> 若 barycentric.x >= 0 && barycentric.y >= 0 && barycentric.x + barycentric.y <= 1,则该点在三角形内。 <p> 若顶点 a、b、c 的值为 aa、bb、cc,则要在点 p 处得到插值: <pre> Geometry.barycentric(p, a, b, c, barycentric); float u = 1.f - barycentric.x - barycentric.y; float x = u * aa.x + barycentric.x * bb.x + barycentric.y * cc.x; float y = u * aa.y + barycentric.x * bb.y + barycentric.y * cc.y; </pre>
+     * @return barycentricOut barycentricOut
      */
     public static Vec2 toBarycoord(Vec2 p, Vec2 a, Vec2 b, Vec2 c, Vec2 barycentricOut){
         Vec2 v0 = tmp1.set(b).sub(a);
@@ -426,14 +452,19 @@ public final class Geometry{
         return barycentricOut;
     }
 
-    /** Returns true if the barycentric coordinates are inside the triangle. */
+    /**
+     * Returns true if the barycentric coordinates are inside the triangle.
+     * 若重心坐标在三角形内则返回 true。
+     */
     public static boolean barycoordInsideTriangle(Vec2 barycentric){
         return barycentric.x >= 0 && barycentric.y >= 0 && barycentric.x + barycentric.y <= 1;
     }
 
     /**
      * Returns interpolated values given the barycentric coordinates of a point in a triangle and the values at each vertex.
-     * @return interpolatedOut
+     * <p>
+     * 根据三角形内一点的重心坐标及各顶点的值,返回多个插值后的值。
+     * @return interpolatedOut interpolatedOut
      */
     public static Vec2 fromBarycoord(Vec2 barycentric, Vec2 a, Vec2 b, Vec2 c, Vec2 interpolatedOut){
         float u = 1 - barycentric.x - barycentric.y;
@@ -444,7 +475,9 @@ public final class Geometry{
 
     /**
      * Returns an interpolated value given the barycentric coordinates of a point in a triangle and the values at each vertex.
-     * @return interpolatedOut
+     * <p>
+     * 根据三角形内一点的重心坐标及各顶点的值,返回插值后的值。
+     * @return interpolatedOut interpolatedOut
      */
     public static float fromBarycoord(Vec2 barycentric, float a, float b, float c){
         float u = 1 - barycentric.x - barycentric.y;
@@ -454,10 +487,12 @@ public final class Geometry{
     /**
      * Returns the lowest positive root of the quadric equation given by a* x * x + b * x + c = 0. If no solution is given
      * Float.Nan is returned.
-     * @param a the first coefficient of the quadric equation
-     * @param b the second coefficient of the quadric equation
-     * @param c the third coefficient of the quadric equation
-     * @return the lowest positive root or Float.Nan
+     * <p>
+     * 返回二次方程 a* x * x + b * x + c = 0 的最小正根。若无解则返回 Float.Nan。
+     * @param a the first coefficient of the quadric equation 二次方程的第一个系数
+     * @param b the second coefficient of the quadric equation 二次方程的第二个系数
+     * @param c the third coefficient of the quadric equation 二次方程的第三个系数
+     * @return the lowest positive root or Float.Nan 最小的正根或 Float.Nan
      */
     public static float lowestPositiveRoot(float a, float b, float c){
         float det = b * b - 4 * a * c;
@@ -492,7 +527,10 @@ public final class Geometry{
         return centroid;
     }
 
-    /** Returns the circumcenter of the triangle. The input points must not be colinear. */
+    /**
+     * Returns the circumcenter of the triangle. The input points must not be colinear.
+     * 返回三角形的外心。输入的点不得共线。
+     */
     public static Vec2 triangleCircumcenter(float x1, float y1, float x2, float y2, float x3, float y3, Vec2 circumcenter){
         float dx21 = x2 - x1, dy21 = y2 - y1;
         float dx32 = x3 - x2, dy32 = y3 - y2;
@@ -539,6 +577,8 @@ public final class Geometry{
      * <p>
      * Gary L. Miller, Dafna Talmor, Shang-Hua Teng, and Noel Walkington. A Delaunay Based Numerical Method for Three Dimensions:
      * Generation, Formulation, and Partition.
+     * <p>
+     * 外接圆半径与最短边之比,作为三角形质量的度量。 <p> Gary L. Miller, Dafna Talmor, Shang-Hua Teng, and Noel Walkington. A Delaunay Based Numerical Method for Three Dimensions: Generation, Formulation, and Partition.
      */
     public static float triangleQuality(float x1, float y1, float x2, float y2, float x3, float y3){
         float length1 = (float)Math.sqrt(x1 * x1 + y1 * y1);
@@ -562,7 +602,10 @@ public final class Geometry{
         return centroid;
     }
 
-    /** Returns the centroid for the specified non-self-intersecting polygon. */
+    /**
+     * Returns the centroid for the specified non-self-intersecting polygon.
+     * 返回指定非自相交多边形的质心。
+     */
     public static Vec2 polygonCentroid(float[] polygon, int offset, int count, Vec2 centroid){
         if(count < 6) throw new IllegalArgumentException("A polygon must have 3 or more coordinate pairs.");
         float x = 0, y = 0;
@@ -600,7 +643,10 @@ public final class Geometry{
         return centroid;
     }
 
-    /** Computes the area for a convex polygon. */
+    /**
+     * Computes the area for a convex polygon.
+     * 计算凸多边形的面积。
+     */
     public static float polygonArea(float[] polygon, int offset, int count){
         float area = 0;
         for(int i = offset, n = offset + count; i < n; i += 2){

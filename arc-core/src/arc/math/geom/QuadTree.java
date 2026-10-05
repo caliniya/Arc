@@ -9,13 +9,16 @@ import arc.struct.*;
  * <p>
  * This class represents any node, but you will likely only interact with the root node.
  *
- * @param <T> The type of object this quad tree should contain. An object only requires some way of getting rough bounds.
+ * <p>
+ * 一个基础四叉树。 <p> 此类表示任意节点,但你通常只会与根节点交互。
+ * @param <T> The type of object this quad tree should contain. An object only requires some way of getting rough bounds. 此四叉树应包含的对象类型。对象只需提供获取粗略边界的方式即可。
  * @author xSke
  * @author Anuke
  */
 public class QuadTree<T extends QuadTreeObject>{
     protected final Rect tmp = new Rect();
     //if many objects are stacked on a point, it may split infinitely, so floor the size
+    // 如果许多对象堆叠在一个点上,可能会无限分裂,因此对尺寸取下限
     protected static final float minNodeSize = 10f;
     protected static final int maxObjectsPerNode = 5;
 
@@ -26,6 +29,7 @@ public class QuadTree<T extends QuadTreeObject>{
     public int totalObjects;
 
     //scratch partitioning lists reused across fill() calls to avoid allocating every rebuild
+    // 在多次 fill() 调用间复用的临时分区列表,避免每次重建都重新分配
     private Ar<T> fillBL, fillBR, fillTL, fillTR;
 
     public QuadTree(Rect bounds){
@@ -49,6 +53,7 @@ public class QuadTree<T extends QuadTreeObject>{
         Object[] items = objects.items;
 
         // Transfer objects to children if they fit entirely in one
+        // 若对象能完全放入某个子节点,则将其转移到该子节点
         for(int i = 0; i < objects.size; i++){
             T obj = (T)items[i];
             hitbox(obj);
@@ -78,12 +83,15 @@ public class QuadTree<T extends QuadTreeObject>{
 
     /**
      * Inserts an object into this node or its child nodes. This will split a leaf node if it exceeds the object limit.
+     * 将对象插入此节点或其子节点。若叶节点超过对象上限,将进行分裂。
      */
     public void insert(T obj){
         hitbox(obj);
         if(!bounds.overlaps(tmp)){
             // New object not in quad tree, ignoring
+            // 不在四叉树中的新对象,忽略
             // throw an exception?
+            // 抛出异常?
             return;
         }
 
@@ -93,10 +101,12 @@ public class QuadTree<T extends QuadTreeObject>{
 
         if(leaf){
             // Leaf, so no need to add to children, just add to root
+            // 叶节点,无需加入子节点,直接加入根节点
             objects.add(obj);
         }else{
             hitbox(obj);
             // Add to relevant child, or root if can't fit completely in a child
+            // 添加到合适的子节点,若无法完全放入任何子节点则添加到根节点
             QuadTree<T> child = getFittingChild(tmp);
             if(child != null){
                 child.insert(obj);
@@ -106,7 +116,10 @@ public class QuadTree<T extends QuadTreeObject>{
         }
     }
 
-    /** Rebuilds this tree from scratch using the given list of objects. */
+    /**
+     * Rebuilds this tree from scratch using the given list of objects.
+     * 使用给定的对象列表从头重建此树。
+     */
     public void fill(Ar<T> list){
         clear();
         totalObjects = list.size;
@@ -141,6 +154,7 @@ public class QuadTree<T extends QuadTreeObject>{
         int size = list.size;
 
         //single partitioning pass instead of one split()-check per insert
+        // 用单次分区遍历代替每次插入时的 split() 检查
         for(int i = 0; i < size; i++){
             T obj = (T)items[i];
             hitbox(obj);
@@ -151,6 +165,7 @@ public class QuadTree<T extends QuadTreeObject>{
             else if(child == topLeft) fillTL.add(obj);
             else if(child == topRight) fillTR.add(obj);
             else objects.add(obj); //doesn't fit any quadrant, stays in this node
+            // 不适合任何象限,留在此节点中
         }
 
         botLeft.fill(fillBL);
@@ -161,14 +176,17 @@ public class QuadTree<T extends QuadTreeObject>{
 
     /**
      * Removes an object from this node or its child nodes.
+     * 从此节点或其子节点中移除对象。
      */
     public boolean remove(T obj){
         boolean result;
         if(leaf){
             // Leaf, no children, remove from root
+            // 叶节点,无子节点,从根节点移除
             result = objects.remove(obj, true);
         }else{
             // Remove from relevant child
+            // 从合适的子节点中移除
             hitbox(obj);
             QuadTree<T> child = getFittingChild(tmp);
 
@@ -176,6 +194,7 @@ public class QuadTree<T extends QuadTreeObject>{
                 result = child.remove(obj);
             }else{
                 // Or root if object doesn't fit in a child
+                // 若对象不适合任何子节点,则放入根节点
                 result = objects.remove(obj, true);
             }
 
@@ -187,7 +206,10 @@ public class QuadTree<T extends QuadTreeObject>{
         return result;
     }
 
-    /** Removes all objects. */
+    /**
+     * Removes all objects.
+     * 移除所有对象。
+     */
     public void clear(){
         objects.clear();
         totalObjects = 0;
@@ -205,11 +227,14 @@ public class QuadTree<T extends QuadTreeObject>{
         float horizontalMidpoint = bounds.y + (bounds.height / 2);
 
         // Object can completely fit within the top quadrants
+        // 对象可完全放入上方的象限
         boolean topQuadrant = boundingBox.y > horizontalMidpoint;
         // Object can completely fit within the bottom quadrants
+        // 对象可完全放入下方的象限
         boolean bottomQuadrant = boundingBox.y < horizontalMidpoint && (boundingBox.y + boundingBox.height) < horizontalMidpoint;
 
         // Object can completely fit within the left quadrants
+        // 对象可完全放入左侧的象限
         if(boundingBox.x < verticalMidpoint && boundingBox.x + boundingBox.width < verticalMidpoint){
             if(topQuadrant){
                 return topLeft;
@@ -217,6 +242,7 @@ public class QuadTree<T extends QuadTreeObject>{
                 return botLeft;
             }
         }else if(boundingBox.x > verticalMidpoint){ // Object can completely fit within the right quadrants
+        // 对象可完全放入右侧的象限
             if(topQuadrant){
                 return topRight;
             }else if(bottomQuadrant){
@@ -225,6 +251,7 @@ public class QuadTree<T extends QuadTreeObject>{
         }
 
         // Else, object needs to be in parent cause it can't fit completely in a quadrant
+        // 否则,对象无法完全放入任何象限,需要放入父节点
         return null;
     }
 
@@ -232,6 +259,8 @@ public class QuadTree<T extends QuadTreeObject>{
      * Processes objects that may intersect the given rectangle.
      * <p>
      * This will never result in false positives.
+     * <p>
+     * 处理可能与给定矩形相交的对象。 <p> 这绝不会产生误报。
      */
     public void intersect(float x, float y, float width, float height, Cons<T> out){
         if(!leaf){
@@ -256,6 +285,8 @@ public class QuadTree<T extends QuadTreeObject>{
      * Processes objects that may intersect the given rectangle. Returning true will break out of the function.
      * <p>
      * This will never result in false positives.
+     * <p>
+     * 处理可能与给定矩形相交的对象。返回 true 将中断函数。 <p> 这绝不会产生误报。
      */
     public boolean intersect(float x, float y, float width, float height, Boolf<T> out){
         if(!leaf){
@@ -281,6 +312,8 @@ public class QuadTree<T extends QuadTreeObject>{
      * Tries to find any object matching the predicate in this tree.
      * <p>
      * This will never result in false positives.
+     * <p>
+     * 尝试在此树中查找任何符合谓词的对象。 <p> 这绝不会产生误报。
      */
     public T find(float x, float y, float width, float height, Boolf<T> out){
         if(!leaf){
@@ -304,7 +337,7 @@ public class QuadTree<T extends QuadTreeObject>{
     }
 
     /**
-     * @return whether an object overlaps this rectangle.
+     * @return whether an object overlaps this rectangle. 是否有对象与此矩形重叠。
      * This will never result in false positives.
      */
     public boolean any(float x, float y, float width, float height){
@@ -331,6 +364,8 @@ public class QuadTree<T extends QuadTreeObject>{
      * Processes objects that may intersect the given rectangle.
      * <p>
      * This will never result in false positives.
+     * <p>
+     * 处理可能与给定矩形相交的对象。 <p> 这绝不会产生误报。
      */
     public void intersect(Rect rect, Cons<T> out){
         intersect(rect.x, rect.y, rect.width, rect.height, out);
@@ -340,6 +375,8 @@ public class QuadTree<T extends QuadTreeObject>{
      * Fills the out parameter with any objects that may intersect the given rectangle.
      * <p>
      * This will result in false positives, but never a false negative.
+     * <p>
+     * 用可能与给定矩形相交的对象填充 out 参数。 <p> 这可能产生误报,但绝不会漏报。
      */
     public void intersect(Rect toCheck, Ar<T> out){
         intersect(toCheck.x, toCheck.y, toCheck.width, toCheck.height, out);
@@ -347,6 +384,7 @@ public class QuadTree<T extends QuadTreeObject>{
 
     /**
      * Fills the out parameter with any objects that may intersect the given rectangle.
+     * 用可能与给定矩形相交的对象填充 out 参数。
      */
     public void intersect(float x, float y, float width, float height, Ar<T> out){
         if(!leaf){
@@ -367,7 +405,10 @@ public class QuadTree<T extends QuadTreeObject>{
         }
     }
 
-    /** Adds all quadtree objects to the specified Ar. */
+    /**
+     * Adds all quadtree objects to the specified Ar.
+     * 将所有四叉树对象添加到指定的 Ar 中。
+     */
     public void getObjects(Ar<T> out){
         out.addAll(objects);
 
@@ -387,9 +428,15 @@ public class QuadTree<T extends QuadTreeObject>{
         t.hitbox(tmp);
     }
 
-    /**Represents an object in a QuadTree.*/
+    /**
+     * Represents an object in a QuadTree.
+     * 表示四叉树中的一个对象。
+     */
     public interface QuadTreeObject{
-        /**Fills the out parameter with this element's rough bounding box. This should never be smaller than the actual object, but may be larger.*/
+        /**
+         * Fills the out parameter with this element's rough bounding box. This should never be smaller than the actual object, but may be larger.
+         * 用此元素的粗略包围盒填充 out 参数。它不应小于实际对象,但可能更大。
+         */
         void hitbox(Rect out);
     }
 }

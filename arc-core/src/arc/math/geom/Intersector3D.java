@@ -22,10 +22,12 @@ public class Intersector3D{
     /**
      * Intersects a {@link Ray} and a {@link Plane}. The intersection point is stored in intersection in case an intersection is
      * present.
-     * @param ray The ray
-     * @param plane The plane
-     * @param intersection The vector the intersection point is written to (optional)
-     * @return Whether an intersection is present.
+     * <p>
+     * 求射线与 {@link Plane} 的交点。若存在交点,交点存入 intersection。
+     * @param ray The ray 射线
+     * @param plane The plane 平面
+     * @param intersection The vector the intersection point is written to (optional) 用于写入交点的向量(可选)
+     * @return Whether an intersection is present. 是否存在交点。
      */
     public static boolean intersectRayPlane(Ray ray, Plane plane, Vec3 intersection){
         float denom = ray.direction.dot(plane.normal);
@@ -46,6 +48,8 @@ public class Intersector3D{
      * Intersects a line and a plane. The intersection is returned as the distance from the first point to the plane. In case an
      * intersection happened, the return value is in the range [0,1]. The intersection point can be recovered by point1 + t *
      * (point2 - point1) where t is the return value of this method.
+     * <p>
+     * 求直线与平面的交点。交点以从第一个点到平面的距离形式返回。若发生相交,返回值在 [0,1] 范围内。交点可通过 point1 + t * (point2 - point1) 求得,其中 t 为本方法的返回值。
      */
     public static float intersectLinePlane(float x, float y, float z, float x2, float y2, float z2, Plane plane,
                                            Vec3 intersection){
@@ -66,12 +70,14 @@ public class Intersector3D{
 
     /**
      * Intersect a {@link Ray} and a triangle, returning the intersection point in intersection.
-     * @param ray The ray
-     * @param t1 The first vertex of the triangle
-     * @param t2 The second vertex of the triangle
-     * @param t3 The third vertex of the triangle
-     * @param intersection The intersection point (optional)
-     * @return True in case an intersection is present.
+     * <p>
+     * 求射线与三角形的交点,交点存入 intersection。
+     * @param ray The ray 射线
+     * @param t1 The first vertex of the triangle 三角形的第一个顶点
+     * @param t2 The second vertex of the triangle 三角形的第二个顶点
+     * @param t3 The third vertex of the triangle 三角形的第三个顶点
+     * @param intersection The intersection point (optional) 交点(可选)
+     * @return True in case an intersection is present. 若存在交点则为 true。
      */
     public static boolean intersectRayTriangle(Ray ray, Vec3 t1, Vec3 t2, Vec3 t3, Vec3 intersection){
         Vec3 edge1 = v0.set(t2).sub(t1);
@@ -114,15 +120,18 @@ public class Intersector3D{
 
     /**
      * Intersects a {@link Ray} and a sphere, returning the intersection point in intersection.
-     * @param ray The ray, the direction component must be normalized before calling this method
-     * @param center The center of the sphere
-     * @param radius The radius of the sphere
-     * @param intersection The intersection point (optional, can be null)
-     * @return Whether an intersection is present.
+     * <p>
+     * 求射线与球体的交点,交点存入 intersection。
+     * @param ray The ray, the direction component must be normalized before calling this method 射线,调用此方法前其方向分量必须已归一化
+     * @param center The center of the sphere 球心
+     * @param radius The radius of the sphere 球的半径
+     * @param intersection The intersection point (optional, can be null) 交点(可选,可为 null)
+     * @return Whether an intersection is present. 是否存在交点。
      */
     public static boolean intersectRaySphere(Ray ray, Vec3 center, float radius, Vec3 intersection){
         final float len = ray.direction.dot(center.x - ray.origin.x, center.y - ray.origin.y, center.z - ray.origin.z);
         if(len < 0.f) // behind the ray
+        // 射线后方
             return false;
         final float dst2 = center.dst2(ray.origin.x + ray.direction.x * len, ray.origin.y + ray.direction.y * len,
         ray.origin.z + ray.direction.z * len);
@@ -146,10 +155,12 @@ public class Intersector3D{
      * If the origin of the ray is inside the box, this method returns true and the intersection point is set to the origin of the
      * ray, accordingly to the definition above.
      * </p>
-     * @param ray The ray
-     * @param box The box
-     * @param intersection The intersection point (optional)
-     * @return Whether an intersection is present.
+     * <p>
+     * 求射线与 {@link BoundingBox} 的交点,交点存入 intersection。此交点定义为射线上位于指定边界内、距原点最近的点。 <p> 返回的交点(若有)保证在包围盒边界内,但由于微小的浮点误差,偶尔可能与射线略有偏差。 </p> <p> 若射线原点在盒内,按上述定义,此方法返回 true 且交点设为射线原点。 </p>
+     * @param ray The ray 射线
+     * @param box The box 盒子
+     * @param intersection The intersection point (optional) 交点(可选)
+     * @return Whether an intersection is present. 是否存在交点。
      */
     public static boolean intersectRayBounds(Ray ray, BoundingBox box, Vec3 intersection){
         if(box.contains(ray.origin)){
@@ -160,6 +171,7 @@ public class Intersector3D{
         boolean hit = false;
 
         // min x
+        // x 的最小值
         if(ray.origin.x <= box.min.x && ray.direction.x > 0){
             t = (box.min.x - ray.origin.x) / ray.direction.x;
             if(t >= 0){
@@ -171,6 +183,7 @@ public class Intersector3D{
             }
         }
         // max x
+        // x 的最大值
         if(ray.origin.x >= box.max.x && ray.direction.x < 0){
             t = (box.max.x - ray.origin.x) / ray.direction.x;
             if(t >= 0){
@@ -182,6 +195,7 @@ public class Intersector3D{
             }
         }
         // min y
+        // y 的最小值
         if(ray.origin.y <= box.min.y && ray.direction.y > 0){
             t = (box.min.y - ray.origin.y) / ray.direction.y;
             if(t >= 0){
@@ -193,6 +207,7 @@ public class Intersector3D{
             }
         }
         // max y
+        // y 的最大值
         if(ray.origin.y >= box.max.y && ray.direction.y < 0){
             t = (box.max.y - ray.origin.y) / ray.direction.y;
             if(t >= 0){
@@ -204,6 +219,7 @@ public class Intersector3D{
             }
         }
         // min z
+        // z 的最小值
         if(ray.origin.z <= box.min.z && ray.direction.z > 0){
             t = (box.min.z - ray.origin.z) / ray.direction.z;
             if(t >= 0){
@@ -215,6 +231,7 @@ public class Intersector3D{
             }
         }
         // max y
+        // y 的最大值
         if(ray.origin.z >= box.max.z && ray.direction.z < 0){
             t = (box.max.z - ray.origin.z) / ray.direction.z;
             if(t >= 0){
@@ -248,9 +265,11 @@ public class Intersector3D{
 
     /**
      * Quick check whether the given {@link Ray} and {@link BoundingBox} intersect.
-     * @param ray The ray
-     * @param box The bounding box
-     * @return Whether the ray and the bounding box intersect.
+     * <p>
+     * 快速判断给定的射线与包围盒是否相交。
+     * @param ray The ray 射线
+     * @param box The bounding box 包围盒
+     * @return Whether the ray and the bounding box intersect. 射线与包围盒是否相交。
      */
     public static boolean intersectRayBoundsFast(Ray ray, BoundingBox box){
         return intersectRayBoundsFast(ray, box.getCenter(tmp1), box.getDimensions(tmp2));
@@ -258,10 +277,12 @@ public class Intersector3D{
 
     /**
      * Quick check whether the given {@link Ray} and {@link BoundingBox} intersect.
-     * @param ray The ray
-     * @param center The center of the bounding box
-     * @param dimensions The dimensions (width, height and depth) of the bounding box
-     * @return Whether the ray and the bounding box intersect.
+     * <p>
+     * 快速判断给定的射线与包围盒是否相交。
+     * @param ray The ray 射线
+     * @param center The center of the bounding box 包围盒的中心
+     * @param dimensions The dimensions (width, height and depth) of the bounding box 包围盒的尺寸(宽、高和深)
+     * @return Whether the ray and the bounding box intersect. 射线与包围盒是否相交。
      */
     public static boolean intersectRayBoundsFast(Ray ray, Vec3 center, Vec3 dimensions){
         final float divX = 1f / ray.direction.x;
@@ -311,10 +332,12 @@ public class Intersector3D{
 
     /**
      * Intersects the given ray with list of triangles. Returns the nearest intersection point in intersection
-     * @param ray The ray
-     * @param triangles The triangles, each successive 3 elements from a vertex
-     * @param intersection The nearest intersection point (optional)
-     * @return Whether the ray and the triangles intersect.
+     * <p>
+     * 用给定的射线与三角形列表求交。最近的交点存入 intersection
+     * @param ray The ray 射线
+     * @param triangles The triangles, each successive 3 elements from a vertex 三角形数组,每连续 3 个元素对应一个顶点
+     * @param intersection The nearest intersection point (optional) 最近的交点(可选)
+     * @return Whether the ray and the triangles intersect. 射线与三角形是否相交。
      */
     public static boolean intersectRayTriangles(Ray ray, float[] triangles, Vec3 intersection){
         float min_dist = Float.MAX_VALUE;
@@ -347,12 +370,14 @@ public class Intersector3D{
 
     /**
      * Intersects the given ray with list of triangles. Returns the nearest intersection point in intersection
-     * @param ray The ray
-     * @param vertices the vertices
-     * @param indices the indices, each successive 3 shorts index the 3 vertices of a triangle
-     * @param vertexSize the size of a vertex in floats
-     * @param intersection The nearest intersection point (optional)
-     * @return Whether the ray and the triangles intersect.
+     * <p>
+     * 用给定的射线与三角形列表求交。最近的交点存入 intersection
+     * @param ray The ray 射线
+     * @param vertices the vertices 顶点
+     * @param indices the indices, each successive 3 shorts index the 3 vertices of a triangle 索引数组,每连续 3 个 short 索引一个三角形的 3 个顶点
+     * @param vertexSize the size of a vertex in floats 顶点的大小(以浮点数计)
+     * @param intersection The nearest intersection point (optional) 最近的交点(可选)
+     * @return Whether the ray and the triangles intersect. 射线与三角形是否相交。
      */
     public static boolean intersectRayTriangles(Ray ray, float[] vertices, short[] indices, int vertexSize,
                                                 Vec3 intersection){
@@ -390,10 +415,12 @@ public class Intersector3D{
 
     /**
      * Intersects the given ray with list of triangles. Returns the nearest intersection point in intersection
-     * @param ray The ray
-     * @param triangles The triangles
-     * @param intersection The nearest intersection point (optional)
-     * @return Whether the ray and the triangles intersect.
+     * <p>
+     * 用给定的射线与三角形列表求交。最近的交点存入 intersection
+     * @param ray The ray 射线
+     * @param triangles The triangles 三角形
+     * @param intersection The nearest intersection point (optional) 最近的交点(可选)
+     * @return Whether the ray and the triangles intersect. 射线与三角形是否相交。
      */
     public static boolean intersectRayTriangles(Ray ray, Ar<Vec3> triangles, Vec3 intersection){
         float min_dist = Float.MAX_VALUE;
@@ -439,7 +466,9 @@ public class Intersector3D{
      * The input triangle should have the form: x, y, z, x2, y2, z2, x3, y3, z3. One can add additional attributes per vertex which
      * will be interpolated if split, such as texture coordinates or normals. Note that these additional attributes won't be
      * normalized, as might be necessary in case of normals.
-     * @param split output SplitTriangle
+     * <p>
+     * 按平面分割三角形。结果存入 SplitTriangle 实例。根据三角形相对平面的位置,结果可能是: <ul> <li>三角形完全在前方/后方:{@link SplitTriangle#front} 或 {@link SplitTriangle#back} 包含原三角形,{@link SplitTriangle#total} 为 1。</li> <li>两个顶点在前方,一个在后方:{@link SplitTriangle#front} 包含 2 个三角形,{@link SplitTriangle#back} 包含 1 个,{@link SplitTriangle#total} 为 3。</li> <li>一个顶点在前方,两个在后方:{@link SplitTriangle#front} 包含 1 个三角形,{@link SplitTriangle#back} 包含 2 个,{@link SplitTriangle#total} 为 3。</li> </ul> <p> 输入三角形应具有如下形式:x, y, z, x2, y2, z2, x3, y3, z3。可以为每个顶点添加额外属性,分割时会被插值,例如纹理坐标或法线。注意这些额外属性不会被归一化,法线等情况可能需要归一化。
+     * @param split output SplitTriangle 输出的 SplitTriangle
      */
     public static void splitTriangle(float[] triangle, Plane plane, SplitTriangle split){
         int stride = triangle.length / 3;
@@ -451,6 +480,7 @@ public class Intersector3D{
         split.reset();
 
         // easy case, triangle is on one side (point on plane means front).
+        // 简单情况,三角形位于一侧(点在平面上视为在前方)。
         if(r1 == r2 && r2 == r3){
             split.total = 1;
             if(r1){
@@ -464,73 +494,93 @@ public class Intersector3D{
         }
 
         // set number of triangles
+        // 设置三角形数量
         split.total = 3;
         split.numFront = (r1 ? 0 : 1) + (r2 ? 0 : 1) + (r3 ? 0 : 1);
         split.numBack = split.total - split.numFront;
 
         // hard case, split the three edges on the plane
+        // 困难情况,将三条边在平面上分割
         // determine which array to fill first, front or back, flip if we
+        // 决定先填充哪个数组(front 还是 back),必要时翻转
         // cross the plane
+        // 穿越平面
         split.setSide(!r1);
 
         // split first edge
+        // 分割第一条边
         int first = 0;
         int second = stride;
         if(r1 != r2){
             // split the edge
+            // 分割该边
             splitEdge(triangle, first, second, stride, plane, split.edgeSplit, 0);
 
             // add first edge vertex and new vertex to current side
+            // 将第一条边的顶点和新顶点加入当前侧
             split.add(triangle, first, stride);
             split.add(split.edgeSplit, 0, stride);
 
             // flip side and add new vertex and second edge vertex to current side
+            // 翻转当前侧,并将新顶点和第二条边的顶点加入该侧
             split.setSide(!split.getSide());
             split.add(split.edgeSplit, 0, stride);
         }else{
             // add both vertices
+            // 添加两个顶点
             split.add(triangle, first, stride);
         }
 
         // split second edge
+        // 分割第二条边
         first = stride;
         second = stride + stride;
         if(r2 != r3){
             // split the edge
+            // 分割该边
             splitEdge(triangle, first, second, stride, plane, split.edgeSplit, 0);
 
             // add first edge vertex and new vertex to current side
+            // 将第一条边的顶点和新顶点加入当前侧
             split.add(triangle, first, stride);
             split.add(split.edgeSplit, 0, stride);
 
             // flip side and add new vertex and second edge vertex to current side
+            // 翻转当前侧,并将新顶点和第二条边的顶点加入该侧
             split.setSide(!split.getSide());
             split.add(split.edgeSplit, 0, stride);
         }else{
             // add both vertices
+            // 添加两个顶点
             split.add(triangle, first, stride);
         }
 
         // split third edge
+        // 分割第三条边
         first = stride + stride;
         second = 0;
         if(r3 != r1){
             // split the edge
+            // 分割该边
             splitEdge(triangle, first, second, stride, plane, split.edgeSplit, 0);
 
             // add first edge vertex and new vertex to current side
+            // 将第一条边的顶点和新顶点加入当前侧
             split.add(triangle, first, stride);
             split.add(split.edgeSplit, 0, stride);
 
             // flip side and add new vertex and second edge vertex to current side
+            // 翻转当前侧,并将新顶点和第二条边的顶点加入该侧
             split.setSide(!split.getSide());
             split.add(split.edgeSplit, 0, stride);
         }else{
             // add both vertices
+            // 添加两个顶点
             split.add(triangle, first, stride);
         }
 
         // triangulate the side with 2 triangles
+        // 用 2 个三角形对该侧进行三角剖分
         if(split.numFront == 2){
             System.arraycopy(split.front, stride * 2, split.front, stride * 3, stride * 2);
             System.arraycopy(split.front, 0, split.front, stride * 5, stride);
@@ -567,7 +617,9 @@ public class Intersector3D{
 
         /**
          * Creates a new instance, assuming numAttributes attributes per triangle vertex.
-         * @param numAttributes must be >= 3
+         * <p>
+         * 创建新实例,假定每个三角形顶点有 numAttributes 个属性。
+         * @param numAttributes must be >= 3 必须 >= 3
          */
         public SplitTriangle(int numAttributes){
             front = new float[numAttributes * 3 * 2];

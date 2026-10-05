@@ -6,6 +6,8 @@ import arc.util.ArcRuntimeException;
 
 /**
  * Implementation of the Bezier curve.
+ * <p>
+ * 贝塞尔曲线的实现。
  * @author Xoppa
  */
 public class Bezier<T extends Vector<T>> implements Path<T>{
@@ -30,79 +32,95 @@ public class Bezier<T extends Vector<T>> implements Path<T>{
 
     /**
      * Simple Linear interpolation
-     * @param out The {@link Vector} to set to the result.
-     * @param t The location (ranging 0..1) on the line.
-     * @param p0 The start point.
-     * @param p1 The end point.
-     * @param tmp A temporary vector to be used by the calculation.
-     * @return The value specified by out for chaining
+     * <p>
+     * 简单线性插值
+     * @param out The {@link Vector} to set to the result. 用于保存结果的 {@link Vector}。
+     * @param t The location (ranging 0..1) on the line. 直线上的位置(范围 0..1)。
+     * @param p0 The start point. 起点。
+     * @param p1 The end point. 终点。
+     * @param tmp A temporary vector to be used by the calculation. 计算过程中使用的临时向量。
+     * @return The value specified by out for chaining 用于链式调用的 out 指定的值
      */
     public static <T extends Vector<T>> T linear(final T out, final float t, final T p0, final T p1, final T tmp){
         // B1(t) = p0 + (p1-p0)*t
+        // 一阶贝塞尔曲线公式
         return out.set(p0).scl(1f - t).add(tmp.set(p1).scl(t)); // Could just use lerp...
+        // 其实直接用 lerp 就行……
     }
 
     /**
      * Simple Linear interpolation derivative
-     * @param out The {@link Vector} to set to the result.
-     * @param t The location (ranging 0..1) on the line.
-     * @param p0 The start point.
-     * @param p1 The end point.
-     * @param tmp A temporary vector to be used by the calculation.
-     * @return The value specified by out for chaining
+     * <p>
+     * 简单线性插值导数
+     * @param out The {@link Vector} to set to the result. 用于保存结果的 {@link Vector}。
+     * @param t The location (ranging 0..1) on the line. 直线上的位置(范围 0..1)。
+     * @param p0 The start point. 起点。
+     * @param p1 The end point. 终点。
+     * @param tmp A temporary vector to be used by the calculation. 计算过程中使用的临时向量。
+     * @return The value specified by out for chaining 用于链式调用的 out 指定的值
      */
     public static <T extends Vector<T>> T linearDerivative(final T out, final float t, final T p0, final T p1, final T tmp){
         // B1'(t) = p1-p0
+        // 一阶贝塞尔曲线的导数公式
         return out.set(p1).sub(p0);
     }
 
     /**
      * Quadratic Bezier curve
-     * @param out The {@link Vector} to set to the result.
-     * @param t The location (ranging 0..1) on the curve.
-     * @param p0 The first bezier point.
-     * @param p1 The second bezier point.
-     * @param p2 The third bezier point.
-     * @param tmp A temporary vector to be used by the calculation.
-     * @return The value specified by out for chaining
+     * <p>
+     * 二次贝塞尔曲线
+     * @param out The {@link Vector} to set to the result. 用于保存结果的 {@link Vector}。
+     * @param t The location (ranging 0..1) on the curve. 曲线上的位置(范围 0..1)。
+     * @param p0 The first bezier point. 第一个贝塞尔点。
+     * @param p1 The second bezier point. 第二个贝塞尔点。
+     * @param p2 The third bezier point. 第三个贝塞尔点。
+     * @param tmp A temporary vector to be used by the calculation. 计算过程中使用的临时向量。
+     * @return The value specified by out for chaining 用于链式调用的 out 指定的值
      */
     public static <T extends Vector<T>> T quadratic(final T out, final float t, final T p0, final T p1, final T p2, final T tmp){
         // B2(t) = (1 - t) * (1 - t) * p0 + 2 * (1-t) * t * p1 + t*t*p2
+        // 二阶贝塞尔曲线公式
         final float dt = 1f - t;
         return out.set(p0).scl(dt * dt).add(tmp.set(p1).scl(2 * dt * t)).add(tmp.set(p2).scl(t * t));
     }
 
     /**
      * Quadratic Bezier curve derivative
-     * @param out The {@link Vector} to set to the result.
-     * @param t The location (ranging 0..1) on the curve.
-     * @param p0 The first bezier point.
-     * @param p1 The second bezier point.
-     * @param p2 The third bezier point.
-     * @param tmp A temporary vector to be used by the calculation.
-     * @return The value specified by out for chaining
+     * <p>
+     * 二次贝塞尔曲线导数
+     * @param out The {@link Vector} to set to the result. 用于保存结果的 {@link Vector}。
+     * @param t The location (ranging 0..1) on the curve. 曲线上的位置(范围 0..1)。
+     * @param p0 The first bezier point. 第一个贝塞尔点。
+     * @param p1 The second bezier point. 第二个贝塞尔点。
+     * @param p2 The third bezier point. 第三个贝塞尔点。
+     * @param tmp A temporary vector to be used by the calculation. 计算过程中使用的临时向量。
+     * @return The value specified by out for chaining 用于链式调用的 out 指定的值
      */
     public static <T extends Vector<T>> T quadraticDerivative(final T out, final float t, final T p0, final T p1, final T p2,
                                                               final T tmp){
         // B2'(t) = 2 * (1 - t) * (p1 - p0) + 2 * t * (p2 - p1)
+        // 二阶贝塞尔曲线的导数公式
         final float dt = 1f - t;
         return out.set(p1).sub(p0).scl(2).scl(1 - t).add(tmp.set(p2).sub(p1).scl(t).scl(2));
     }
 
     /**
      * Cubic Bezier curve
-     * @param out The {@link Vector} to set to the result.
-     * @param t The location (ranging 0..1) on the curve.
-     * @param p0 The first bezier point.
-     * @param p1 The second bezier point.
-     * @param p2 The third bezier point.
-     * @param p3 The fourth bezier point.
-     * @param tmp A temporary vector to be used by the calculation.
-     * @return The value specified by out for chaining
+     * <p>
+     * 三次贝塞尔曲线
+     * @param out The {@link Vector} to set to the result. 用于保存结果的 {@link Vector}。
+     * @param t The location (ranging 0..1) on the curve. 曲线上的位置(范围 0..1)。
+     * @param p0 The first bezier point. 第一个贝塞尔点。
+     * @param p1 The second bezier point. 第二个贝塞尔点。
+     * @param p2 The third bezier point. 第三个贝塞尔点。
+     * @param p3 The fourth bezier point. 第四个贝塞尔点。
+     * @param tmp A temporary vector to be used by the calculation. 计算过程中使用的临时向量。
+     * @return The value specified by out for chaining 用于链式调用的 out 指定的值
      */
     public static <T extends Vector<T>> T cubic(final T out, final float t, final T p0, final T p1, final T p2, final T p3,
                                                 final T tmp){
         // B3(t) = (1-t) * (1-t) * (1-t) * p0 + 3 * (1-t) * (1-t) * t * p1 + 3 * (1-t) * t * t * p2 + t * t * t * p3
+        // 三阶贝塞尔曲线公式
         final float dt = 1f - t;
         final float dt2 = dt * dt;
         final float t2 = t * t;
@@ -112,18 +130,21 @@ public class Bezier<T extends Vector<T>> implements Path<T>{
 
     /**
      * Cubic Bezier curve derivative
-     * @param out The {@link Vector} to set to the result.
-     * @param t The location (ranging 0..1) on the curve.
-     * @param p0 The first bezier point.
-     * @param p1 The second bezier point.
-     * @param p2 The third bezier point.
-     * @param p3 The fourth bezier point.
-     * @param tmp A temporary vector to be used by the calculation.
-     * @return The value specified by out for chaining
+     * <p>
+     * 三次贝塞尔曲线导数
+     * @param out The {@link Vector} to set to the result. 用于保存结果的 {@link Vector}。
+     * @param t The location (ranging 0..1) on the curve. 曲线上的位置(范围 0..1)。
+     * @param p0 The first bezier point. 第一个贝塞尔点。
+     * @param p1 The second bezier point. 第二个贝塞尔点。
+     * @param p2 The third bezier point. 第三个贝塞尔点。
+     * @param p3 The fourth bezier point. 第四个贝塞尔点。
+     * @param tmp A temporary vector to be used by the calculation. 计算过程中使用的临时向量。
+     * @return The value specified by out for chaining 用于链式调用的 out 指定的值
      */
     public static <T extends Vector<T>> T cubicDerivative(final T out, final float t, final T p0, final T p1, final T p2,
                                                           final T p3, final T tmp){
         // B3'(t) = 3 * (1-t) * (1-t) * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * t * t * (p3 - p2)
+        // 三阶贝塞尔曲线的导数公式
         final float dt = 1f - t;
         final float dt2 = dt * dt;
         final float t2 = t * t;
@@ -194,6 +215,7 @@ public class Bezier<T extends Vector<T>> implements Path<T>{
     @Override
     public float approximate(final T v){
         // TODO: make a real approximate method
+        // TODO:做一个真正的近似方法
         T p1 = points.get(0);
         T p2 = points.get(points.size - 1);
         float l1Sqr = p1.dst2(p2);
@@ -207,6 +229,7 @@ public class Bezier<T extends Vector<T>> implements Path<T>{
     @Override
     public float locate(T v){
         // TODO implement a precise method
+        // TODO 实现精确方法
         return approximate(v);
     }
 

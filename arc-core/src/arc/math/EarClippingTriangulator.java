@@ -15,6 +15,8 @@ import arc.struct.ShortAr;
  * </ul>
  * If the input polygon is not simple (self-intersects), there will be output but it is of unspecified quality (garbage in,
  * garbage out).
+ * <p>
+ * 一种简单的切耳(ear cutting)算法实现,用于对无孔的简单多边形进行三角剖分。更多信息: <ul> <li><a href="http://cgm.cs.mcgill.ca/~godfried/teaching/cg-projects/97/Ian/algorithm2.html">http://cgm.cs.mcgill.ca/~godfried/ teaching/cg-projects/97/Ian/algorithm2.html</a></li> <li><a href="http://www.geometrictools.com/Documentation/TriangulationByEarClipping.pdf">http://www.geometrictools.com/Documentation /TriangulationByEarClipping.pdf</a></li> </ul> 如果输入多边形不是简单多边形(自相交),仍会有输出,但质量不做保证(垃圾进,垃圾出)。
  * @author badlogicgames@gmail.com
  * @author Nicolas Gramlich (optimizations, collinear edge support)
  * @author Eric Spitz
@@ -68,8 +70,10 @@ public class EarClippingTriangulator{
 
     /**
      * Triangulates the given (convex or concave) simple polygon to a list of triangle vertices.
-     * @param vertices pairs describing vertices of the polygon, in either clockwise or counterclockwise order.
-     * @return triples of triangle indices in clockwise order. Note the returned array is reused for later calls to the same
+     * <p>
+     * 将给定的(凸或凹)简单多边形三角剖分为三角形顶点列表。
+     * @param vertices pairs describing vertices of the polygon, in either clockwise or counterclockwise order. 以点对描述的多边形顶点,可为顺时针或逆时针顺序。
+     * @return triples of triangle indices in clockwise order. Note the returned array is reused for later calls to the same 以顺时针顺序返回三角形索引三元组。注意返回的数组在对同一对象的后续调用中会被复用
      * method.
      */
     public ShortAr computeTriangles(float[] vertices, int offset, int count){
@@ -88,6 +92,7 @@ public class EarClippingTriangulator{
         }else{
             for(int i = 0, n = vertexCount - 1; i < vertexCount; i++)
                 indices[i] = (short)(vertexOffset + n - i); // Reversed.
+                // 反转。
         }
 
         IntAr vertexTypes = this.vertexTypes;
@@ -97,6 +102,7 @@ public class EarClippingTriangulator{
             vertexTypes.add(classifyVertex(i));
 
         // A polygon with n vertices has a triangulation of n-2 triangles.
+        // 具有 n 个顶点的多边形可三角剖分为 n-2 个三角形。
         ShortAr triangles = this.triangles;
         triangles.clear();
         triangles.ensureCapacity(Math.max(0, vertexCount - 2) * 3);
@@ -112,6 +118,7 @@ public class EarClippingTriangulator{
             cutEarTip(earTipIndex);
 
             // The type of the two vertices adjacent to the clipped vertex may have changed.
+            // 与被裁剪顶点相邻的两个顶点的类型可能已发生变化。
             int previousIndex = previousIndex(earTipIndex);
             int nextIndex = earTipIndex == vertexCount ? 0 : earTipIndex;
             vertexTypes[previousIndex] = classifyVertex(previousIndex);
@@ -127,7 +134,10 @@ public class EarClippingTriangulator{
         }
     }
 
-    /** @return {@link #CONCAVE} or {@link #CONVEX} */
+    /**
+     * @return {@link #CONCAVE} or {@link #CONVEX}
+     * {@link #CONCAVE} 或 {@link #CONVEX}
+     */
     private int classifyVertex(int index){
         short[] indices = this.indices;
         int previous = indices[previousIndex(index)] * 2;
@@ -144,16 +154,21 @@ public class EarClippingTriangulator{
             if(isEarTip(i)) return i;
 
         // Desperate mode: if no vertex is an ear tip, we are dealing with a degenerate polygon (e.g. nearly collinear).
+        // 绝望模式:如果没有顶点是耳尖,说明这是一个退化多边形(例如近似共线)。
         // Note that the input was not necessarily degenerate, but we could have made it so by clipping some valid ears.
+        // 注意输入不一定原本就是退化的,也可能是我们裁掉一些有效耳后造成的。
 
         // Idea taken from Martin Held, "FIST: Fast industrial-strength triangulation of polygons", Algorithmica (1998),
+        // 思路来自 Martin Held 的 “FIST: Fast industrial-strength triangulation of polygons”,Algorithmica (1998),
         // http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.115.291
 
         // Return a convex or tangential vertex if one exists.
+        // 若存在,返回一个凸顶点或切向顶点。
         int[] vertexTypes = this.vertexTypes.items;
         for(int i = 0; i < vertexCount; i++)
             if(vertexTypes[i] != CONCAVE) return i;
         return 0; // If all vertices are concave, just return the first one.
+        // 如果所有顶点都是凹的,直接返回第一个。
     }
 
     private boolean isEarTip(int earTipIndex){
@@ -172,17 +187,24 @@ public class EarClippingTriangulator{
         float p3x = vertices[p3], p3y = vertices[p3 + 1];
 
         // Check if any point is inside the triangle formed by previous, current and next vertices.
+        // 检查是否有任何点位于由前一个、当前和下一个顶点构成的三角形内。
         // Only consider vertices that are not part of this triangle, or else we'll always find one inside.
+        // 只考虑不属于该三角形的顶点,否则总会在内部找到一个点。
         for(int i = nextIndex(nextIndex); i != previousIndex; i = nextIndex(i)){
             // Concave vertices can obviously be inside the candidate ear, but so can tangential vertices
+            // 凹顶点显然可能在候选耳内,但切向顶点也可能在候选耳内
             // if they coincide with one of the triangle's vertices.
+            // 如果它们与三角形的某个顶点重合。
             if(vertexTypes[i] != CONVEX){
                 int v = indices[i] * 2;
                 float vx = vertices[v];
                 float vy = vertices[v + 1];
                 // Because the polygon has clockwise winding order, the area sign will be positive if the point is strictly inside.
+                // 由于多边形为顺时针环绕顺序,当点严格位于内部时面积符号为正。
                 // It will be 0 on the edge, which we want to include as well.
+                // 在边上时结果为 0,我们也希望把边包括在内。
                 // note: check the edge defined by p1->p3 first since this fails _far_ more then the other 2 checks.
+                // 注意:先检查 p1->p3 定义的边,因为它失败的概率远高于另外两个检查。
                 if(computeSpannedAreaSign(p3x, p3y, p1x, p1y, vx, vy) >= 0){
                     if(computeSpannedAreaSign(p1x, p1y, p2x, p2y, vx, vy) >= 0){
                         if(computeSpannedAreaSign(p2x, p2y, p3x, p3y, vx, vy) >= 0) return false;

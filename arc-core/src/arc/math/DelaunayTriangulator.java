@@ -10,6 +10,8 @@ import arc.math.geom.Vec2;
 
 /**
  * Delaunay triangulation. Adapted from Paul Bourke's triangulate: http://paulbourke.net/papers/triangulate/
+ * <p>
+ * Delaunay 三角剖分。改编自 Paul Bourke 的 triangulate:http://paulbourke.net/papers/triangulate/
  * @author Nathan Sweet
  */
 public class DelaunayTriangulator{
@@ -39,11 +41,13 @@ public class DelaunayTriangulator{
 
     /**
      * Triangulates the given point cloud to a list of triangle indices that make up the Delaunay triangulation.
-     * @param points x,y pairs describing points. Duplicate points will result in undefined behavior.
-     * @param sorted If false, the points will be sorted by the x coordinate, which is required by the triangulation algorithm. If
+     * <p>
+     * 将给定点云三角剖分为构成 Delaunay 三角剖分的三角形索引列表。
+     * @param points x,y pairs describing points. Duplicate points will result in undefined behavior. 以 x,y 对描述的点。重复的点会导致未定义行为。
+     * @param sorted If false, the points will be sorted by the x coordinate, which is required by the triangulation algorithm. If 若为 false,点将按 x 坐标排序,这是三角剖分算法所要求的。若
      * sorting is done the input array is not modified, the returned indices are for the input array, and count*2
      * additional working memory is needed.
-     * @return triples of indices into the points that describe the triangles in clockwise order. Note the returned array is reused
+     * @return triples of indices into the points that describe the triangles in clockwise order. Note the returned array is reused 以顺时针顺序描述各三角形的点的索引三元组。注意返回的数组会被复用
      * for later calls to the same method.
      */
     public ShortAr computeTriangles(float[] points, int offset, int count, boolean sorted){
@@ -63,6 +67,7 @@ public class DelaunayTriangulator{
         int end = offset + count;
 
         // Determine bounds for super triangle.
+        // 确定超级三角形的边界。
         float xmin = points[0], ymin = points[1];
         float xmax = xmin, ymax = ymin;
         for(int i = offset + 2; i < end; i++){
@@ -79,6 +84,7 @@ public class DelaunayTriangulator{
         float xmid = (xmax + xmin) / 2f, ymid = (ymax + ymin) / 2f;
 
         // Setup the super triangle, which contains all points.
+        // 设置包含所有点的超级三角形。
         float[] superTriangle = this.superTriangle;
         superTriangle[0] = xmid - dmax;
         superTriangle[1] = ymid - dmax;
@@ -95,16 +101,19 @@ public class DelaunayTriangulator{
         complete.ensureCapacity(count);
 
         // Add super triangle.
+        // 添加超级三角形。
         triangles.add(end);
         triangles.add(end + 2);
         triangles.add(end + 4);
         complete.add(false);
 
         // Include each point one at a time into the existing mesh.
+        // 逐点将每个点加入已有的网格。
         for(int pointIndex = offset; pointIndex < end; pointIndex += 2){
             float x = points[pointIndex], y = points[pointIndex + 1];
 
             // If x,y lies inside the circumcircle of a triangle, the edges are stored and the triangle removed.
+            // 如果 x,y 位于某个三角形的外接圆内,则保存其边并移除该三角形。
             short[] trianglesArray = triangles.items;
             boolean[] completeArray = complete.items;
             for(int triangleIndex = triangles.size - 1; triangleIndex >= 0; triangleIndex -= 3){
@@ -161,6 +170,7 @@ public class DelaunayTriangulator{
             int[] edgesArray = edges.items;
             for(int i = 0, n = edges.size; i < n; i += 2){
                 // Skip multiple edges. If all triangles are anticlockwise then all interior edges are opposite pointing in direction.
+                // 跳过多条边。若所有三角形都是逆时针的,则所有内部边的方向都相反。
                 int p1 = edgesArray[i];
                 if(p1 == -1) continue;
                 int p2 = edgesArray[i + 1];
@@ -174,6 +184,7 @@ public class DelaunayTriangulator{
                 if(skip) continue;
 
                 // Form new triangles for the current point. Edges are arranged in clockwise order.
+                // 为当前点构造新三角形。边按顺时针方向排列。
                 triangles.add(p1);
                 triangles.add(edgesArray[i + 1]);
                 triangles.add(pointIndex);
@@ -183,6 +194,7 @@ public class DelaunayTriangulator{
         }
 
         // Remove triangles with super triangle vertices.
+        // 移除带有超级三角形顶点的三角形。
         short[] trianglesArray = triangles.items;
         for(int i = triangles.size - 1; i >= 0; i -= 3){
             if(trianglesArray[i] >= end || trianglesArray[i - 1] >= end || trianglesArray[i - 2] >= end){
@@ -193,6 +205,7 @@ public class DelaunayTriangulator{
         }
 
         // Convert sorted to unsorted indices.
+        // 将排序索引转换为未排序索引。
         if(!sorted){
             short[] originalIndicesArray = originalIndices.items;
             for(int i = 0, n = triangles.size; i < n; i++)
@@ -200,6 +213,7 @@ public class DelaunayTriangulator{
         }
 
         // Adjust triangles to start from zero and count by 1, not by vertex x,y coordinate pairs.
+        // 调整三角形索引,使其从 0 开始按 1 递增计数,而不是按顶点 x,y 坐标对计数。
         if(offset == 0){
             for(int i = 0, n = triangles.size; i < n; i++)
                 trianglesArray[i] = (short)(trianglesArray[i] / 2);
@@ -215,6 +229,8 @@ public class DelaunayTriangulator{
      * Returns INSIDE if point xp,yp is inside the circumcircle made up of the points x1,y1, x2,y2, x3,y3. Returns COMPLETE if xp
      * is to the right of the entire circumcircle. Otherwise returns INCOMPLETE. Note: a point on the circumcircle edge is
      * considered inside.
+     * <p>
+     * 若点 xp,yp 位于由 x1,y1、x2,y2、x3,y3 构成的外接圆内则返回 INSIDE。若 xp 在整个外接圆的右侧则返回 COMPLETE。否则返回 INCOMPLETE。注意:外接圆边上的点视为在圆内。
      */
     private int circumCircle(float xp, float yp, float x1, float y1, float x2, float y2, float x3, float y3){
         float xc, yc;
@@ -256,7 +272,9 @@ public class DelaunayTriangulator{
 
     /**
      * Sorts x,y pairs of values by the x value.
-     * @param count Number of indices, must be even.
+     * <p>
+     * 按 x 值对 x,y 点对排序。
+     * @param count Number of indices, must be even. 索引数量,必须为偶数。
      */
     private void sort(float[] values, int count){
         int pointCount = count / 2;
@@ -330,6 +348,8 @@ public class DelaunayTriangulator{
     /**
      * Removes all triangles with a centroid outside the specified hull, which may be concave. Note some triangulations may have
      * triangles whose centroid is inside the hull but a portion is outside.
+     * <p>
+     * 移除所有质心位于指定凸包(可能为凹)之外的三角形。注意某些三角剖分中可能存在质心在凸包内但部分区域在外的三角形。
      */
     public void trim(ShortAr triangles, float[] points, float[] hull, int offset, int count){
         short[] trianglesArray = triangles.items;

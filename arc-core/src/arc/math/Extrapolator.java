@@ -20,7 +20,9 @@ public class Extrapolator{
 
     public boolean addSample(double packetTime, double curTime, float[] pos){
         // The best guess I can make for velocity is the difference between
+        // 对速度的最佳猜测是以下两者之差
         // this sample and the last registered sample.
+        // 此样本与上一个登记的样本。
         float[] vel = tmpArr2;
         if(Math.abs(packetTime - lastPacketTime) > 1e-4){
             double dt = 1.0 / (packetTime - lastPacketTime);
@@ -50,11 +52,17 @@ public class Extrapolator{
         }
 
         // I now have two positions and two times:
+        // 我现在有两个位置和两个时间:
         //   1. aimPos / aimTime
+        // 1. aimPos / aimTime(瞄准位置与瞄准时间)
         //   2. snapPos / snapTime
+        // 2. snapPos / snapTime(快照位置与快照时间)
         // I must generate the interpolation velocity based on these two samples.
+        // 我必须根据这两个样本生成插值速度。
         // However, if aimTime is the same as snapTime, I'm in trouble.
+        // 然而,如果 aimTime 与 snapTime 相同,那我就麻烦了。
         // In that case, use the supplied velocity.
+        // 这种情况下,使用提供的速度。
         if(Math.abs(aimTime - snapTime) < 1e-4){
             copyArray(snapVel, vel);
         }else{
@@ -69,6 +77,7 @@ public class Extrapolator{
 
     /**
      * Version for extrapolator of {@code size = 1}.
+     * {@code size = 1} 的外推器版本。
      */
     public boolean addSample(double packetTime, double curTime, float pos){
         checkArraySizeOne();
@@ -79,6 +88,7 @@ public class Extrapolator{
 
     /**
      * Version for extrapolator of {@code size = 1}.
+     * {@code size = 1} 的外推器版本。
      */
     public boolean addSample(double packetTime, double curTime, float pos, float vel){
         checkArraySizeOne();
@@ -109,6 +119,7 @@ public class Extrapolator{
 
     /**
      * Version for extrapolator of {@code size = 1}.
+     * {@code size = 1} 的外推器版本。
      */
     public void reset(double packetTime, double curTime, float pos){
         checkArraySizeOne();
@@ -118,6 +129,7 @@ public class Extrapolator{
 
     /**
      * Version for extrapolator of {@code size = 1}.
+     * {@code size = 1} 的外推器版本。
      */
     public void reset(double packetTime, double curTime, float pos, float vel){
         checkArraySizeOne();
@@ -141,12 +153,14 @@ public class Extrapolator{
         boolean isOk = true;
 
         // asking for something before allowable time?
+        // 请求的时间早于允许的时间?
         if(forTime < snapTime){
             forTime = snapTime;
             isOk = false;
         }
 
         // asking for something very far in the future?
+        // 请求的是非常遥远的未来?
         double maxRange = aimTime + updateTime;
         if(forTime > maxRange){
             forTime = maxRange;
@@ -154,6 +168,7 @@ public class Extrapolator{
         }
 
         // calculate the interpolated position
+        // 计算插值后的位置
         for(int i = 0; i < size; ++i){
             if(outVel != null){
                 outVel[i] = snapVel[i];
@@ -171,6 +186,7 @@ public class Extrapolator{
 
     /**
      * Version for extrapolator of {@code size = 1}.
+     * {@code size = 1} 的外推器版本。
      */
     public float readPosition(double forTime){
         checkArraySizeOne();
@@ -196,9 +212,13 @@ public class Extrapolator{
         }
 
         // The theory is that, if latency increases, quickly
+        // 理论依据是:如果延迟增大,就迅速
         // compensate for it, but if latency decreases, be a
+        // 对其进行补偿,但如果延迟减小,则要更
         // little more resilient; this is intended to compensate
+        // 韧性更强一点;此设计旨在补偿
         // for jittery delivery.
+        // 以应对颠簸的传输。
         double lat = cur - packet;
         if(lat < 0){
             lat = 0;
@@ -210,8 +230,11 @@ public class Extrapolator{
         }
 
         // Do the same running average for update time.
+        // 对更新时间做同样的滑动平均。
         // Again, the theory is that a lossy connection wants
+        // 同样,其理论依据是:有损连接希望
         // an average of a higher update time.
+        // 更新时间的平均值偏大。
         double tick = packet - lastPacketTime;
         if(tick > updateTime){
             updateTime = (updateTime + tick) * 0.5;

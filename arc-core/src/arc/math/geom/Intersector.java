@@ -5,6 +5,8 @@ import arc.struct.*;
 
 /**
  * Class offering various static methods for intersection testing between different geometric objects.
+ * <p>
+ * 提供多种几何对象相交测试静态方法的类。
  * @author badlogicgames@gmail.com
  * @author jan.stria
  * @author Nathan Sweet
@@ -28,6 +30,7 @@ public final class Intersector{
 
     public static boolean intersectPolygons(float[] p1, float[] p2){
         // reusable points to trace edges around polygon
+        // 用于沿多边形描边的可复用点
         floatArray2.clear();
         floatArray.clear();
         floatArray2.addAll(p1);
@@ -37,6 +40,7 @@ public final class Intersector{
         for(int i = 0; i < p2.length; i += 2){
             ep1.set(p2[i], p2[i + 1]);
             // wrap around to beginning of array if index points to end;
+            // 若索引指向数组末尾,则回绕到开头;
             if(i < p2.length - 2){
                 ep2.set(p2[i + 2], p2[i + 3]);
             }else{
@@ -49,6 +53,7 @@ public final class Intersector{
             for(int j = 0; j < floatArray2.size; j += 2){
                 e.set(floatArray2.get(j), floatArray2.get(j + 1));
                 // determine if point is inside clip edge
+                // 判断点是否在裁剪边内
                 if(Intersector.pointLineSide(ep2, ep1, e) > 0){
                     if(!(Intersector.pointLineSide(ep2, ep1, s) > 0)){
                         Intersector.intersectLines(s, e, ep1, ep2, ip);
@@ -78,11 +83,13 @@ public final class Intersector{
     /**
      * Returns whether the given point is inside the triangle. This assumes that the point is on the plane of the triangle. No
      * check is performed that this is the case.
-     * @param point the point
-     * @param t1 the first vertex of the triangle
-     * @param t2 the second vertex of the triangle
-     * @param t3 the third vertex of the triangle
-     * @return whether the point is in the triangle
+     * <p>
+     * 返回给定点是否在三角形内。此方法假定该点位于三角形所在平面上。不检查该前提是否成立。
+     * @param point the point 点
+     * @param t1 the first vertex of the triangle 三角形的第一个顶点
+     * @param t2 the second vertex of the triangle 三角形的第二个顶点
+     * @param t3 the third vertex of the triangle 三角形的第三个顶点
+     * @return whether the point is in the triangle 点是否在三角形内
      */
     public static boolean isInTriangle(Vec3 point, Vec3 t1, Vec3 t2, Vec3 t3){
         v0.set(t1).sub(point);
@@ -99,7 +106,10 @@ public final class Intersector{
         return !(ab * bc - ac * bb < 0);
     }
 
-    /** @return whether x,y is inside the hexagon with radius d centered at cx, cy. */
+    /**
+     * @return whether x,y is inside the hexagon with radius d centered at cx, cy.
+     * x,y 是否在以 cx, cy 为圆心、半径 d 的六边形内。
+     */
     public static boolean isInsideHexagon(float cx, float cy, float d, float x, float y){
         float dx = Math.abs(x - cx) / d;
         float dy = Math.abs(y - cy) / d;
@@ -107,7 +117,10 @@ public final class Intersector{
         return (dy <= a) && (a * dx + 0.25 * dy <= 0.5 * a);
     }
 
-    /** @return whether the specified x,y is inside a regular polygon. */
+    /**
+     * @return whether the specified x,y is inside a regular polygon.
+     * 指定的 x,y 是否在正多边形内。
+     */
     public static boolean isInRegularPolygon(int sides, float cx, float cy, float radius, float rotation, float x, float y){
         floatArray.clear();
         for(int i = 0; i < sides; i++){
@@ -118,7 +131,10 @@ public final class Intersector{
         return isInPolygon(floatArray.items, 0, floatArray.size, x, y);
     }
 
-    /** Returns true if the given point is inside the triangle. */
+    /**
+     * Returns true if the given point is inside the triangle.
+     * 若给定点在三角形内则返回 true。
+     */
     public static boolean isInTriangle(Vec2 p, Vec2 a, Vec2 b, Vec2 c){
         float px1 = p.x - a.x;
         float py1 = p.y - a.y;
@@ -127,7 +143,10 @@ public final class Intersector{
         return (c.x - b.x) * (p.y - b.y) - (c.y - b.y) * (p.x - b.x) > 0 == side12;
     }
 
-    /** Returns true if the given point is inside the triangle. */
+    /**
+     * Returns true if the given point is inside the triangle.
+     * 若给定点在三角形内则返回 true。
+     */
     public static boolean isInTriangle(float px, float py, float ax, float ay, float bx, float by, float cx, float cy){
         float px1 = px - ax;
         float py1 = py - ay;
@@ -140,6 +159,8 @@ public final class Intersector{
      * Determines on which side of the given line the point is. Returns -1 if the point is on the left side of the line, 0 if the
      * point is on the line and 1 if the point is on the right side of the line. Left and right are relative to the lines direction
      * which is linePoint1 to linePoint2.
+     * <p>
+     * 判断点在给定直线的哪一侧。若点在直线左侧返回 -1,在直线上返回 0,在右侧返回 1。左右相对于直线方向(linePoint1 到 linePoint2)而言。
      */
     public static int pointLineSide(Vec2 linePoint1, Vec2 linePoint2, Vec2 point){
         return (int)Math.signum(
@@ -153,9 +174,11 @@ public final class Intersector{
 
     /**
      * Checks whether the given point is in the polygon.
-     * @param polygon The polygon vertices passed as an array
-     * @param point The point
-     * @return true if the point is in the polygon
+     * <p>
+     * 检查给定点是否在多边形内。
+     * @param polygon The polygon vertices passed as an array 以数组形式传入的多边形顶点
+     * @param point The point 点
+     * @return true if the point is in the polygon 若点在多边形内则为 true
      */
     public static boolean isInPolygon(Ar<Vec2> polygon, Vec2 point){
         Vec2 lastVertice = polygon.peek();
@@ -174,8 +197,10 @@ public final class Intersector{
 
     /**
      * Returns true if the specified point is in the polygon.
-     * @param offset Starting polygon index.
-     * @param count Number of array indices to use after offset.
+     * <p>
+     * 若指定点在多边形内则返回 true。
+     * @param offset Starting polygon index. 多边形起始索引。
+     * @param count Number of array indices to use after offset. 偏移量之后使用的数组索引数量。
      */
     public static boolean isInPolygon(float[] polygon, int offset, int count, float x, float y){
         boolean oddNodes = false;
@@ -195,22 +220,26 @@ public final class Intersector{
     /**
      * Intersects two convex polygons with clockwise vertices and sets the overlap polygon resulting from the intersection.
      * Follows the Sutherland-Hodgman algorithm.
-     * @param p1 The polygon that is being clipped
-     * @param p2 The clip polygon
-     * @param overlap The intersection of the two polygons (can be null, if an intersection polygon is not needed)
-     * @return Whether the two polygons intersect.
+     * <p>
+     * 求两个顺时针顶点凸多边形的交集,并将交集多边形设置到 overlap。采用 Sutherland-Hodgman 算法。
+     * @param p1 The polygon that is being clipped 被裁剪的多边形
+     * @param p2 The clip polygon 裁剪多边形
+     * @param overlap The intersection of the two polygons (can be null, if an intersection polygon is not needed) 两个多边形的交集(如果不需要交集多边形,可为 null)
+     * @return Whether the two polygons intersect. 两多边形是否相交。
      */
     public static boolean intersectPolygons(Polygon p1, Polygon p2, Polygon overlap){
         if(p1.getVertices().length == 0 || p2.getVertices().length == 0){
             return false;
         }
         // reusable points to trace edges around polygon
+        // 用于沿多边形描边的可复用点
         floatArray2.clear();
         floatArray.clear();
         floatArray2.addAll(p1.getTransformedVertices());
         for(int i = 0; i < p2.getTransformedVertices().length; i += 2){
             ep1.set(p2.getTransformedVertices()[i], p2.getTransformedVertices()[i + 1]);
             // wrap around to beginning of array if index points to end;
+            // 若索引指向数组末尾,则回绕到开头;
             if(i < p2.getTransformedVertices().length - 2){
                 ep2.set(p2.getTransformedVertices()[i + 2], p2.getTransformedVertices()[i + 3]);
             }else{
@@ -223,6 +252,7 @@ public final class Intersector{
             for(int j = 0; j < floatArray2.size; j += 2){
                 e.set(floatArray2.get(j), floatArray2.get(j + 1));
                 // determine if point is inside clip edge
+                // 判断点是否在裁剪边内
                 if(Intersector.pointLineSide(ep2, ep1, e) > 0){
                     if(!(Intersector.pointLineSide(ep2, ep1, s) > 0)){
                         Intersector.intersectLines(s, e, ep1, ep2, ip);
@@ -258,28 +288,43 @@ public final class Intersector{
         }
     }
 
-    /** Returns the distance between the given line and point. Note the specified line is not a line segment. */
+    /**
+     * Returns the distance between the given line and point. Note the specified line is not a line segment.
+     * 返回给定直线与点之间的距离。注意指定的直线不是线段。
+     */
     public static float distanceLinePoint(Vec2 start, Vec2 end, Vec2 point){
         return distanceLinePoint(start.x, start.y, end.x, end.y, point.x, point.y);
     }
 
-    /** Returns the distance between the given line and point. Note the specified line is not a line segment. */
+    /**
+     * Returns the distance between the given line and point. Note the specified line is not a line segment.
+     * 返回给定直线与点之间的距离。注意指定的直线不是线段。
+     */
     public static float distanceLinePoint(float startX, float startY, float endX, float endY, float pointX, float pointY){
         float normalLength = (float)Math.sqrt((endX - startX) * (endX - startX) + (endY - startY) * (endY - startY));
         return Math.abs((pointX - startX) * (endY - startY) - (pointY - startY) * (endX - startX)) / normalLength;
     }
 
-    /** Returns the distance between the given segment and point. */
+    /**
+     * Returns the distance between the given segment and point.
+     * 返回给定线段与点之间的距离。
+     */
     public static float distanceSegmentPoint(float startX, float startY, float endX, float endY, float pointX, float pointY){
         return nearestSegmentPoint(startX, startY, endX, endY, pointX, pointY, v2tmp).dst(pointX, pointY);
     }
 
-    /** Returns the distance between the given segment and point. */
+    /**
+     * Returns the distance between the given segment and point.
+     * 返回给定线段与点之间的距离。
+     */
     public static float distanceSegmentPoint(Vec2 start, Vec2 end, Vec2 point){
         return nearestSegmentPoint(start, end, point, v2tmp).dst(point);
     }
 
-    /** Returns a point on the segment nearest to the specified point. */
+    /**
+     * Returns a point on the segment nearest to the specified point.
+     * 返回线段上距指定点最近的点。
+     */
     public static Vec2 nearestSegmentPoint(Vec2 start, Vec2 end, Vec2 point, Vec2 nearest){
         float length2 = start.dst2(end);
         if(length2 == 0) return nearest.set(start);
@@ -289,7 +334,10 @@ public final class Intersector{
         return nearest.set(start.x + t * (end.x - start.x), start.y + t * (end.y - start.y));
     }
 
-    /** Returns a point on the segment nearest to the specified point. */
+    /**
+     * Returns a point on the segment nearest to the specified point.
+     * 返回线段上距指定点最近的点。
+     */
     public static Vec2 nearestSegmentPoint(float startX, float startY, float endX, float endY, float pointX, float pointY,
                                            Vec2 nearest){
         final float xDiff = endX - startX;
@@ -304,11 +352,13 @@ public final class Intersector{
 
     /**
      * Returns whether the given line segment intersects the given circle.
-     * @param start The start point of the line segment
-     * @param end The end point of the line segment
-     * @param center The center of the circle
-     * @param squareRadius The squared radius of the circle
-     * @return Whether the line segment and the circle intersect
+     * <p>
+     * 返回给定线段是否与给定圆相交。
+     * @param start The start point of the line segment 线段的起始点
+     * @param end The end point of the line segment 线段的端点
+     * @param center The center of the circle 圆心
+     * @param squareRadius The squared radius of the circle 圆的半径的平方
+     * @return Whether the line segment and the circle intersect 线段与圆是否相交
      */
     public static boolean intersectSegmentCircle(Vec2 start, Vec2 end, Vec2 center, float squareRadius){
         tmp.set(end.x - start.x, end.y - start.y, 0);
@@ -321,6 +371,7 @@ public final class Intersector{
             tmp2.set(end.x, end.y, 0);
         }else{
             tmp3.set(tmp.scl(u)); // remember tmp is already normalized
+            // 注意 tmp 已归一化
             tmp2.set(tmp3.x + start.x, tmp3.y + start.y, 0);
         }
 
@@ -333,12 +384,14 @@ public final class Intersector{
     /**
      * Checks whether the line segment and the circle intersect and returns by how much and in what direction the line has to move
      * away from the circle to not intersect.
-     * @param start The line segment starting point
-     * @param end The line segment end point
-     * @param point The center of the circle
-     * @param radius The radius of the circle
-     * @param displacement The displacement vector set by the method having unit length
-     * @return The displacement or Float.POSITIVE_INFINITY if no intersection is present
+     * <p>
+     * 检查线段与圆是否相交,并返回线段需要沿什么方向、移动多少距离才能不与圆相交。
+     * @param start The line segment starting point 线段起点
+     * @param end The line segment end point 线段终点
+     * @param point The center of the circle 圆心
+     * @param radius The radius of the circle 圆的半径
+     * @param displacement The displacement vector set by the method having unit length 由方法设置的位移向量,为单位长度
+     * @return The displacement or Float.POSITIVE_INFINITY if no intersection is present 位移,无交点时为 Float.POSITIVE_INFINITY
      */
     public static float intersectSegmentCircleDisplace(Vec2 start, Vec2 end, Vec2 point, float radius,
                                                        Vec2 displacement){
@@ -360,11 +413,13 @@ public final class Intersector{
      * Intersect two 2D Rays and return the scalar parameter of the first ray at the intersection point. You can get the
      * intersection point by: Vec2 point(direction1).scl(scalar).add(start1); For more information, check:
      * http://stackoverflow.com/a/565282/1091440
-     * @param start1 Where the first ray start
-     * @param direction1 The direction the first ray is pointing
-     * @param start2 Where the second ray start
-     * @param direction2 The direction the second ray is pointing
-     * @return scalar parameter on the first ray describing the point where the intersection happens. May be negative. In case the
+     * <p>
+     * 求两条 2D 射线的相交并返回第一条射线在交点处的标量参数。交点可通过以下方式获得:Vec2 point(direction1).scl(scalar).add(start1);更多信息参见:http://stackoverflow.com/a/565282/1091440
+     * @param start1 Where the first ray start 第一条射线的起点
+     * @param direction1 The direction the first ray is pointing 第一条射线的指向
+     * @param start2 Where the second ray start 第二条射线的起点
+     * @param direction2 The direction the second ray is pointing 第二条射线的指向
+     * @return scalar parameter on the first ray describing the point where the intersection happens. May be negative. In case the 第一条射线上描述交点位置的标量参数。可能为负。若
      * rays are collinear, Float.POSITIVE_INFINITY will be returned.
      */
     public static float intersectRayRay(Vec2 start1, Vec2 direction1, Vec2 start2, Vec2 direction2){
@@ -373,6 +428,7 @@ public final class Intersector{
         float d1xd2 = direction1.x * direction2.y - direction1.y * direction2.x;
         if(d1xd2 == 0.0f){
             return Float.POSITIVE_INFINITY; // collinear
+            // 共线
         }
         float d2sx = direction2.x / d1xd2;
         float d2sy = direction2.y / d1xd2;
@@ -381,12 +437,14 @@ public final class Intersector{
 
     /**
      * Intersects the two lines and returns the intersection point in intersection.
-     * @param p1 The first point of the first line
-     * @param p2 The second point of the first line
-     * @param p3 The first point of the second line
-     * @param p4 The second point of the second line
-     * @param intersection The intersection point. May be null.
-     * @return Whether the two lines intersect
+     * <p>
+     * 求两直线的交点,交点存入 intersection。
+     * @param p1 The first point of the first line 第一条直线的第一个点
+     * @param p2 The second point of the first line 第一条直线的第二个点
+     * @param p3 The first point of the second line 第二条直线的第一个点
+     * @param p4 The second point of the second line 第二条直线的第二个点
+     * @param intersection The intersection point. May be null. 交点。可为 null。
+     * @return Whether the two lines intersect 两直线是否相交
      */
     public static boolean intersectLines(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, Vec2 intersection){
         float x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y, x3 = p3.x, y3 = p3.y, x4 = p4.x, y4 = p4.y;
@@ -403,8 +461,10 @@ public final class Intersector{
 
     /**
      * Intersects the two lines and returns the intersection point in intersection.
-     * @param intersection The intersection point, or null.
-     * @return Whether the two lines intersect
+     * <p>
+     * 求两直线的交点,交点存入 intersection。
+     * @param intersection The intersection point, or null. 交点,或 null。
+     * @return Whether the two lines intersect 两直线是否相交
      */
     public static boolean intersectLines(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, Vec2 intersection){
         float d = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
@@ -419,10 +479,12 @@ public final class Intersector{
 
     /**
      * Check whether the given line and {@link Polygon} intersect.
-     * @param p1 The first point of the line
-     * @param p2 The second point of the line
-     * @param polygon The polygon
-     * @return Whether polygon and line intersects
+     * <p>
+     * 检查给定直线是否与 {@link Polygon} 相交。
+     * @param p1 The first point of the line 直线的第一个点
+     * @param p2 The second point of the line 直线的第二个点
+     * @param polygon The polygon 多边形
+     * @return Whether polygon and line intersects 多边形与直线是否相交
      */
     public static boolean intersectLinePolygon(Vec2 p1, Vec2 p2, Polygon polygon){
         float[] vertices = polygon.getTransformedVertices();
@@ -449,7 +511,9 @@ public final class Intersector{
     /**
      * Determines whether the given rectangles intersect and, if they do, sets the supplied {@code intersection} rectangle to the
      * area of overlap.
-     * @return Whether the rectangles intersect
+     * <p>
+     * 判断给定矩形是否相交,若相交,则将重叠区域设置到给定的 {@code intersection} 矩形中。
+     * @return Whether the rectangles intersect 两矩形是否相交
      */
     public static boolean intersectRectangles(Rect rect1, Rect rect2, Rect intersection){
         if(rect1.overlaps(rect2)){
@@ -462,7 +526,10 @@ public final class Intersector{
         return false;
     }
 
-    /** Experimental method! May be inaccurate, do not use.*/
+    /**
+     * Experimental method! May be inaccurate, do not use.
+     * 实验性方法!可能不准确,请勿使用。
+     */
     public static boolean intersectSegmentRectangleFast(float startx, float starty, float endx, float endy, float rectX, float rectY, float rectW, float rectH){
         float
         deltax = endx - startx,
@@ -486,11 +553,13 @@ public final class Intersector{
 
     /**
      * Determines whether the given rectangle and segment intersect
-     * @param startX x-coordinate start of line segment
-     * @param startY y-coordinate start of line segment
-     * @param endX y-coordinate end of line segment
-     * @param endY y-coordinate end of line segment
-     * @return whether the rectangle intersects with the line segment
+     * <p>
+     * 判断给定矩形与线段是否相交
+     * @param startX x-coordinate start of line segment 线段起点的 x 坐标
+     * @param startY y-coordinate start of line segment 线段起点的 y 坐标
+     * @param endX y-coordinate end of line segment 线段终点的 y 坐标
+     * @param endY y-coordinate end of line segment 线段终点的 y 坐标
+     * @return whether the rectangle intersects with the line segment 矩形是否与线段相交
      */
     public static boolean intersectSegmentRectangle(float startX, float startY, float endX, float endY, float rectX, float rectY, float rectW, float rectH){
         float rectangleEndX = rectX + rectW;
@@ -506,12 +575,14 @@ public final class Intersector{
 
     /**
      * Determines whether the given rectangle and segment intersect
-     * @param startX x-coordinate start of line segment
-     * @param startY y-coordinate start of line segment
-     * @param endX y-coordinate end of line segment
-     * @param endY y-coordinate end of line segment
-     * @param rect rectangle that is being tested for collision
-     * @return whether the rectangle intersects with the line segment
+     * <p>
+     * 判断给定矩形与线段是否相交
+     * @param startX x-coordinate start of line segment 线段起点的 x 坐标
+     * @param startY y-coordinate start of line segment 线段起点的 y 坐标
+     * @param endX y-coordinate end of line segment 线段终点的 y 坐标
+     * @param endY y-coordinate end of line segment 线段终点的 y 坐标
+     * @param rect rectangle that is being tested for collision 被测试是否碰撞的矩形
+     * @return whether the rectangle intersects with the line segment 矩形是否与线段相交
      */
     public static boolean intersectSegmentRectangle(float startX, float startY, float endX, float endY, Rect rect){
         float rectangleEndX = rect.x + rect.width;
@@ -534,6 +605,7 @@ public final class Intersector{
 
     /**
      * {@link #intersectSegmentRectangle(float, float, float, float, Rect)}
+     * 参见上述方法
      */
     public static boolean intersectSegmentRectangle(Vec2 start, Vec2 end, Rect rect){
         return intersectSegmentRectangle(start.x, start.y, end.x, end.y, rect);
@@ -541,9 +613,11 @@ public final class Intersector{
 
     /**
      * Check whether the given line segment and {@link Polygon} intersect.
-     * @param p1 The first point of the segment
-     * @param p2 The second point of the segment
-     * @return Whether polygon and segment intersect
+     * <p>
+     * 检查给定线段是否与 {@link Polygon} 相交。
+     * @param p1 The first point of the segment 线段的第一个点
+     * @param p2 The second point of the segment 线段的第二个点
+     * @return Whether polygon and segment intersect 多边形与线段是否相交
      */
     public static boolean intersectSegmentPolygon(Vec2 p1, Vec2 p2, Polygon polygon){
         float[] vertices = polygon.getTransformedVertices();
@@ -572,12 +646,14 @@ public final class Intersector{
 
     /**
      * Intersects the two line segments and returns the intersection point in intersection.
-     * @param p1 The first point of the first line segment
-     * @param p2 The second point of the first line segment
-     * @param p3 The first point of the second line segment
-     * @param p4 The second point of the second line segment
-     * @param intersection The intersection point. May be null.
-     * @return Whether the two line segments intersect
+     * <p>
+     * 求两线段的交点,交点存入 intersection。
+     * @param p1 The first point of the first line segment 第一条线段的第一个点
+     * @param p2 The second point of the first line segment 第一条线段的第二个点
+     * @param p3 The first point of the second line segment 第二条线段的第一个点
+     * @param p4 The second point of the second line segment 第二条线段的第二个点
+     * @param intersection The intersection point. May be null. 交点。可为 null。
+     * @return Whether the two line segments intersect 两线段是否相交
      */
     public static boolean intersectSegments(Vec2 p1, Vec2 p2, Vec2 p3, Vec2 p4, Vec2 intersection){
         float x1 = p1.x, y1 = p1.y, x2 = p2.x, y2 = p2.y, x3 = p3.x, y3 = p3.y, x4 = p4.x, y4 = p4.y;
@@ -597,7 +673,10 @@ public final class Intersector{
         return true;
     }
 
-    /** @param intersection May be null. */
+    /**
+     * @param intersection May be null.
+     * 可以为 null。
+     */
     public static boolean intersectSegments(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
                                             Vec2 intersection){
         float d = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
@@ -661,9 +740,11 @@ public final class Intersector{
 
     /**
      * Check whether specified counter-clockwise wound convex polygons overlap.
-     * @param p1 The first polygon.
-     * @param p2 The second polygon.
-     * @return Whether polygons overlap.
+     * <p>
+     * 检查指定的逆时针环绕凸多边形是否重叠。
+     * @param p1 The first polygon. 第一个多边形。
+     * @param p2 The second polygon. 第二个多边形。
+     * @return Whether polygons overlap. 多边形是否重叠。
      */
     public static boolean overlapConvexPolygons(Polygon p1, Polygon p2){
         return overlapConvexPolygons(p1, p2, null);
@@ -672,10 +753,12 @@ public final class Intersector{
     /**
      * Check whether specified counter-clockwise wound convex polygons overlap. If they do, optionally obtain a Minimum
      * Translation Vector indicating the minimum magnitude vector required to push the polygon p1 out of collision with polygon p2.
-     * @param p1 The first polygon.
-     * @param p2 The second polygon.
-     * @param mtv A Minimum Translation Vector to fill in the case of a collision, or null (optional).
-     * @return Whether polygons overlap.
+     * <p>
+     * 检查指定的逆时针环绕凸多边形是否重叠。若重叠,可选择获取一个最小平移向量,表示将多边形 p1 推出与多边形 p2 碰撞所需的最小幅度向量。
+     * @param p1 The first polygon. 第一个多边形。
+     * @param p2 The second polygon. 第二个多边形。
+     * @param mtv A Minimum Translation Vector to fill in the case of a collision, or null (optional). 发生碰撞时用于填充的最小平移向量,或 null(可选)。
+     * @return Whether polygons overlap. 多边形是否重叠。
      */
     public static boolean overlapConvexPolygons(Polygon p1, Polygon p2, MinimumTranslationVector mtv){
         return overlapConvexPolygons(p1.getTransformedVertices(), p2.getTransformedVertices(), mtv);
@@ -690,10 +773,12 @@ public final class Intersector{
      * Check whether polygons defined by the given counter-clockwise wound vertex arrays overlap. If they do, optionally obtain a
      * Minimum Translation Vector indicating the minimum magnitude vector required to push the polygon defined by verts1 out of the
      * collision with the polygon defined by verts2.
-     * @param verts1 Vertices of the first polygon.
-     * @param verts2 Vertices of the second polygon.
-     * @param mtv A Minimum Translation Vector to fill in the case of a collision, or null (optional).
-     * @return Whether polygons overlap.
+     * <p>
+     * 检查由给定的逆时针环绕顶点数组定义的多边形是否重叠。若重叠,可选择获取一个最小平移向量(Minimum Translation Vector),表示将 verts1 定义的多边形推出与 verts2 定义的多边形碰撞所需的最小幅度向量。
+     * @param verts1 Vertices of the first polygon. 第一个多边形的顶点。
+     * @param verts2 Vertices of the second polygon. 第二个多边形的顶点。
+     * @param mtv A Minimum Translation Vector to fill in the case of a collision, or null (optional). 发生碰撞时用于填充的最小平移向量,或 null(可选)。
+     * @return Whether polygons overlap. 多边形是否重叠。
      */
     public static boolean overlapConvexPolygons(float[] verts1, int offset1, int count1, float[] verts2, int offset2, int count2,
                                                 MinimumTranslationVector mtv){
@@ -706,6 +791,7 @@ public final class Intersector{
         int end2 = offset2 + count2;
 
         // Get polygon1 axes
+        // 获取多边形 1 的轴
         for(int i = offset1; i < end1; i += 2){
             float x1 = verts1[i];
             float y1 = verts1[i + 1];
@@ -720,8 +806,10 @@ public final class Intersector{
             axisY /= length;
 
             // -- Begin check for separation on this axis --//
+            // —— 开始检查该轴上的分离 ——
 
             // Project polygon1 onto this axis
+            // 将多边形 1 投影到此轴上
             float min1 = axisX * verts1[0] + axisY * verts1[1];
             float max1 = min1;
             for(int j = offset1; j < end1; j += 2){
@@ -734,11 +822,13 @@ public final class Intersector{
             }
 
             // Project polygon2 onto this axis
+            // 将多边形 2 投影到此轴上
             numInNormalDir = 0;
             float min2 = axisX * verts2[0] + axisY * verts2[1];
             float max2 = min2;
             for(int j = offset2; j < end2; j += 2){
                 // Counts the number of points that are within the projected area.
+                // 统计投影面积内的点数。
                 numInNormalDir -= pointLineSide(x1, y1, x2, y2, verts2[j], verts2[j + 1]);
                 float p = axisX * verts2[j] + axisY * verts2[j + 1];
                 if(p < min2){
@@ -764,14 +854,17 @@ public final class Intersector{
                 if(o < overlap){
                     overlap = o;
                     // Adjusts the direction based on the number of points found
+                    // 根据找到的点数调整方向
                     smallestAxisX = numInNormalDir >= 0 ? axisX : -axisX;
                     smallestAxisY = numInNormalDir >= 0 ? axisY : -axisY;
                 }
             }
             // -- End check for separation on this axis --//
+            // —— 结束检查该轴上的分离 ——
         }
 
         // Get polygon2 axes
+        // 获取多边形 2 的轴
         for(int i = offset2; i < end2; i += 2){
             float x1 = verts2[i];
             float y1 = verts2[i + 1];
@@ -786,14 +879,17 @@ public final class Intersector{
             axisY /= length;
 
             // -- Begin check for separation on this axis --//
+            // —— 开始检查该轴上的分离 ——
             numInNormalDir = 0;
 
             // Project polygon1 onto this axis
+            // 将多边形 1 投影到此轴上
             float min1 = axisX * verts1[0] + axisY * verts1[1];
             float max1 = min1;
             for(int j = offset1; j < end1; j += 2){
                 float p = axisX * verts1[j] + axisY * verts1[j + 1];
                 // Counts the number of points that are within the projected area.
+                // 统计投影面积内的点数。
                 numInNormalDir -= pointLineSide(x1, y1, x2, y2, verts1[j], verts1[j + 1]);
                 if(p < min1){
                     min1 = p;
@@ -803,6 +899,7 @@ public final class Intersector{
             }
 
             // Project polygon2 onto this axis
+            // 将多边形 2 投影到此轴上
             float min2 = axisX * verts2[0] + axisY * verts2[1];
             float max2 = min2;
             for(int j = offset2; j < end2; j += 2){
@@ -832,11 +929,13 @@ public final class Intersector{
                 if(o < overlap){
                     overlap = o;
                     // Adjusts the direction based on the number of points found
+                    // 根据找到的点数调整方向
                     smallestAxisX = numInNormalDir < 0 ? axisX : -axisX;
                     smallestAxisY = numInNormalDir < 0 ? axisY : -axisY;
                 }
             }
             // -- End check for separation on this axis --//
+            // —— 结束检查该轴上的分离 ——
         }
         if(mtv != null){
             mtv.normal.set(smallestAxisX, smallestAxisY);
@@ -846,11 +945,20 @@ public final class Intersector{
     }
 
 
-    /** Minimum translation required to separate two polygons. */
+    /**
+     * Minimum translation required to separate two polygons.
+     * 分离两个多边形所需的最小平移量。
+     */
     public static class MinimumTranslationVector{
-        /** Unit length vector that indicates the direction for the separation */
+        /**
+         * Unit length vector that indicates the direction for the separation
+         * 表示分离方向的单位长度向量
+         */
         public Vec2 normal = new Vec2();
-        /** Distance of the translation required for the separation */
+        /**
+         * Distance of the translation required for the separation
+         * 分离所需的平移距离
+         */
         public float depth = 0;
     }
 }

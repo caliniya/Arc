@@ -2,6 +2,8 @@ package arc.math.geom;
 
 /**
  * Encapsulates a ray having a starting position and a unit length direction.
+ * <p>
+ * 封装具有起始位置和单位长度方向的射线。
  * @author badlogicgames@gmail.com
  */
 public class Ray{
@@ -13,24 +15,31 @@ public class Ray{
 
     /**
      * Constructor, sets the starting position of the ray and the direction.
-     * @param origin The starting position
-     * @param direction The direction
+     * <p>
+     * 构造函数,设置射线的起始位置和方向。
+     * @param origin The starting position 起始位置
+     * @param direction The direction 方向
      */
     public Ray(Vec3 origin, Vec3 direction){
         this.origin.set(origin);
         this.direction.set(direction).nor();
     }
 
-    /** @return a copy of this ray. */
+    /**
+     * @return a copy of this ray.
+     * 此射线的副本。
+     */
     public Ray cpy(){
         return new Ray(this.origin, this.direction);
     }
 
     /**
      * Returns the endpoint given the distance. This is calculated as startpoint + distance * direction.
-     * @param out The vector to set to the result
-     * @param distance The distance from the end point to the start point.
-     * @return The out param
+     * <p>
+     * 根据距离返回端点。计算方式为 startpoint + distance * direction。
+     * @param out The vector to set to the result 用于保存结果的向量
+     * @param distance The distance from the end point to the start point. 终点到起点的距离。
+     * @return The out param out 参数
      */
     public Vec3 getEndPoint(final Vec3 out, final float distance){
         return out.set(direction).scl(distance).add(origin);
@@ -38,9 +47,11 @@ public class Ray{
 
     /**
      * Sets the starting position and the direction of this ray.
-     * @param origin The starting position
-     * @param direction The direction
-     * @return this ray for chaining
+     * <p>
+     * 设置此射线的起始位置和方向。
+     * @param origin The starting position 起始位置
+     * @param direction The direction 方向
+     * @return this ray for chaining 此射线,用于链式调用
      */
     public Ray set(Vec3 origin, Vec3 direction){
         this.origin.set(origin);
@@ -50,13 +61,15 @@ public class Ray{
 
     /**
      * Sets this ray from the given starting position and direction.
-     * @param x The x-component of the starting position
-     * @param y The y-component of the starting position
-     * @param z The z-component of the starting position
-     * @param dx The x-component of the direction
-     * @param dy The y-component of the direction
-     * @param dz The z-component of the direction
-     * @return this ray for chaining
+     * <p>
+     * 根据给定的起始位置和方向设置此射线。
+     * @param x The x-component of the starting position 起始位置的 x 分量
+     * @param y The y-component of the starting position 起始位置的 y 分量
+     * @param z The z-component of the starting position 起始位置的 z 分量
+     * @param dx The x-component of the direction 方向的 x 分量
+     * @param dy The y-component of the direction 方向的 y 分量
+     * @param dz The z-component of the direction 方向的 z 分量
+     * @return this ray for chaining 此射线,用于链式调用
      */
     public Ray set(float x, float y, float z, float dx, float dy, float dz){
         this.origin.set(x, y, z);
@@ -66,8 +79,10 @@ public class Ray{
 
     /**
      * Sets the starting position and direction from the given ray
-     * @param ray The ray
-     * @return This ray for chaining
+     * <p>
+     * 根据给定的射线设置起始位置和方向
+     * @param ray The ray 射线
+     * @return This ray for chaining 此射线,用于链式调用
      */
     public Ray set(Ray ray){
         this.origin.set(ray.origin);

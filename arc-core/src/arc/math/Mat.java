@@ -6,6 +6,8 @@ import arc.util.*;
 /**
  * A 3x3 <a href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column major</a> matrix; useful for 2D
  * transforms.
+ * <p>
+ * 一个 3x3 <a href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">列主序</a>矩阵;可用于 2D 变换。
  * @author mzechner
  */
 public class Mat{
@@ -31,7 +33,9 @@ public class Mat{
 
     /**
      * Constructs a matrix from the given float array. The array must have at least 9 elements; the first 9 will be copied.
-     * @param values The float array to copy. Remember that this matrix is in <a
+     * <p>
+     * 根据给定的浮点数组构造矩阵。数组必须至少有 9 个元素;将复制前 9 个。
+     * @param values The float array to copy. Remember that this matrix is in <a 要复制的浮点数组。注意此矩阵采用 <a
      * href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column major</a> order. (The float array is
      * not modified.)
      */
@@ -45,8 +49,10 @@ public class Mat{
      * <pre>
      * mul(A, B) => A := AB
      * </pre>
-     * @param mata The float array representing the first matrix. Must have at least 9 elements.
-     * @param matb The float array representing the second matrix. Must have at least 9 elements.
+     * <p>
+     * 按以下方式将矩阵 a 与矩阵 b 相乘: <pre> mul(A, B) => A := AB </pre>
+     * @param mata The float array representing the first matrix. Must have at least 9 elements. 表示第一个矩阵的浮点数组。必须至少有 9 个元素。
+     * @param matb The float array representing the second matrix. Must have at least 9 elements. 表示第二个矩阵的浮点数组。必须至少有 9 个元素。
      */
     private static void mul(float[] mata, float[] matb){
         float v00 = mata[M00] * matb[M00] + mata[M01] * matb[M10] + mata[M02] * matb[M20];
@@ -72,7 +78,10 @@ public class Mat{
         mata[M22] = v22;
     }
 
-    /** Sets this matrix to an orthographic projection. */
+    /**
+     * Sets this matrix to an orthographic projection.
+     * 将此矩阵设置为正交投影。
+     */
     public Mat setOrtho(float x, float y, float width, float height){
         final float right = x + width, top = y + height;
 
@@ -94,7 +103,9 @@ public class Mat{
 
     /**
      * Sets this matrix to the identity matrix
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为单位矩阵
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Mat idt(){
         float[] val = this.val;
@@ -116,8 +127,10 @@ public class Mat{
      * <pre>
      * A.mul(B) results in A := AB
      * </pre>
-     * @param m Matrix to multiply by.
-     * @return This matrix for the purpose of chaining operations together.
+     * <p>
+     * 后乘给定矩阵,结果存入此矩阵。例如: <pre> A.mul(B) results in A := AB </pre>
+     * @param m Matrix to multiply by. 用于相乘的矩阵。
+     * @return This matrix for the purpose of chaining operations together. 此矩阵,用于链式操作。
      */
     public Mat mul(Mat m){
         float[] val = this.val;
@@ -153,8 +166,10 @@ public class Mat{
      * <pre>
      * A.mulLeft(B) results in A := BA
      * </pre>
-     * @param m The other Matrix to multiply by
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 前乘给定矩阵,结果存入此矩阵。例如: <pre> A.mulLeft(B) results in A := BA </pre>
+     * @param m The other Matrix to multiply by 用于相乘的另一个矩阵
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Mat mulLeft(Mat m){
         float[] val = this.val;
@@ -186,8 +201,10 @@ public class Mat{
 
     /**
      * Sets this matrix to a rotation matrix that will rotate any vector in counter-clockwise direction around the z-axis.
-     * @param degrees the angle in degrees.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为绕 z 轴逆时针旋转任意向量的旋转矩阵。
+     * @param degrees the angle in degrees. 以度表示的角度。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Mat setToRotation(float degrees){
         return setToRotationRad(Mathf.degreesToRadians * degrees);
@@ -195,8 +212,10 @@ public class Mat{
 
     /**
      * Sets this matrix to a rotation matrix that will rotate any vector in counter-clockwise direction around the z-axis.
-     * @param radians the angle in radians.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为绕 z 轴逆时针旋转任意向量的旋转矩阵。
+     * @param radians the angle in radians. 以弧度表示的角度。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Mat setToRotationRad(float radians){
         float cos = (float)Math.cos(radians);
@@ -239,9 +258,11 @@ public class Mat{
 
     /**
      * Sets this matrix to a translation matrix.
-     * @param x the translation in x
-     * @param y the translation in y
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为平移矩阵。
+     * @param x the translation in x x 方向的平移
+     * @param y the translation in y y 方向的平移
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Mat setToTranslation(float x, float y){
         float[] val = this.val;
@@ -263,8 +284,10 @@ public class Mat{
 
     /**
      * Sets this matrix to a translation matrix.
-     * @param translation The translation vector.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为平移矩阵。
+     * @param translation The translation vector. 平移向量。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Mat setToTranslation(Vec2 translation){
         float[] val = this.val;
@@ -286,9 +309,11 @@ public class Mat{
 
     /**
      * Sets this matrix to a scaling matrix.
-     * @param scaleX the scale in x
-     * @param scaleY the scale in y
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为缩放矩阵。
+     * @param scaleX the scale in x x 方向上的缩放
+     * @param scaleY the scale in y y 方向上的缩放
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Mat setToScaling(float scaleX, float scaleY){
         float[] val = this.val;
@@ -306,8 +331,10 @@ public class Mat{
 
     /**
      * Sets this matrix to a scaling matrix.
-     * @param scale The scale vector.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为缩放矩阵。
+     * @param scale The scale vector. 缩放向量。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Mat setToScaling(Vec2 scale){
         float[] val = this.val;
@@ -330,7 +357,10 @@ public class Mat{
         + "[" + val[M20] + "|" + val[M21] + "|" + val[M22] + "]";
     }
 
-    /** @return The determinant of this matrix */
+    /**
+     * @return The determinant of this matrix
+     * 此矩阵的行列式
+     */
     public float det(){
         float[] val = this.val;
         return val[M00] * val[M11] * val[M22] + val[M01] * val[M12] * val[M20] + val[M02] * val[M10] * val[M21] - val[M00]
@@ -339,8 +369,10 @@ public class Mat{
 
     /**
      * Inverts this matrix given that the determinant is != 0.
-     * @return This matrix for the purpose of chaining operations.
-     * @throws ArcRuntimeException if the matrix is singular (not invertible)
+     * <p>
+     * 在行列式 != 0 的前提下求此矩阵的逆。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
+     * @throws ArcRuntimeException if the matrix is singular (not invertible) 矩阵奇异(不可逆)时抛出。
      */
     public Mat inv(){
         float det = det();
@@ -374,8 +406,10 @@ public class Mat{
 
     /**
      * Copies the values from the provided matrix to this matrix.
-     * @param mat The matrix to copy.
-     * @return This matrix for the purposes of chaining.
+     * <p>
+     * 将给定矩阵的值复制到此矩阵。
+     * @param mat The matrix to copy. 要复制的矩阵。
+     * @return This matrix for the purposes of chaining. 此矩阵,用于链式调用。
      */
     public Mat set(Mat mat){
         System.arraycopy(mat.val, 0, val, 0, val.length);
@@ -384,8 +418,10 @@ public class Mat{
 
     /**
      * Copies the values from the provided affine matrix to this matrix. The last row is set to (0, 0, 1).
-     * @param affine The affine matrix to copy.
-     * @return This matrix for the purposes of chaining.
+     * <p>
+     * 将给定仿射矩阵的值复制到此矩阵。最后一行被设为 (0, 0, 1)。
+     * @param affine The affine matrix to copy. 要复制的仿射矩阵。
+     * @return This matrix for the purposes of chaining. 此矩阵,用于链式调用。
      */
     public Mat set(Affine2 affine){
         float[] val = this.val;
@@ -406,9 +442,11 @@ public class Mat{
     /**
      * Sets the matrix to the given matrix as a float array. The float array must have at least 9 elements; the first 9 will be
      * copied.
-     * @param values The matrix, in float form, that is to be copied. Remember that this matrix is in <a
+     * <p>
+     * 将矩阵设置为浮点数组形式的给定矩阵。浮点数组必须至少有 9 个元素;将复制前 9 个。
+     * @param values The matrix, in float form, that is to be copied. Remember that this matrix is in <a 要复制的以浮点形式表示的矩阵。注意此矩阵采用 <a
      * href="http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column major</a> order.
-     * @return This matrix for the purpose of chaining methods together.
+     * @return This matrix for the purpose of chaining methods together. 此矩阵,用于链式调用。
      */
     public Mat set(float[] values){
         System.arraycopy(values, 0, val, 0, val.length);
@@ -417,8 +455,10 @@ public class Mat{
 
     /**
      * Adds a translational component to the matrix in the 3rd column. The other columns are untouched.
-     * @param vector The translation vector.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 将平移分量添加到矩阵的第 3 列。其他列不受影响。
+     * @param vector The translation vector. 平移向量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Mat trn(Vec2 vector){
         val[M02] += vector.x;
@@ -428,9 +468,11 @@ public class Mat{
 
     /**
      * Adds a translational component to the matrix in the 3rd column. The other columns are untouched.
-     * @param x The x-component of the translation vector.
-     * @param y The y-component of the translation vector.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 将平移分量添加到矩阵的第 3 列。其他列不受影响。
+     * @param x The x-component of the translation vector. 平移向量的 x 分量。
+     * @param y The y-component of the translation vector. 平移向量的 y 分量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Mat trn(float x, float y){
         val[M02] += x;
@@ -440,8 +482,10 @@ public class Mat{
 
     /**
      * Adds a translational component to the matrix in the 3rd column. The other columns are untouched.
-     * @param vector The translation vector. (The z-component of the vector is ignored because this is a 3x3 matrix)
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 将平移分量添加到矩阵的第 3 列。其他列不受影响。
+     * @param vector The translation vector. (The z-component of the vector is ignored because this is a 3x3 matrix) 平移向量。(由于这是 3x3 矩阵,向量的 z 分量会被忽略)
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Mat trn(Vec3 vector){
         val[M02] += vector.x;
@@ -452,9 +496,11 @@ public class Mat{
     /**
      * Postmultiplies this matrix by a translation matrix. Postmultiplication is also used by OpenGL ES' 1.x
      * glTranslate/glRotate/glScale.
-     * @param x The x-component of the translation vector.
-     * @param y The y-component of the translation vector.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个平移矩阵。OpenGL ES 1.x 的 glTranslate/glRotate/glScale 也采用后乘。
+     * @param x The x-component of the translation vector. 平移向量的 x 分量。
+     * @param y The y-component of the translation vector. 平移向量的 y 分量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Mat translate(float x, float y){
         float[] val = this.val;
@@ -476,8 +522,10 @@ public class Mat{
     /**
      * Postmultiplies this matrix by a translation matrix. Postmultiplication is also used by OpenGL ES' 1.x
      * glTranslate/glRotate/glScale.
-     * @param translation The translation vector.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个平移矩阵。OpenGL ES 1.x 的 glTranslate/glRotate/glScale 也采用后乘。
+     * @param translation The translation vector. 平移向量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Mat translate(Vec2 translation){
         float[] val = this.val;
@@ -499,8 +547,10 @@ public class Mat{
     /**
      * Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x
      * glTranslate/glRotate/glScale.
-     * @param degrees The angle in degrees
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个(逆时针)旋转矩阵。OpenGL ES 1.x 的 glTranslate/glRotate/glScale 也采用后乘。
+     * @param degrees The angle in degrees 以度表示的角度
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Mat rotate(float degrees){
         return rotateRad(Mathf.degreesToRadians * degrees);
@@ -509,8 +559,10 @@ public class Mat{
     /**
      * Postmultiplies this matrix with a (counter-clockwise) rotation matrix. Postmultiplication is also used by OpenGL ES' 1.x
      * glTranslate/glRotate/glScale.
-     * @param radians The angle in radians
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个(逆时针)旋转矩阵。OpenGL ES 1.x 的 glTranslate/glRotate/glScale 也采用后乘。
+     * @param radians The angle in radians 以弧度表示的角度
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Mat rotateRad(float radians){
         if(radians == 0) return this;
@@ -536,9 +588,11 @@ public class Mat{
     /**
      * Postmultiplies this matrix with a scale matrix. Postmultiplication is also used by OpenGL ES' 1.x
      * glTranslate/glRotate/glScale.
-     * @param scaleX The scale in the x-axis.
-     * @param scaleY The scale in the y-axis.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个缩放矩阵。OpenGL ES 1.x 的 glTranslate/glRotate/glScale 也采用后乘。
+     * @param scaleX The scale in the x-axis. x 轴上的缩放。
+     * @param scaleY The scale in the y-axis. y 轴上的缩放。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Mat scale(float scaleX, float scaleY){
         float[] tmp = this.tmp;
@@ -558,8 +612,10 @@ public class Mat{
     /**
      * Postmultiplies this matrix with a scale matrix. Postmultiplication is also used by OpenGL ES' 1.x
      * glTranslate/glRotate/glScale.
-     * @param scale The vector to scale the matrix by.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个缩放矩阵。OpenGL ES 1.x 的 glTranslate/glRotate/glScale 也采用后乘。
+     * @param scale The vector to scale the matrix by. 用于缩放矩阵的向量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Mat scale(Vec2 scale){
         float[] tmp = this.tmp;
@@ -578,7 +634,9 @@ public class Mat{
 
     /**
      * Get the values in this matrix.
-     * @return The float values that make up this matrix in column-major order.
+     * <p>
+     * 获取此矩阵的值。
+     * @return The float values that make up this matrix in column-major order. 以列主序构成此矩阵的浮点值。
      */
     public float[] getValues(){
         return val;
@@ -607,8 +665,10 @@ public class Mat{
 
     /**
      * Scale the matrix in the both the x and y components by the scalar value.
-     * @param scale The single value that will be used to scale both the x and y components.
-     * @return This matrix for the purpose of chaining methods together.
+     * <p>
+     * 以标量值在 x 和 y 分量上同时缩放矩阵。
+     * @param scale The single value that will be used to scale both the x and y components. 用于同时缩放 x 和 y 分量的单一数值。
+     * @return This matrix for the purpose of chaining methods together. 此矩阵,用于链式调用。
      */
     public Mat scl(float scale){
         val[M00] *= scale;
@@ -618,8 +678,10 @@ public class Mat{
 
     /**
      * Scale this matrix using the x and y components of the vector but leave the rest of the matrix alone.
-     * @param scale The {@link Vec3} to use to scale this matrix.
-     * @return This matrix for the purpose of chaining methods together.
+     * <p>
+     * 使用向量的 x 和 y 分量缩放此矩阵,但不改动矩阵的其他部分。
+     * @param scale The {@link Vec3} to use to scale this matrix. 用于缩放此矩阵的 {@link Vec3}。
+     * @return This matrix for the purpose of chaining methods together. 此矩阵,用于链式调用。
      */
     public Mat scl(Vec2 scale){
         val[M00] *= scale.x;
@@ -629,8 +691,10 @@ public class Mat{
 
     /**
      * Scale this matrix using the x and y components of the vector but leave the rest of the matrix alone.
-     * @param scale The {@link Vec3} to use to scale this matrix. The z component will be ignored.
-     * @return This matrix for the purpose of chaining methods together.
+     * <p>
+     * 使用向量的 x 和 y 分量缩放此矩阵,但不改动矩阵的其他部分。
+     * @param scale The {@link Vec3} to use to scale this matrix. The z component will be ignored. 用于缩放此矩阵的 {@link Vec3}。z 分量将被忽略。
+     * @return This matrix for the purpose of chaining methods together. 此矩阵,用于链式调用。
      */
     public Mat scl(Vec3 scale){
         val[M00] *= scale.x;
@@ -640,10 +704,13 @@ public class Mat{
 
     /**
      * Transposes the current matrix.
-     * @return This matrix for the purpose of chaining methods together.
+     * <p>
+     * 转置当前矩阵。
+     * @return This matrix for the purpose of chaining methods together. 此矩阵,用于链式调用。
      */
     public Mat transpose(){
         // Where MXY you do not have to change MXX
+        // 对于 MXY 的情况,不必更改 MXX
         float[] val = this.val;
         float v01 = val[M10];
         float v02 = val[M20];

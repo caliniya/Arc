@@ -23,12 +23,14 @@ public class BSpline<T extends Vector<T>> implements Path<T>{
 
     /**
      * Calculates the cubic b-spline value for the given position (t).
-     * @param out The Vector to set to the result.
-     * @param t The position (0<=t<=1) on the spline
-     * @param points The control points
-     * @param continuous If true the b-spline restarts at 0 when reaching 1
-     * @param tmp A temporary vector used for the calculation
-     * @return The value of out
+     * <p>
+     * 计算给定位置 (t) 处的三次 b 样条值。
+     * @param out The Vector to set to the result. 用于保存结果的向量。
+     * @param t The position (0<=t<=1) on the spline 样条上的位置(0<=t<=1)
+     * @param points The control points 控制点
+     * @param continuous If true the b-spline restarts at 0 when reaching 1 若为 true,b 样条到达 1 时会从 0 重新开始
+     * @param tmp A temporary vector used for the calculation 计算中使用的临时向量
+     * @return The value of out out 的值
      */
     public static <T extends Vector<T>> T cubic(final T out, final float t, final T[] points, final boolean continuous,
                                                 final T tmp){
@@ -41,12 +43,14 @@ public class BSpline<T extends Vector<T>> implements Path<T>{
 
     /**
      * Calculates the cubic b-spline derivative for the given position (t).
-     * @param out The Vector to set to the result.
-     * @param t The position (0<=t<=1) on the spline
-     * @param points The control points
-     * @param continuous If true the b-spline restarts at 0 when reaching 1
-     * @param tmp A temporary vector used for the calculation
-     * @return The value of out
+     * <p>
+     * 计算给定位置 (t) 处的三次 b 样条导数。
+     * @param out The Vector to set to the result. 用于保存结果的向量。
+     * @param t The position (0<=t<=1) on the spline 样条上的位置(0<=t<=1)
+     * @param points The control points 控制点
+     * @param continuous If true the b-spline restarts at 0 when reaching 1 若为 true,b 样条到达 1 时会从 0 重新开始
+     * @param tmp A temporary vector used for the calculation 计算中使用的临时向量
+     * @return The value of out out 的值
      */
     public static <T extends Vector<T>> T cubic_derivative(final T out, final float t, final T[] points,
                                                            final boolean continuous, final T tmp){
@@ -59,13 +63,15 @@ public class BSpline<T extends Vector<T>> implements Path<T>{
 
     /**
      * Calculates the cubic b-spline value for the given span (i) at the given position (u).
-     * @param out The Vector to set to the result.
-     * @param i The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - 3 (cubic degree)
-     * @param u The position (0<=u<=1) on the span
-     * @param points The control points
-     * @param continuous If true the b-spline restarts at 0 when reaching 1
-     * @param tmp A temporary vector used for the calculation
-     * @return The value of out
+     * <p>
+     * 计算给定跨段 (i) 上给定位置 (u) 处的三次 b 样条值。
+     * @param out The Vector to set to the result. 用于保存结果的向量。
+     * @param i The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - 3 (cubic degree) 跨段索引(0<=i<spanCount),spanCount = continuous ? points.length : points.length - 3(三次次数)
+     * @param u The position (0<=u<=1) on the span 跨段上的位置(0<=u<=1)
+     * @param points The control points 控制点
+     * @param continuous If true the b-spline restarts at 0 when reaching 1 若为 true,b 样条到达 1 时会从 0 重新开始
+     * @param tmp A temporary vector used for the calculation 计算中使用的临时向量
+     * @return The value of out out 的值
      */
     public static <T extends Vector<T>> T cubic(final T out, final int i, final float u, final T[] points,
                                                 final boolean continuous, final T tmp){
@@ -83,13 +89,15 @@ public class BSpline<T extends Vector<T>> implements Path<T>{
 
     /**
      * Calculates the cubic b-spline derivative for the given span (i) at the given position (u).
-     * @param out The Vector to set to the result.
-     * @param i The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - 3 (cubic degree)
-     * @param u The position (0<=u<=1) on the span
-     * @param points The control points
-     * @param continuous If true the b-spline restarts at 0 when reaching 1
-     * @param tmp A temporary vector used for the calculation
-     * @return The value of out
+     * <p>
+     * 计算给定跨段 (i) 上给定位置 (u) 处的三次 b 样条导数。
+     * @param out The Vector to set to the result. 用于保存结果的向量。
+     * @param i The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - 3 (cubic degree) 跨段索引(0<=i<spanCount),spanCount = continuous ? points.length : points.length - 3(三次次数)
+     * @param u The position (0<=u<=1) on the span 跨段上的位置(0<=u<=1)
+     * @param points The control points 控制点
+     * @param continuous If true the b-spline restarts at 0 when reaching 1 若为 true,b 样条到达 1 时会从 0 重新开始
+     * @param tmp A temporary vector used for the calculation 计算中使用的临时向量
+     * @return The value of out out 的值
      */
     public static <T extends Vector<T>> T cubic_derivative(final T out, final int i, final float u, final T[] points,
                                                            final boolean continuous, final T tmp){
@@ -106,13 +114,15 @@ public class BSpline<T extends Vector<T>> implements Path<T>{
 
     /**
      * Calculates the n-degree b-spline value for the given position (t).
-     * @param out The Vector to set to the result.
-     * @param t The position (0<=t<=1) on the spline
-     * @param points The control points
-     * @param degree The degree of the b-spline
-     * @param continuous If true the b-spline restarts at 0 when reaching 1
-     * @param tmp A temporary vector used for the calculation
-     * @return The value of out
+     * <p>
+     * 计算给定位置 (t) 处的 n 次 b 样条值。
+     * @param out The Vector to set to the result. 用于保存结果的向量。
+     * @param t The position (0<=t<=1) on the spline 样条上的位置(0<=t<=1)
+     * @param points The control points 控制点
+     * @param degree The degree of the b-spline b 样条的次数
+     * @param continuous If true the b-spline restarts at 0 when reaching 1 若为 true,b 样条到达 1 时会从 0 重新开始
+     * @param tmp A temporary vector used for the calculation 计算中使用的临时向量
+     * @return The value of out out 的值
      */
     public static <T extends Vector<T>> T calculate(final T out, final float t, final T[] points, final int degree,
                                                     final boolean continuous, final T tmp){
@@ -125,13 +135,15 @@ public class BSpline<T extends Vector<T>> implements Path<T>{
 
     /**
      * Calculates the n-degree b-spline derivative for the given position (t).
-     * @param out The Vector to set to the result.
-     * @param t The position (0<=t<=1) on the spline
-     * @param points The control points
-     * @param degree The degree of the b-spline
-     * @param continuous If true the b-spline restarts at 0 when reaching 1
-     * @param tmp A temporary vector used for the calculation
-     * @return The value of out
+     * <p>
+     * 计算给定位置 (t) 处的 n 次 b 样条导数。
+     * @param out The Vector to set to the result. 用于保存结果的向量。
+     * @param t The position (0<=t<=1) on the spline 样条上的位置(0<=t<=1)
+     * @param points The control points 控制点
+     * @param degree The degree of the b-spline b 样条的次数
+     * @param continuous If true the b-spline restarts at 0 when reaching 1 若为 true,b 样条到达 1 时会从 0 重新开始
+     * @param tmp A temporary vector used for the calculation 计算中使用的临时向量
+     * @return The value of out out 的值
      */
     public static <T extends Vector<T>> T derivative(final T out, final float t, final T[] points, final int degree,
                                                      final boolean continuous, final T tmp){
@@ -144,14 +156,16 @@ public class BSpline<T extends Vector<T>> implements Path<T>{
 
     /**
      * Calculates the n-degree b-spline value for the given span (i) at the given position (u).
-     * @param out The Vector to set to the result.
-     * @param i The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - degree
-     * @param u The position (0<=u<=1) on the span
-     * @param points The control points
-     * @param degree The degree of the b-spline
-     * @param continuous If true the b-spline restarts at 0 when reaching 1
-     * @param tmp A temporary vector used for the calculation
-     * @return The value of out
+     * <p>
+     * 计算给定跨段 (i) 上给定位置 (u) 处的 n 次 b 样条值。
+     * @param out The Vector to set to the result. 用于保存结果的向量。
+     * @param i The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - degree 跨段索引(0<=i<spanCount),spanCount = continuous ? points.length : points.length - degree
+     * @param u The position (0<=u<=1) on the span 跨段上的位置(0<=u<=1)
+     * @param points The control points 控制点
+     * @param degree The degree of the b-spline b 样条的次数
+     * @param continuous If true the b-spline restarts at 0 when reaching 1 若为 true,b 样条到达 1 时会从 0 重新开始
+     * @param tmp A temporary vector used for the calculation 计算中使用的临时向量
+     * @return The value of out out 的值
      */
     public static <T extends Vector<T>> T calculate(final T out, final int i, final float u, final T[] points, final int degree,
                                                     final boolean continuous, final T tmp){
@@ -163,14 +177,16 @@ public class BSpline<T extends Vector<T>> implements Path<T>{
 
     /**
      * Calculates the n-degree b-spline derivative for the given span (i) at the given position (u).
-     * @param out The Vector to set to the result.
-     * @param i The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - degree
-     * @param u The position (0<=u<=1) on the span
-     * @param points The control points
-     * @param degree The degree of the b-spline
-     * @param continuous If true the b-spline restarts at 0 when reaching 1
-     * @param tmp A temporary vector used for the calculation
-     * @return The value of out
+     * <p>
+     * 计算给定跨段 (i) 上给定位置 (u) 处的 n 次 b 样条导数。
+     * @param out The Vector to set to the result. 用于保存结果的向量。
+     * @param i The span (0<=i<spanCount) spanCount = continuous ? points.length : points.length - degree 跨段索引(0<=i<spanCount),spanCount = continuous ? points.length : points.length - degree
+     * @param u The position (0<=u<=1) on the span 跨段上的位置(0<=u<=1)
+     * @param points The control points 控制点
+     * @param degree The degree of the b-spline b 样条的次数
+     * @param continuous If true the b-spline restarts at 0 when reaching 1 若为 true,b 样条到达 1 时会从 0 重新开始
+     * @param tmp A temporary vector used for the calculation 计算中使用的临时向量
+     * @return The value of out out 的值
      */
     public static <T extends Vector<T>> T derivative(final T out, final int i, final float u, final T[] points, final int degree,
                                                      final boolean continuous, final T tmp){
@@ -209,7 +225,10 @@ public class BSpline<T extends Vector<T>> implements Path<T>{
         return valueAt(out, i, u);
     }
 
-    /** @return The value of the spline at position u of the specified span */
+    /**
+     * @return The value of the spline at position u of the specified span
+     * 指定跨段上位置 u 处样条的值
+     */
     public T valueAt(final T out, final int span, final float u){
         return calculate(out, continuous ? span : (span + (int)(degree * 0.5f)), u, controlPoints, degree, continuous, tmp);
     }
@@ -223,17 +242,26 @@ public class BSpline<T extends Vector<T>> implements Path<T>{
         return derivativeAt(out, i, u);
     }
 
-    /** @return The derivative of the spline at position u of the specified span */
+    /**
+     * @return The derivative of the spline at position u of the specified span
+     * 指定跨段上位置 u 处样条的导数
+     */
     public T derivativeAt(final T out, final int span, final float u){
         return derivative(out, continuous ? span : (span + (int)(degree * 0.5f)), u, controlPoints, degree, continuous, tmp);
     }
 
-    /** @return The span closest to the specified value */
+    /**
+     * @return The span closest to the specified value
+     * 最接近指定值的跨段
+     */
     public int nearest(final T in){
         return nearest(in, 0, spanCount);
     }
 
-    /** @return The span closest to the specified value, restricting to the specified spans. */
+    /**
+     * @return The span closest to the specified value, restricting to the specified spans.
+     * 最接近指定值的跨段,限定在指定跨段范围内。
+     */
     public int nearest(final T in, int start, final int count){
         while(start < 0)
             start += spanCount;
@@ -289,6 +317,7 @@ public class BSpline<T extends Vector<T>> implements Path<T>{
     @Override
     public float locate(T v){
         // TODO Add a precise method
+        // TODO 添加精确方法
         return approximate(v);
     }
 

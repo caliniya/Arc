@@ -8,6 +8,8 @@ import arc.util.*;
  * href="http://en.wikipedia.org/wiki/Affine_transformation">Affine transformations</a> preserve straight lines, and
  * parallel lines remain parallel after the transformation. Operations on affine matrices are faster because the last row can
  * always be assumed (0, 0, 1).
+ * <p>
+ * 一种特殊的 3x3 矩阵,可表示 2D 平移、缩放、翻转、旋转和剪切的组合序列。<a href="http://en.wikipedia.org/wiki/Affine_transformation">仿射变换</a>保持直线性,平行线变换后仍保持平行。仿射矩阵上的运算更快,因为最后一行总可以假定 (0, 0, 1)。
  * @author vmilea
  */
 public final class Affine2{
@@ -15,14 +17,20 @@ public final class Affine2{
     public float m10 = 0, m11 = 1, m12 = 0;
 
     // constant: m21 = 0, m21 = 1, m22 = 1
+    // 常数:m21 = 0, m21 = 1, m22 = 1
 
-    /** Constructs an identity matrix. */
+    /**
+     * Constructs an identity matrix.
+     * 构造单位矩阵。
+     */
     public Affine2(){
     }
 
     /**
      * Constructs a matrix from the given affine matrix.
-     * @param other The affine matrix to copy. This matrix will not be modified.
+     * <p>
+     * 根据给定的仿射矩阵构造矩阵。
+     * @param other The affine matrix to copy. This matrix will not be modified. 要复制的仿射矩阵。此矩阵不会被修改。
      */
     public Affine2(Affine2 other){
         set(other);
@@ -30,7 +38,9 @@ public final class Affine2{
 
     /**
      * Sets this matrix to the identity matrix
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为单位矩阵
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 idt(){
         m00 = 1;
@@ -44,8 +54,10 @@ public final class Affine2{
 
     /**
      * Copies the values from the provided affine matrix to this matrix.
-     * @param other The affine matrix to copy.
-     * @return This matrix for the purposes of chaining.
+     * <p>
+     * 将给定仿射矩阵的值复制到此矩阵。
+     * @param other The affine matrix to copy. 要复制的仿射矩阵。
+     * @return This matrix for the purposes of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 set(Affine2 other){
         m00 = other.m00;
@@ -59,8 +71,10 @@ public final class Affine2{
 
     /**
      * Copies the values from the provided matrix to this matrix.
-     * @param matrix The matrix to copy, assumed to be an affine transformation.
-     * @return This matrix for the purposes of chaining.
+     * <p>
+     * 将给定矩阵的值复制到此矩阵。
+     * @param matrix The matrix to copy, assumed to be an affine transformation. 要复制的矩阵,假定为仿射变换。
+     * @return This matrix for the purposes of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 set(Mat matrix){
         float[] other = matrix.val;
@@ -76,9 +90,11 @@ public final class Affine2{
 
     /**
      * Sets this matrix to a translation matrix.
-     * @param x The translation in x
-     * @param y The translation in y
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为平移矩阵。
+     * @param x The translation in x x 方向的平移
+     * @param y The translation in y y 方向的平移
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToTranslation(float x, float y){
         m00 = 1;
@@ -92,8 +108,10 @@ public final class Affine2{
 
     /**
      * Sets this matrix to a translation matrix.
-     * @param trn The translation vector.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为平移矩阵。
+     * @param trn The translation vector. 平移向量。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToTranslation(Vec2 trn){
         return setToTranslation(trn.x, trn.y);
@@ -101,9 +119,11 @@ public final class Affine2{
 
     /**
      * Sets this matrix to a scaling matrix.
-     * @param scaleX The scale in x.
-     * @param scaleY The scale in y.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为缩放矩阵。
+     * @param scaleX The scale in x. x 方向上的缩放。
+     * @param scaleY The scale in y. y 方向上的缩放。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToScaling(float scaleX, float scaleY){
         m00 = scaleX;
@@ -117,8 +137,10 @@ public final class Affine2{
 
     /**
      * Sets this matrix to a scaling matrix.
-     * @param scale The scale vector.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为缩放矩阵。
+     * @param scale The scale vector. 缩放向量。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToScaling(Vec2 scale){
         return setToScaling(scale.x, scale.y);
@@ -126,8 +148,10 @@ public final class Affine2{
 
     /**
      * Sets this matrix to a rotation matrix that will rotate any vector in counter-clockwise direction around the z-axis.
-     * @param degrees The angle in degrees.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为绕 z 轴逆时针旋转任意向量的旋转矩阵。
+     * @param degrees The angle in degrees. 以度表示的角度。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToRotation(float degrees){
         float cos = Mathf.cosDeg(degrees);
@@ -144,8 +168,10 @@ public final class Affine2{
 
     /**
      * Sets this matrix to a rotation matrix that will rotate any vector in counter-clockwise direction around the z-axis.
-     * @param radians The angle in radians.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为绕 z 轴逆时针旋转任意向量的旋转矩阵。
+     * @param radians The angle in radians. 以弧度表示的角度。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToRotationRad(float radians){
         float cos = Mathf.cos(radians);
@@ -162,9 +188,11 @@ public final class Affine2{
 
     /**
      * Sets this matrix to a rotation matrix that will rotate any vector in counter-clockwise direction around the z-axis.
-     * @param cos The angle cosine.
-     * @param sin The angle sine.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为绕 z 轴逆时针旋转任意向量的旋转矩阵。
+     * @param cos The angle cosine. 角度的余弦值。
+     * @param sin The angle sine. 角度的正弦值。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToRotation(float cos, float sin){
         m00 = cos;
@@ -178,9 +206,11 @@ public final class Affine2{
 
     /**
      * Sets this matrix to a shearing matrix.
-     * @param shearX The shear in x direction.
-     * @param shearY The shear in y direction.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为剪切矩阵。
+     * @param shearX The shear in x direction. x 方向上的剪切。
+     * @param shearY The shear in y direction. y 方向上的剪切。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToShearing(float shearX, float shearY){
         m00 = 1;
@@ -194,8 +224,10 @@ public final class Affine2{
 
     /**
      * Sets this matrix to a shearing matrix.
-     * @param shear The shear vector.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为剪切矩阵。
+     * @param shear The shear vector. 剪切向量。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToShearing(Vec2 shear){
         return setToShearing(shear.x, shear.y);
@@ -204,12 +236,14 @@ public final class Affine2{
     /**
      * Sets this matrix to a concatenation of translation, rotation and scale. It is a more efficient form for:
      * <code>idt().translate(x, y).rotate(degrees).scale(scaleX, scaleY)</code>
-     * @param x The translation in x.
-     * @param y The translation in y.
-     * @param degrees The angle in degrees.
-     * @param scaleX The scale in y.
-     * @param scaleY The scale in x.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为平移、旋转和缩放的组合。这是 <code>idt().translate(x, y).rotate(degrees).scale(scaleX, scaleY)</code> 更高效的形式
+     * @param x The translation in x. x 方向的平移。
+     * @param y The translation in y. y 方向的平移。
+     * @param degrees The angle in degrees. 以度表示的角度。
+     * @param scaleX The scale in y. y 方向上的缩放。
+     * @param scaleY The scale in x. x 方向上的缩放。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToTrnRotScl(float x, float y, float degrees, float scaleX, float scaleY){
         m02 = x;
@@ -235,10 +269,12 @@ public final class Affine2{
     /**
      * Sets this matrix to a concatenation of translation, rotation and scale. It is a more efficient form for:
      * <code>idt().translate(trn).rotate(degrees).scale(scale)</code>
-     * @param trn The translation vector.
-     * @param degrees The angle in degrees.
-     * @param scale The scale vector.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为平移、旋转和缩放的组合。这是 <code>idt().translate(trn).rotate(degrees).scale(scale)</code> 更高效的形式
+     * @param trn The translation vector. 平移向量。
+     * @param degrees The angle in degrees. 以度表示的角度。
+     * @param scale The scale vector. 缩放向量。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToTrnRotScl(Vec2 trn, float degrees, Vec2 scale){
         return setToTrnRotScl(trn.x, trn.y, degrees, scale.x, scale.y);
@@ -247,12 +283,14 @@ public final class Affine2{
     /**
      * Sets this matrix to a concatenation of translation, rotation and scale. It is a more efficient form for:
      * <code>idt().translate(x, y).rotateRad(radians).scale(scaleX, scaleY)</code>
-     * @param x The translation in x.
-     * @param y The translation in y.
-     * @param radians The angle in radians.
-     * @param scaleX The scale in y.
-     * @param scaleY The scale in x.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为平移、旋转和缩放的组合。这是 <code>idt().translate(x, y).rotateRad(radians).scale(scaleX, scaleY)</code> 更高效的形式
+     * @param x The translation in x. x 方向的平移。
+     * @param y The translation in y. y 方向的平移。
+     * @param radians The angle in radians. 以弧度表示的角度。
+     * @param scaleX The scale in y. y 方向上的缩放。
+     * @param scaleY The scale in x. x 方向上的缩放。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToTrnRotRadScl(float x, float y, float radians, float scaleX, float scaleY){
         m02 = x;
@@ -278,10 +316,12 @@ public final class Affine2{
     /**
      * Sets this matrix to a concatenation of translation, rotation and scale. It is a more efficient form for:
      * <code>idt().translate(trn).rotateRad(radians).scale(scale)</code>
-     * @param trn The translation vector.
-     * @param radians The angle in radians.
-     * @param scale The scale vector.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为平移、旋转和缩放的组合。这是 <code>idt().translate(trn).rotateRad(radians).scale(scale)</code> 更高效的形式
+     * @param trn The translation vector. 平移向量。
+     * @param radians The angle in radians. 以弧度表示的角度。
+     * @param scale The scale vector. 缩放向量。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToTrnRotRadScl(Vec2 trn, float radians, Vec2 scale){
         return setToTrnRotRadScl(trn.x, trn.y, radians, scale.x, scale.y);
@@ -290,11 +330,13 @@ public final class Affine2{
     /**
      * Sets this matrix to a concatenation of translation and scale. It is a more efficient form for:
      * <code>idt().translate(x, y).scale(scaleX, scaleY)</code>
-     * @param x The translation in x.
-     * @param y The translation in y.
-     * @param scaleX The scale in y.
-     * @param scaleY The scale in x.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为平移与缩放的组合。这是 <code>idt().translate(x, y).scale(scaleX, scaleY)</code> 更高效的形式
+     * @param x The translation in x. x 方向的平移。
+     * @param y The translation in y. y 方向的平移。
+     * @param scaleX The scale in y. y 方向上的缩放。
+     * @param scaleY The scale in x. x 方向上的缩放。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToTrnScl(float x, float y, float scaleX, float scaleY){
         m00 = scaleX;
@@ -309,9 +351,11 @@ public final class Affine2{
     /**
      * Sets this matrix to a concatenation of translation and scale. It is a more efficient form for:
      * <code>idt().translate(trn).scale(scale)</code>
-     * @param trn The translation vector.
-     * @param scale The scale vector.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为平移与缩放的组合。这是 <code>idt().translate(trn).scale(scale)</code> 更高效的形式
+     * @param trn The translation vector. 平移向量。
+     * @param scale The scale vector. 缩放向量。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToTrnScl(Vec2 trn, Vec2 scale){
         return setToTrnScl(trn.x, trn.y, scale.x, scale.y);
@@ -319,9 +363,11 @@ public final class Affine2{
 
     /**
      * Sets this matrix to the product of two matrices.
-     * @param l Left matrix.
-     * @param r Right matrix.
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 将此矩阵设置为两个矩阵的乘积。
+     * @param l Left matrix. 左矩阵。
+     * @param r Right matrix. 右矩阵。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 setToProduct(Affine2 l, Affine2 r){
         m00 = l.m00 * r.m00 + l.m01 * r.m10;
@@ -335,8 +381,10 @@ public final class Affine2{
 
     /**
      * Inverts this matrix given that the determinant is != 0.
-     * @return This matrix for the purpose of chaining operations.
-     * @throws ArcRuntimeException if the matrix is singular (not invertible)
+     * <p>
+     * 在行列式 != 0 的前提下求此矩阵的逆。
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
+     * @throws ArcRuntimeException if the matrix is singular (not invertible) 矩阵奇异(不可逆)时抛出。
      */
     public Affine2 inv(){
         float det = det();
@@ -366,8 +414,10 @@ public final class Affine2{
      * <pre>
      * A.mul(B) results in A := AB
      * </pre>
-     * @param other Matrix to multiply by.
-     * @return This matrix for the purpose of chaining operations together.
+     * <p>
+     * 后乘给定矩阵,结果存入此矩阵。例如: <pre> A.mul(B) results in A := AB </pre>
+     * @param other Matrix to multiply by. 用于相乘的矩阵。
+     * @return This matrix for the purpose of chaining operations together. 此矩阵,用于链式操作。
      */
     public Affine2 mul(Affine2 other){
         float tmp00 = m00 * other.m00 + m01 * other.m10;
@@ -392,8 +442,10 @@ public final class Affine2{
      * <pre>
      * A.preMul(B) results in A := BA
      * </pre>
-     * @param other The other Matrix to multiply by
-     * @return This matrix for the purpose of chaining operations.
+     * <p>
+     * 前乘给定矩阵,结果存入此矩阵。例如: <pre> A.preMul(B) results in A := BA </pre>
+     * @param other The other Matrix to multiply by 用于相乘的另一个矩阵
+     * @return This matrix for the purpose of chaining operations. 此矩阵,用于链式操作。
      */
     public Affine2 preMul(Affine2 other){
         float tmp00 = other.m00 * m00 + other.m01 * m10;
@@ -414,9 +466,11 @@ public final class Affine2{
 
     /**
      * Postmultiplies this matrix by a translation matrix.
-     * @param x The x-component of the translation vector.
-     * @param y The y-component of the translation vector.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个平移矩阵。
+     * @param x The x-component of the translation vector. 平移向量的 x 分量。
+     * @param y The y-component of the translation vector. 平移向量的 y 分量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 translate(float x, float y){
         m02 += m00 * x + m01 * y;
@@ -426,8 +480,10 @@ public final class Affine2{
 
     /**
      * Postmultiplies this matrix by a translation matrix.
-     * @param trn The translation vector.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个平移矩阵。
+     * @param trn The translation vector. 平移向量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 translate(Vec2 trn){
         return translate(trn.x, trn.y);
@@ -435,9 +491,11 @@ public final class Affine2{
 
     /**
      * Premultiplies this matrix by a translation matrix.
-     * @param x The x-component of the translation vector.
-     * @param y The y-component of the translation vector.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 前乘一个平移矩阵。
+     * @param x The x-component of the translation vector. 平移向量的 x 分量。
+     * @param y The y-component of the translation vector. 平移向量的 y 分量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 preTranslate(float x, float y){
         m02 += x;
@@ -447,8 +505,10 @@ public final class Affine2{
 
     /**
      * Premultiplies this matrix by a translation matrix.
-     * @param trn The translation vector.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 前乘一个平移矩阵。
+     * @param trn The translation vector. 平移向量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 preTranslate(Vec2 trn){
         return preTranslate(trn.x, trn.y);
@@ -456,9 +516,11 @@ public final class Affine2{
 
     /**
      * Postmultiplies this matrix with a scale matrix.
-     * @param scaleX The scale in the x-axis.
-     * @param scaleY The scale in the y-axis.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个缩放矩阵。
+     * @param scaleX The scale in the x-axis. x 轴上的缩放。
+     * @param scaleY The scale in the y-axis. y 轴上的缩放。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 scale(float scaleX, float scaleY){
         m00 *= scaleX;
@@ -470,8 +532,10 @@ public final class Affine2{
 
     /**
      * Postmultiplies this matrix with a scale matrix.
-     * @param scale The scale vector.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个缩放矩阵。
+     * @param scale The scale vector. 缩放向量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 scale(Vec2 scale){
         return scale(scale.x, scale.y);
@@ -479,9 +543,11 @@ public final class Affine2{
 
     /**
      * Premultiplies this matrix with a scale matrix.
-     * @param scaleX The scale in the x-axis.
-     * @param scaleY The scale in the y-axis.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 前乘一个缩放矩阵。
+     * @param scaleX The scale in the x-axis. x 轴上的缩放。
+     * @param scaleY The scale in the y-axis. y 轴上的缩放。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 preScale(float scaleX, float scaleY){
         m00 *= scaleX;
@@ -495,8 +561,10 @@ public final class Affine2{
 
     /**
      * Premultiplies this matrix with a scale matrix.
-     * @param scale The scale vector.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 前乘一个缩放矩阵。
+     * @param scale The scale vector. 缩放向量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 preScale(Vec2 scale){
         return preScale(scale.x, scale.y);
@@ -504,8 +572,10 @@ public final class Affine2{
 
     /**
      * Postmultiplies this matrix with a (counter-clockwise) rotation matrix.
-     * @param degrees The angle in degrees
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个(逆时针)旋转矩阵。
+     * @param degrees The angle in degrees 以度表示的角度
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 rotate(float degrees){
         if(degrees == 0) return this;
@@ -527,8 +597,10 @@ public final class Affine2{
 
     /**
      * Postmultiplies this matrix with a (counter-clockwise) rotation matrix.
-     * @param radians The angle in radians
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个(逆时针)旋转矩阵。
+     * @param radians The angle in radians 以弧度表示的角度
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 rotateRad(float radians){
         if(radians == 0) return this;
@@ -550,8 +622,10 @@ public final class Affine2{
 
     /**
      * Premultiplies this matrix with a (counter-clockwise) rotation matrix.
-     * @param degrees The angle in degrees
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 前乘一个(逆时针)旋转矩阵。
+     * @param degrees The angle in degrees 以度表示的角度
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 preRotate(float degrees){
         if(degrees == 0) return this;
@@ -577,8 +651,10 @@ public final class Affine2{
 
     /**
      * Premultiplies this matrix with a (counter-clockwise) rotation matrix.
-     * @param radians The angle in radians
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 前乘一个(逆时针)旋转矩阵。
+     * @param radians The angle in radians 以弧度表示的角度
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 preRotateRad(float radians){
         if(radians == 0) return this;
@@ -604,9 +680,11 @@ public final class Affine2{
 
     /**
      * Postmultiplies this matrix by a shear matrix.
-     * @param shearX The shear in x direction.
-     * @param shearY The shear in y direction.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个剪切矩阵。
+     * @param shearX The shear in x direction. x 方向上的剪切。
+     * @param shearY The shear in y direction. y 方向上的剪切。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 shear(float shearX, float shearY){
         float tmp0 = m00 + shearY * m01;
@@ -623,8 +701,10 @@ public final class Affine2{
 
     /**
      * Postmultiplies this matrix by a shear matrix.
-     * @param shear The shear vector.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 后乘一个剪切矩阵。
+     * @param shear The shear vector. 剪切向量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 shear(Vec2 shear){
         return shear(shear.x, shear.y);
@@ -632,9 +712,11 @@ public final class Affine2{
 
     /**
      * Premultiplies this matrix by a shear matrix.
-     * @param shearX The shear in x direction.
-     * @param shearY The shear in y direction.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 前乘一个剪切矩阵。
+     * @param shearX The shear in x direction. x 方向上的剪切。
+     * @param shearY The shear in y direction. y 方向上的剪切。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 preShear(float shearX, float shearY){
         float tmp00 = m00 + shearX * m10;
@@ -655,8 +737,10 @@ public final class Affine2{
 
     /**
      * Premultiplies this matrix by a shear matrix.
-     * @param shear The shear vector.
-     * @return This matrix for the purpose of chaining.
+     * <p>
+     * 前乘一个剪切矩阵。
+     * @param shear The shear vector. 剪切向量。
+     * @return This matrix for the purpose of chaining. 此矩阵,用于链式调用。
      */
     public Affine2 preShear(Vec2 shear){
         return preShear(shear.x, shear.y);
@@ -664,7 +748,9 @@ public final class Affine2{
 
     /**
      * Calculates the determinant of the matrix.
-     * @return The determinant of this matrix.
+     * <p>
+     * 计算矩阵的行列式。
+     * @return The determinant of this matrix. 此矩阵的行列式。
      */
     public float det(){
         return m00 * m11 - m01 * m10;
@@ -672,8 +758,10 @@ public final class Affine2{
 
     /**
      * Get the x-y translation component of the matrix.
-     * @param position Output vector.
-     * @return Filled position.
+     * <p>
+     * 获取矩阵的 x-y 平移分量。
+     * @param position Output vector. 输出向量。
+     * @return Filled position. 已填充的位置。
      */
     public Vec2 getTranslation(Vec2 position){
         position.x = m02;
@@ -683,7 +771,9 @@ public final class Affine2{
 
     /**
      * Check if the this is a plain translation matrix.
-     * @return True if scale is 1 and rotation is 0.
+     * <p>
+     * 检查此矩阵是否为纯平移矩阵。
+     * @return True if scale is 1 and rotation is 0. 若缩放为 1 且旋转为 0 则为 true。
      */
     public boolean isTranslation(){
         return (m00 == 1 && m11 == 1 && m01 == 0 && m10 == 0);
@@ -691,13 +781,18 @@ public final class Affine2{
 
     /**
      * Check if this is an indentity matrix.
-     * @return True if scale is 1 and rotation is 0.
+     * <p>
+     * 检查此矩阵是否为单位矩阵。
+     * @return True if scale is 1 and rotation is 0. 若缩放为 1 且旋转为 0 则为 true。
      */
     public boolean isIdt(){
         return (m00 == 1 && m02 == 0 && m12 == 0 && m11 == 1 && m01 == 0 && m10 == 0);
     }
 
-    /** Applies the affine transformation on a vector. */
+    /**
+     * Applies the affine transformation on a vector.
+     * 对向量应用仿射变换。
+     */
     public void applyTo(Vec2 point){
         float x = point.x;
         float y = point.y;

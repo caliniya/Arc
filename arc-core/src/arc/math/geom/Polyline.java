@@ -24,7 +24,10 @@ public class Polyline implements Shape2D{
         this.localVertices = vertices;
     }
 
-    /** Returns vertices without scaling or rotation and without being offset by the polyline position. */
+    /**
+     * Returns vertices without scaling or rotation and without being offset by the polyline position.
+     * 返回未缩放、未旋转且未按折线位置偏移的顶点。
+     */
     public float[] getVertices(){
         return localVertices;
     }
@@ -35,7 +38,10 @@ public class Polyline implements Shape2D{
         dirty = true;
     }
 
-    /** Returns vertices scaled, rotated, and offset by the polygon position. */
+    /**
+     * Returns vertices scaled, rotated, and offset by the polygon position.
+     * 返回经多边形位置缩放、旋转和偏移后的顶点。
+     */
     public float[] getTransformedVertices(){
         if(!dirty) return worldVertices;
         dirty = false;
@@ -61,12 +67,14 @@ public class Polyline implements Shape2D{
             float y = localVertices[i + 1] - originY;
 
             // scale if needed
+            // 必要时缩放
             if(scale){
                 x *= scaleX;
                 y *= scaleY;
             }
 
             // rotate if needed
+            // 必要时旋转
             if(rotation != 0){
                 float oldX = x;
                 x = cos * x - sin * y;
@@ -79,7 +87,10 @@ public class Polyline implements Shape2D{
         return worldVertices;
     }
 
-    /** Returns the euclidean length of the polyline without scaling */
+    /**
+     * Returns the euclidean length of the polyline without scaling
+     * 返回折线未经缩放的欧氏长度
+     */
     public float getLength(){
         if(!calculateLength) return length;
         calculateLength = false;
@@ -94,7 +105,10 @@ public class Polyline implements Shape2D{
         return length;
     }
 
-    /** Returns the euclidean length of the polyline */
+    /**
+     * Returns the euclidean length of the polyline
+     * 返回折线的欧氏长度
+     */
     public float getScaledLength(){
         if(!calculateScaledLength) return scaledLength;
         calculateScaledLength = false;

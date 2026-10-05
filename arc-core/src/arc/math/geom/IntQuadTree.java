@@ -34,6 +34,7 @@ public class IntQuadTree{
         leaf = false;
 
         // Transfer objects to children if they fit entirely in one
+        // 若对象能完全放入某个子节点,则将其转移到该子节点
         for(int i = 0; i < objects.size; i ++){
             int obj = objects.items[i];
             hitbox(obj);
@@ -61,12 +62,15 @@ public class IntQuadTree{
 
     /**
      * Inserts an object into this node or its child nodes. This will split a leaf node if it exceeds the object limit.
+     * 将对象插入此节点或其子节点。若叶节点超过对象上限,将进行分裂。
      */
     public void insert(int obj){
         hitbox(obj);
         if(!bounds.overlaps(tmp)){
             // New object not in quad tree, ignoring
+            // 不在四叉树中的新对象,忽略
             // throw an exception?
+            // 抛出异常?
             return;
         }
 
@@ -76,10 +80,12 @@ public class IntQuadTree{
 
         if(leaf){
             // Leaf, so no need to add to children, just add to root
+            // 叶节点,无需加入子节点,直接加入根节点
             objects.add(obj);
         }else{
             hitbox(obj);
             // Add to relevant child, or root if can't fit completely in a child
+            // 添加到合适的子节点,若无法完全放入任何子节点则添加到根节点
             IntQuadTree child = getFittingChild(tmp);
             if(child != null){
                 child.insert(obj);
@@ -91,14 +97,17 @@ public class IntQuadTree{
 
     /**
      * Removes an object from this node or its child nodes.
+     * 从此节点或其子节点中移除对象。
      */
     public boolean remove(int obj){
         boolean result;
         if(leaf){
             // Leaf, no children, remove from root
+            // 叶节点,无子节点,从根节点移除
             result = objects.removeValue(obj);
         }else{
             // Remove from relevant child
+            // 从合适的子节点中移除
             hitbox(obj);
             IntQuadTree child = getFittingChild(tmp);
 
@@ -106,6 +115,7 @@ public class IntQuadTree{
                 result = child.remove(obj);
             }else{
                 // Or root if object doesn't fit in a child
+                // 若对象不适合任何子节点,则放入根节点
                 result = objects.removeValue(obj);
             }
 
@@ -117,7 +127,10 @@ public class IntQuadTree{
         return result;
     }
 
-    /** Removes all objects. */
+    /**
+     * Removes all objects.
+     * 移除所有对象。
+     */
     public void clear(){
         objects.clear();
         totalObjects = 0;
@@ -135,11 +148,14 @@ public class IntQuadTree{
         float horizontalMidpoint = bounds.y + (bounds.height / 2);
 
         // Object can completely fit within the top quadrants
+        // 对象可完全放入上方的象限
         boolean topQuadrant = boundingBox.y > horizontalMidpoint;
         // Object can completely fit within the bottom quadrants
+        // 对象可完全放入下方的象限
         boolean bottomQuadrant = boundingBox.y < horizontalMidpoint && (boundingBox.y + boundingBox.height) < horizontalMidpoint;
 
         // Object can completely fit within the left quadrants
+        // 对象可完全放入左侧的象限
         if(boundingBox.x < verticalMidpoint && boundingBox.x + boundingBox.width < verticalMidpoint){
             if(topQuadrant){
                 return topLeft;
@@ -147,6 +163,7 @@ public class IntQuadTree{
                 return botLeft;
             }
         }else if(boundingBox.x > verticalMidpoint){ // Object can completely fit within the right quadrants
+        // 对象可完全放入右侧的象限
             if(topQuadrant){
                 return topRight;
             }else if(bottomQuadrant){
@@ -155,6 +172,7 @@ public class IntQuadTree{
         }
 
         // Else, object needs to be in parent cause it can't fit completely in a quadrant
+        // 否则,对象无法完全放入任何象限,需要放入父节点
         return null;
     }
 
@@ -162,6 +180,8 @@ public class IntQuadTree{
      * Processes objects that may intersect the given rectangle.
      * <p>
      * This will never result in false positives.
+     * <p>
+     * 处理可能与给定矩形相交的对象。 <p> 这绝不会产生误报。
      */
     public void intersect(float x, float y, float width, float height, Intc out){
         if(!leaf){
@@ -183,7 +203,7 @@ public class IntQuadTree{
     }
 
     /**
-     * @return whether an object overlaps this rectangle.
+     * @return whether an object overlaps this rectangle. 是否有对象与此矩形重叠。
      * This will never result in false positives.
      */
     public boolean any(float x, float y, float width, float height){
@@ -210,6 +230,8 @@ public class IntQuadTree{
      * Processes objects that may intersect the given rectangle.
      * <p>
      * This will never result in false positives.
+     * <p>
+     * 处理可能与给定矩形相交的对象。 <p> 这绝不会产生误报。
      */
     public void intersect(Rect rect, Intc out){
         intersect(rect.x, rect.y, rect.width, rect.height, out);
@@ -219,6 +241,8 @@ public class IntQuadTree{
      * Fills the out parameter with any objects that may intersect the given rectangle.
      * <p>
      * This will result in false positives, but never a false negative.
+     * <p>
+     * 用可能与给定矩形相交的对象填充 out 参数。 <p> 这可能产生误报,但绝不会漏报。
      */
     public void intersect(Rect toCheck, IntAr out){
         intersect(toCheck.x, toCheck.y, toCheck.width, toCheck.height, out);
@@ -226,6 +250,7 @@ public class IntQuadTree{
 
     /**
      * Fills the out parameter with any objects that may intersect the given rectangle.
+     * 用可能与给定矩形相交的对象填充 out 参数。
      */
     public void intersect(float x, float y, float width, float height, IntAr out){
         if(!leaf){
@@ -246,7 +271,10 @@ public class IntQuadTree{
         }
     }
 
-    /** Adds all quadtree objects to the specified Ar. */
+    /**
+     * Adds all quadtree objects to the specified Ar.
+     * 将所有四叉树对象添加到指定的 Ar 中。
+     */
     public void getObjects(IntAr out){
         out.addAll(objects);
 
@@ -266,9 +294,15 @@ public class IntQuadTree{
         prov.hitbox(t, tmp);
     }
 
-    /**Represents an object in a QuadTree.*/
+    /**
+     * Represents an object in a QuadTree.
+     * 表示四叉树中的一个对象。
+     */
     public interface IntQuadTreeProvider{
-        /**Fills the out parameter with this element's rough bounding box. This should never be smaller than the actual object, but may be larger.*/
+        /**
+         * Fills the out parameter with this element's rough bounding box. This should never be smaller than the actual object, but may be larger.
+         * 用此元素的粗略包围盒填充 out 参数。它不应小于实际对象,但可能更大。
+         */
         void hitbox(int object, Rect out);
     }
 }

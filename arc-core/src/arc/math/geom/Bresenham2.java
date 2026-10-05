@@ -11,6 +11,8 @@ import arc.util.pooling.Pools;
  * <p>
  * Instances of this class own the returned array of points and the points themselves to avoid garbage struct as much as
  * possible. Calling any of the methods will result in the reuse of the previously returned array and vectors.
+ * <p>
+ * 使用 Bresenham 算法返回 2D 网格上一条直线在整数坐标处的点列表。 <p> <p> 此类实例拥有返回的点数组及点本身,以尽量避免产生垃圾。调用任何方法都会复用之前返回的数组和向量。
  * @author badlogic
  */
 public class Bresenham2{
@@ -19,10 +21,12 @@ public class Bresenham2{
 
     /**
      * Iterates through a list of {@link Point2} instances along the given line, at integer coordinates.
-     * @param startX the start x coordinate of the line
-     * @param startY the start y coordinate of the line
-     * @param endX the end x coordinate of the line
-     * @param endY the end y coordinate of the line
+     * <p>
+     * 沿给定直线以整数坐标遍历 {@link Point2} 实例列表。
+     * @param startX the start x coordinate of the line 直线起点的 x 坐标
+     * @param startY the start y coordinate of the line 直线起点的 y 坐标
+     * @param endX the end x coordinate of the line 直线终点的 x 坐标
+     * @param endY the end y coordinate of the line 直线终点的 y 坐标
      */
     public static void line(int startX, int startY, int endX, int endY, Intc2 consumer){
         int dx = Math.abs(endX - startX);
@@ -52,9 +56,11 @@ public class Bresenham2{
 
     /**
      * Returns a list of {@link Point2} instances along the given line, at integer coordinates.
-     * @param start the start of the line
-     * @param end the end of the line
-     * @return the list of points on the line at integer coordinates
+     * <p>
+     * 返回沿给定直线、以整数坐标排列的 {@link Point2} 实例列表。
+     * @param start the start of the line 直线的起点
+     * @param end the end of the line 直线的终点
+     * @return the list of points on the line at integer coordinates 直线上整数坐标点的列表
      */
     public Ar<Point2> line(Point2 start, Point2 end){
         return line(start.x, start.y, end.x, end.y);
@@ -62,11 +68,13 @@ public class Bresenham2{
 
     /**
      * Returns a list of {@link Point2} instances along the given line, at integer coordinates.
-     * @param startX the start x coordinate of the line
-     * @param startY the start y coordinate of the line
-     * @param endX the end x coordinate of the line
-     * @param endY the end y coordinate of the line
-     * @return the list of points on the line at integer coordinates
+     * <p>
+     * 返回沿给定直线、以整数坐标排列的 {@link Point2} 实例列表。
+     * @param startX the start x coordinate of the line 直线起点的 x 坐标
+     * @param startY the start y coordinate of the line 直线起点的 y 坐标
+     * @param endX the end x coordinate of the line 直线终点的 x 坐标
+     * @param endY the end y coordinate of the line 直线终点的 y 坐标
+     * @return the list of points on the line at integer coordinates 直线上整数坐标点的列表
      */
     public Ar<Point2> line(int startX, int startY, int endX, int endY){
         pool.freeAll(points);
@@ -76,13 +84,15 @@ public class Bresenham2{
 
     /**
      * Returns a list of {@link Point2} instances along the given line, at integer coordinates.
-     * @param startX the start x coordinate of the line
-     * @param startY the start y coordinate of the line
-     * @param endX the end x coordinate of the line
-     * @param endY the end y coordinate of the line
-     * @param pool the pool from which Point2 instances are fetched
-     * @param output the output array, will be cleared in this method
-     * @return the list of points on the line at integer coordinates
+     * <p>
+     * 返回沿给定直线、以整数坐标排列的 {@link Point2} 实例列表。
+     * @param startX the start x coordinate of the line 直线起点的 x 坐标
+     * @param startY the start y coordinate of the line 直线起点的 y 坐标
+     * @param endX the end x coordinate of the line 直线终点的 x 坐标
+     * @param endY the end y coordinate of the line 直线终点的 y 坐标
+     * @param pool the pool from which Point2 instances are fetched 从中获取 Point2 实例的对象池
+     * @param output the output array, will be cleared in this method 输出数组,将在此方法中被清空
+     * @return the list of points on the line at integer coordinates 直线上整数坐标点的列表
      */
     public Ar<Point2> line(int startX, int startY, int endX, int endY, Pool<Point2> pool, Ar<Point2> output){
 
@@ -129,13 +139,15 @@ public class Bresenham2{
 
     /**
      * Returns a list of {@link Point2} instances along the given line at integer coordinates, with no diagonals.
-     * @param startX the start x coordinate of the line
-     * @param startY the start y coordinate of the line
-     * @param endX the end x coordinate of the line
-     * @param endY the end y coordinate of the line
-     * @param pool the pool from which Point2 instances are fetched
-     * @param output the output array, will be cleared in this method
-     * @return the list of points on the line at integer coordinates
+     * <p>
+     * 返回沿给定直线、以整数坐标排列且无对角线的 {@link Point2} 实例列表。
+     * @param startX the start x coordinate of the line 直线起点的 x 坐标
+     * @param startY the start y coordinate of the line 直线起点的 y 坐标
+     * @param endX the end x coordinate of the line 直线终点的 x 坐标
+     * @param endY the end y coordinate of the line 直线终点的 y 坐标
+     * @param pool the pool from which Point2 instances are fetched 从中获取 Point2 实例的对象池
+     * @param output the output array, will be cleared in this method 输出数组,将在此方法中被清空
+     * @return the list of points on the line at integer coordinates 直线上整数坐标点的列表
      */
     public Ar<Point2> lineNoDiagonal(int startX, int startY, int endX, int endY, Pool<Point2> pool, Ar<Point2> output){
         int xDist = Math.abs(endX - startX);

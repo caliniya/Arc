@@ -5,24 +5,37 @@ import arc.util.*;
 
 /**
  * Encapsulates a 2D vector. Allows chaining methods by returning a reference to itself
+ * <p>
+ * 封装 2D 向量。通过返回自身引用实现链式调用
  * @author badlogicgames@gmail.com
  */
 public class Vec2 implements Vector<Vec2>, Position{
     public static final Vec2 X = new Vec2(1, 0), Y = new Vec2(0, 1), ZERO = new Vec2(0, 0);
 
-    /** the x-component of this vector **/
+    /**
+     * the x-component of this vector
+     * 此向量的 x 分量
+     */
     public float x;
-    /** the y-component of this vector **/
+    /**
+     * the y-component of this vector
+     * 此向量的 y 分量
+     */
     public float y;
 
-    /** Constructs a new vector at (0,0) */
+    /**
+     * Constructs a new vector at (0,0)
+     * 在 (0,0) 处构造新向量
+     */
     public Vec2(){
     }
 
     /**
      * Constructs a vector with the given components
-     * @param x The x-component
-     * @param y The y-component
+     * <p>
+     * 用给定的分量构造向量
+     * @param x The x-component x 分量
+     * @param y The y-component y 分量
      */
     public Vec2(float x, float y){
         this.x = x;
@@ -31,7 +44,9 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Constructs a vector from the given vector
-     * @param v The vector
+     * <p>
+     * 根据给定的向量构造向量
+     * @param v The vector 向量
      */
     public Vec2(Vec2 v){
         set(v);
@@ -49,7 +64,10 @@ public class Vec2 implements Vector<Vec2>, Position{
         return set(amount, 0).rotateRadExact(angle * Mathf.degreesToRadians);
     }
 
-    /**Snaps this vector's coordinates to integers.*/
+    /**
+     * Snaps this vector's coordinates to integers.
+     * 将此向量的坐标取整到整数。
+     */
     public Vec2 snap(){
         return set((int)x, (int)y);
     }
@@ -91,9 +109,11 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Sets the components of this vector
-     * @param x The x-component
-     * @param y The y-component
-     * @return This vector for chaining
+     * <p>
+     * 设置此向量的各分量
+     * @param x The x-component x 分量
+     * @param y The y-component y 分量
+     * @return This vector for chaining 此向量,用于链式调用
      */
     public Vec2 set(float x, float y){
         this.x = x;
@@ -120,9 +140,11 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Substracts the other vector from this vector.
-     * @param x The x-component of the other vector
-     * @param y The y-component of the other vector
-     * @return This vector for chaining
+     * <p>
+     * 从此向量中减去另一向量。
+     * @param x The x-component of the other vector 另一个向量的 x 分量
+     * @param y The y-component of the other vector 另一个向量的 y 分量
+     * @return This vector for chaining 此向量,用于链式调用
      */
     public Vec2 sub(float x, float y){
         this.x -= x;
@@ -163,9 +185,11 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Adds the given components to this vector
-     * @param x The x-component
-     * @param y The y-component
-     * @return This vector for chaining
+     * <p>
+     * 将给定的各分量加到此向量上
+     * @param x The x-component x 分量
+     * @param y The y-component y 分量
+     * @return This vector for chaining 此向量,用于链式调用
      */
     public Vec2 add(float x, float y){
         this.x += x;
@@ -195,7 +219,9 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Multiplies this vector by a scalar
-     * @return This vector for chaining
+     * <p>
+     * 将此向量乘以标量
+     * @return This vector for chaining 此向量,用于链式调用
      */
     public Vec2 scl(float x, float y){
         this.x *= x;
@@ -232,9 +258,9 @@ public class Vec2 implements Vector<Vec2>, Position{
     }
 
     /**
-     * @param x The x-component of the other vector
-     * @param y The y-component of the other vector
-     * @return the distance between this and the other vector
+     * @param x The x-component of the other vector 另一个向量的 x 分量
+     * @param y The y-component of the other vector 另一个向量的 y 分量
+     * @return the distance between this and the other vector 此向量与另一向量之间的距离
      */
     public float dst(float x, float y){
         final float x_d = x - this.x;
@@ -250,9 +276,9 @@ public class Vec2 implements Vector<Vec2>, Position{
     }
 
     /**
-     * @param x The x-component of the other vector
-     * @param y The y-component of the other vector
-     * @return the squared distance between this and the other vector
+     * @param x The x-component of the other vector 另一个向量的 x 分量
+     * @param y The y-component of the other vector 另一个向量的 y 分量
+     * @return the squared distance between this and the other vector 此向量与另一向量之间距离的平方
      */
     public float dst2(float x, float y){
         final float xd = x - this.x;
@@ -308,7 +334,9 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Converts this {@code Vec2} to a string in the format {@code (x,y)}.
-     * @return a string representation of this object.
+     * <p>
+     * 将此 {@code Vec2} 转换为 {@code (x,y)} 格式的字符串。
+     * @return a string representation of this object. 此对象的字符串表示。
      */
     @Override
     public String toString(){
@@ -337,8 +365,10 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Sets this {@code Vec2} to the value represented by the specified string according to the format of {@link #toString()}.
-     * @param v the string.
-     * @return this vector for chaining
+     * <p>
+     * 按照 {@link #toString()} 的格式,将此 {@code Vec2} 设置为由指定字符串表示的值。
+     * @param v the string. 字符串。
+     * @return this vector for chaining 此向量,用于链式调用
      */
     public Vec2 fromString(String v){
         int s = v.indexOf(',', 1);
@@ -349,6 +379,7 @@ public class Vec2 implements Vector<Vec2>, Position{
                 return this.set(x, y);
             }catch(NumberFormatException ex){
                 // Throw a ArcRuntimeException
+                // 抛出 ArcRuntimeException
             }
         }
         throw new ArcRuntimeException("Malformed Vec2: " + v);
@@ -356,8 +387,10 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Left-multiplies this vector by the given matrix
-     * @param mat the matrix
-     * @return this vector
+     * <p>
+     * 将此向量左乘给定矩阵
+     * @param mat the matrix 矩阵
+     * @return this vector 此向量
      */
     public Vec2 mul(Mat mat){
         float x = this.x * mat.val[0] + this.y * mat.val[3] + mat.val[6];
@@ -369,8 +402,10 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Calculates the 2D cross product between this and the given vector.
-     * @param v the other vector
-     * @return the cross product
+     * <p>
+     * 计算此向量与给定向量之间的 2D 叉积。
+     * @param v the other vector 另一个向量
+     * @return the cross product 叉积
      */
     public float crs(Vec2 v){
         return this.x * v.y - this.y * v.x;
@@ -378,16 +413,18 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Calculates the 2D cross product between this and the given vector.
-     * @param x the x-coordinate of the other vector
-     * @param y the y-coordinate of the other vector
-     * @return the cross product
+     * <p>
+     * 计算此向量与给定向量之间的 2D 叉积。
+     * @param x the x-coordinate of the other vector 另一个向量的 x 坐标
+     * @param y the y-coordinate of the other vector 另一个向量的 y 坐标
+     * @return the cross product 叉积
      */
     public float crs(float x, float y){
         return this.x * y - this.y * x;
     }
 
     /**
-     * @return the angle in degrees of this vector (point) relative to the x-axis. Angles are towards the positive y-axis
+     * @return the angle in degrees of this vector (point) relative to the x-axis. Angles are towards the positive y-axis 此向量(点)相对于 x 轴的以度表示的角度。角度朝向 y 轴正方向
      * (typically counter-clockwise) and between 0 and 360.
      */
     public float angle(){
@@ -397,21 +434,24 @@ public class Vec2 implements Vector<Vec2>, Position{
     }
 
     /**
-     * @return the angle in degrees of this vector (point) relative to the given vector. Angles are towards the positive y-axis
+     * @return the angle in degrees of this vector (point) relative to the given vector. Angles are towards the positive y-axis 此向量(点)相对于给定向量的以度表示的角度。角度朝向 y 轴正方向
      * (typically counter-clockwise.) between -180 and +180
      */
     public float angle(Vec2 reference){
         return (float)Math.atan2(crs(reference), dot(reference)) * Mathf.radiansToDegrees;
     }
 
-    /**Sets this vector to a random direction with the specified length.*/
+    /**
+     * Sets this vector to a random direction with the specified length.
+     * 将此向量设置为具有指定长度的随机方向。
+     */
     public Vec2 rnd(float length){
         setToRandomDirection().scl(length);
         return this;
     }
 
     /**
-     * @return the angle in radians of this vector (point) relative to the x-axis. Angles are towards the positive y-axis.
+     * @return the angle in radians of this vector (point) relative to the x-axis. Angles are towards the positive y-axis. 此向量(点)相对于 x 轴的以弧度表示的角度。角度朝向 y 轴正方向。
      * (typically counter-clockwise)
      */
     public float angleRad(){
@@ -419,7 +459,7 @@ public class Vec2 implements Vector<Vec2>, Position{
     }
 
     /**
-     * @return the angle in radians of this vector (point) relative to the given vector. Angles are towards the positive y-axis.
+     * @return the angle in radians of this vector (point) relative to the given vector. Angles are towards the positive y-axis. 此向量(点)相对于给定向量的以弧度表示的角度。角度朝向 y 轴正方向。
      * (typically counter-clockwise.)
      */
     public float angleRad(Vec2 reference){
@@ -428,7 +468,9 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Sets the angle of the vector in degrees relative to the x-axis, towards the positive y-axis (typically counter-clockwise).
-     * @param degrees The angle in degrees to set.
+     * <p>
+     * 设置向量相对 x 轴、以度表示的角度,朝 y 轴正方向(通常为逆时针)。
+     * @param degrees The angle in degrees to set. 要设置的以度表示的角度。
      */
     public Vec2 setAngle(float degrees){
         return setAngleRad(degrees * Mathf.degreesToRadians);
@@ -436,7 +478,9 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Sets the angle of the vector in radians relative to the x-axis, towards the positive y-axis (typically counter-clockwise).
-     * @param radians The angle in radians to set.
+     * <p>
+     * 设置向量相对 x 轴、以弧度表示的角度,朝 y 轴正方向(通常为逆时针)。
+     * @param radians The angle in radians to set. 要设置的以弧度表示的角度。
      */
     public Vec2 setAngleRad(float radians){
         this.set(len(), 0f);
@@ -451,7 +495,9 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Rotates the Vec2 by the given angle, counter-clockwise assuming the y-axis points up.
-     * @param degrees the angle in degrees
+     * <p>
+     * 将 Vec2 旋转给定角度,在 y 轴朝上的前提下为逆时针。
+     * @param degrees the angle in degrees 以度表示的角度
      */
     public Vec2 rotate(float degrees){
         return rotateRad(degrees * Mathf.degreesToRadians);
@@ -459,8 +505,10 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Rotates the Vec2 by the given angle around reference vector, counter-clockwise assuming the y-axis points up.
-     * @param degrees the angle in degrees
-     * @param reference center Vec2
+     * <p>
+     * 将 Vec2 绕参考向量旋转给定角度,在 y 轴朝上的前提下为逆时针。
+     * @param degrees the angle in degrees 以度表示的角度
+     * @param reference center Vec2 作为参考中心的 Vec2
      */
     public Vec2 rotateAround(Vec2 reference, float degrees){
         return this.sub(reference).rotate(degrees).add(reference);
@@ -468,7 +516,9 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Rotates the Vec2 by the given angle, counter-clockwise assuming the y-axis points up.
-     * @param radians the angle in radians
+     * <p>
+     * 将 Vec2 旋转给定角度,在 y 轴朝上的前提下为逆时针。
+     * @param radians the angle in radians 以弧度表示的角度
      */
     public Vec2 rotateRad(float radians){
         float cos = Mathf.cos(radians);
@@ -498,14 +548,19 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Rotates the Vec2 by the given angle around reference vector, counter-clockwise assuming the y-axis points up.
-     * @param radians the angle in radians
-     * @param reference center Vec2
+     * <p>
+     * 将 Vec2 绕参考向量旋转给定角度,在 y 轴朝上的前提下为逆时针。
+     * @param radians the angle in radians 以弧度表示的角度
+     * @param reference center Vec2 作为参考中心的 Vec2
      */
     public Vec2 rotateAroundRad(Vec2 reference, float radians){
         return this.sub(reference).rotateRad(radians).add(reference);
     }
 
-    /** Rotates the Vec2 by 90 degrees in the specified direction, where >= 0 is counter-clockwise and < 0 is clockwise. */
+    /**
+     * Rotates the Vec2 by 90 degrees in the specified direction, where >= 0 is counter-clockwise and < 0 is clockwise.
+     * 将 Vec2 按指定方向旋转 90 度,>= 0 为逆时针,< 0 为顺时针。
+     */
     public Vec2 rotate90(int dir){
         float x = this.x;
         if(dir >= 0){
@@ -626,7 +681,9 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Compares this vector with the other vector, using the supplied epsilon for fuzzy equality testing.
-     * @return whether the vectors are the same.
+     * <p>
+     * 将此向量与另一向量比较,使用给定的 epsilon 进行近似相等测试。
+     * @return whether the vectors are the same. 两向量是否相同。
      */
     public boolean epsilonEquals(float x, float y, float epsilon){
         if(Math.abs(x - this.x) > epsilon) return false;
@@ -635,8 +692,10 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Compares this vector with the other vector using Mathf.FLOAT_ROUNDING_ERROR for fuzzy equality testing
-     * @param other other vector to compare
-     * @return true if vector are equal, otherwise false
+     * <p>
+     * 使用 Mathf.FLOAT_ROUNDING_ERROR 将此向量与另一向量进行近似相等比较
+     * @param other other vector to compare 用于比较的另一个向量
+     * @return true if vector are equal, otherwise false 若向量相等则为 true,否则为 false
      */
     public boolean epsilonEquals(final Vec2 other){
         return epsilonEquals(other, Mathf.FLOAT_ROUNDING_ERROR);
@@ -644,9 +703,11 @@ public class Vec2 implements Vector<Vec2>, Position{
 
     /**
      * Compares this vector with the other vector using Mathf.FLOAT_ROUNDING_ERROR for fuzzy equality testing
-     * @param x x component of the other vector to compare
-     * @param y y component of the other vector to compare
-     * @return true if vector are equal, otherwise false
+     * <p>
+     * 使用 Mathf.FLOAT_ROUNDING_ERROR 将此向量与另一向量进行近似相等比较
+     * @param x x component of the other vector to compare 用于比较的另一个向量的 x 分量
+     * @param y y component of the other vector to compare 用于比较的另一个向量的 y 分量
+     * @return true if vector are equal, otherwise false 若向量相等则为 true,否则为 false
      */
     public boolean epsilonEquals(float x, float y){
         return epsilonEquals(x, y, Mathf.FLOAT_ROUNDING_ERROR);

@@ -7,7 +7,10 @@ import arc.struct.*;
 public class LinearRegression{
     public float intercept, slope;
 
-    /** Performs a linear regression on the data points. */
+    /**
+     * Performs a linear regression on the data points.
+     * 对数据点进行线性回归。
+     */
     public void calculate(Ar<Vec2> v){
         int n = v.size;
 
@@ -29,7 +32,10 @@ public class LinearRegression{
         intercept = ybar - slope * xbar;
     }
 
-    /** @return the expected response {@code y} given the value of the predictor variable {@code x}. */
+    /**
+     * @return the expected response {@code y} given the value of the predictor variable {@code x}.
+     * 给定预测变量 {@code x} 时预期的响应值 {@code y}。
+     */
     public float predict(float x){
         return slope * x + intercept;
     }
