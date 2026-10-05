@@ -10,6 +10,8 @@ import arc.util.*;
  * rendering thread, synchronously. Passing a {@link CubemapParameter} to
  * {@link AssetManager#load(String, Class, AssetLoaderParameters)} allows one to specify parameters as can be passed to the
  * various Cubemap constructors, e.g. filtering and so on.
+ * <p>
+ * 用于 {@link Cubemap} 实例的 {@link AssetLoader}。像素数据是异步加载的,而纹理则在渲染线程上同步创建。向 {@link AssetManager#load(String, Class, AssetLoaderParameters)} 传入 {@link CubemapParameter} 可以指定参数,与传递给各种 Cubemap 构造函数的参数相同,例如过滤方式等。
  * @author mzechner, Vincent Bousquet
  */
 public class CubemapLoader extends AsynchronousAssetLoader<Cubemap, CubemapLoader.CubemapParameter>{
@@ -48,7 +50,10 @@ public class CubemapLoader extends AsynchronousAssetLoader<Cubemap, CubemapLoade
     }
 
     public static class CubemapParameter extends AssetLoaderParameters<Cubemap>{
-        /** The texture to put the data in, optional. **/
+        /**
+         * The texture to put the data in, optional.
+         * 要放入数据的纹理,可选。
+         */
         public @Nullable Cubemap cubemap = null;
         public boolean mipmaps;
         public TextureFilter minFilter = TextureFilter.nearest;

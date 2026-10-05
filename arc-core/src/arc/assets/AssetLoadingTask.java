@@ -11,6 +11,8 @@ import java.util.concurrent.*;
 
 /**
  * Responsible for loading an asset through an {@link AssetLoader} based on an {@link AssetDescriptor}.
+ * <p>
+ * 负责通过 {@link AssetLoader} 基于 {@link AssetDescriptor} 加载资产。
  * @author mzechner
  */
 @SuppressWarnings("unchecked")
@@ -38,7 +40,10 @@ class AssetLoadingTask implements Callable<Void>{
         startTime = Time.nanos();
     }
 
-    /** Loads parts of the asset asynchronously if the loader is an {@link AsynchronousAssetLoader}. */
+    /**
+     * Loads parts of the asset asynchronously if the loader is an {@link AsynchronousAssetLoader}.
+     * 如果加载器是 {@link AsynchronousAssetLoader},则异步加载资产的部分内容。
+     */
     @Override
     public Void call(){
         AsynchronousAssetLoader asyncLoader = (AsynchronousAssetLoader)loader;
@@ -49,6 +54,7 @@ class AssetLoadingTask implements Callable<Void>{
                 manager.injectDependencies(assetDesc.fileName, dependencies);
             }else{
                 // if we have no dependencies, we load the async part of the task immediately.
+                // 如果我们没有任何依赖,则立即加载任务的异步部分。
                 asyncLoader.loadAsync(manager, assetDesc.fileName, resolve(loader, assetDesc), assetDesc.params);
                 asyncDone = true;
             }
@@ -63,7 +69,11 @@ class AssetLoadingTask implements Callable<Void>{
      * {@link AsynchronousAssetLoader#loadAsync(AssetManager, String, Fi, AssetLoaderParameters)} method is first called on
      * a worker thread. Once this method returns, the rest of the asset is loaded on the rendering thread via
      * {@link AsynchronousAssetLoader#loadSync(AssetManager, String, Fi, AssetLoaderParameters)}.
-     * @return true in case the asset was fully loaded, false otherwise
+     * <p>
+     * 更新资产的加载。如果资产是通过 {@link AsynchronousAssetLoader} 加载的,则首先在工作线程上调用加载器的
+     * {@link AsynchronousAssetLoader#loadAsync(AssetManager, String, Fi, AssetLoaderParameters)} 方法;该方法返回后,
+     * 再在渲染线程上通过 {@link AsynchronousAssetLoader#loadSync(AssetManager, String, Fi, AssetLoaderParameters)} 加载资产的其余部分。
+     * @return true in case the asset was fully loaded, false otherwise 如果资产已完全加载则为 true,否则为 false
      */
     public boolean update(){
         ticks++;

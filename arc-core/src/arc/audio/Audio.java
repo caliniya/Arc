@@ -6,28 +6,49 @@ import arc.util.*;
 
 import static arc.audio.Soloud.*;
 
-/** High-level wrapper for the Soloud library. */
+/**
+ * High-level wrapper for the Soloud library.
+ * Soloud 库的高级封装。
+ */
 public class Audio implements Disposable{
     public float globalPitch = 1f;
-    /** Falloff when playing audio.*/
+    /**
+     * Falloff when playing audio.
+     * 播放音频时的衰减。
+     */
     public float falloff = 16000f;
-    /** Default value for maximum instances of a sound. Must be set before a sound is loaded. */
+    /**
+     * Default value for maximum instances of a sound. Must be set before a sound is loaded.
+     * 单个音效最大实例数的默认值。必须在加载音效之前设置。
+     */
     public int defaultSoundMaxConcurrent = 6;
 
     boolean initialized;
 
     public float sfxVolume = 0f;
-    /** Global bus for all sounds. */
+    /**
+     * Global bus for all sounds.
+     * 所有音效的全局总线。
+     */
     public AudioBus soundBus = new AudioBus();
-    /** Global bus for all music. */
+    /**
+     * Global bus for all music.
+     * 所有音乐的全局总线。
+     */
     public AudioBus musicBus = new AudioBus();
 
-    /** Initializes Soloud audio by default. May throw an exception if initialization fails. */
+    /**
+     * Initializes Soloud audio by default. May throw an exception if initialization fails.
+     * 默认初始化 Soloud 音频。如果初始化失败,可能抛出异常。
+     */
     public Audio(){
         initialize();
     }
 
-    /** Conditionally initializes audio. If enabled is false, does nothing. */
+    /**
+     * Conditionally initializes audio. If enabled is false, does nothing.
+     * 按条件初始化音频。如果 enabled 为 false,则不执行任何操作。
+     */
     public Audio(boolean enabled){
         if(enabled){
             initialize();
@@ -38,7 +59,10 @@ public class Audio implements Disposable{
         return initialized;
     }
 
-    /** Intializes Soloud audio. If this fails, prints an error and disables audio. */
+    /**
+     * Intializes Soloud audio. If this fails, prints an error and disables audio.
+     * 初始化 Soloud 音频。如果失败,则打印错误并禁用音频。
+     */
     protected void initialize(){
         try{
             init();
@@ -75,7 +99,10 @@ public class Audio implements Disposable{
         }
     }
 
-    /** Loads a sound, logging an error and returning a dummy track upon failure. */
+    /**
+     * Loads a sound, logging an error and returning a dummy track upon failure.
+     * 加载音效,失败时记录错误并返回一个虚拟音轨。
+     */
     public Sound newSound(Fi file){
         if(!initialized) return new Sound();
         try{
@@ -86,7 +113,10 @@ public class Audio implements Disposable{
         }
     }
 
-    /** Loads music, logging an error and returning a dummy track upon failure. */
+    /**
+     * Loads music, logging an error and returning a dummy track upon failure.
+     * 加载音乐,失败时记录错误并返回一个虚拟音轨。
+     */
     public Music newMusic(Fi file){
         if(!initialized) return new Music();
         try{

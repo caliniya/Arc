@@ -11,18 +11,29 @@ import java.util.concurrent.*;
 /**
  * Packs pages of images using the maximal rectangles bin packing algorithm by Jukka Jylänki. A brute force binary search is
  * used to pack into the smallest bin possible.
+ * <p>
+ * 使用 Jukka Jylänki 的最大矩形装箱算法打包图片页。使用蛮力二分搜索来尽可能装入最小的容器。
  * @author Nathan Sweet
  */
 public class MaxRectsPacker implements Packer{
     final Settings settings;
-    /** Below this many rects, packing is so quick that handing work to other threads costs more than it saves. */
+    /**
+     * Below this many rects, packing is so quick that handing work to other threads costs more than it saves.
+     * 当矩形数量低于此值时,打包非常快,把工作交给其他线程的开销反而大于收益。
+     */
     private static final int parallelThreshold = 48;
 
     private final FreeRectChoiceHeuristic[] methods = FreeRectChoiceHeuristic.values();
-    /** One instance per heuristic, so the heuristics can be evaluated at the same time without sharing any state. */
+    /**
+     * One instance per heuristic, so the heuristics can be evaluated at the same time without sharing any state.
+     * 每个启发式算法一个实例,以便可以同时评估各个启发式算法而不共享任何状态。
+     */
     private final MaxRects[] maxRects = new MaxRects[methods.length];
     private final Sort sort = new Sort();
-    /** Where progress is printed. Null means System.out. */
+    /**
+     * Where progress is printed. Null means System.out.
+     * 进度打印的位置。为 null 表示 System.out。
+     */
     PrintStream log;
 
     private final Comparator<Rect> rectComparator = new Comparator<Rect>(){
@@ -56,6 +67,7 @@ public class MaxRectsPacker implements Packer{
         if(settings.fast){
             if(settings.rotation){
                 // Sort by longest side if rotation is enabled.
+                // 如果启用了旋转,则按最长边排序。
                 sort.sort(inputRects, (o1, o2) -> {
                     int n1 = Math.max(o1.width, o1.height);
                     int n2 = Math.max(o2.width, o2.height);
@@ -63,6 +75,7 @@ public class MaxRectsPacker implements Packer{
                 });
             }else{
                 // Sort only by width (largest to smallest) if rotation is disabled.
+                // 如果禁用了旋转,则仅按宽度排序(从大到小)。
                 sort.sort(inputRects, (o1, o2) -> o2.width - o1.width);
             }
         }
@@ -94,6 +107,7 @@ public class MaxRectsPacker implements Packer{
         }
 
         // Find min size.
+        // 求最小尺寸。
         int minWidth = Integer.MAX_VALUE, minHeight = Integer.MAX_VALUE;
         for(int i = 0, nn = inputRects.size; i < nn; i++){
             Rect rect = inputRects.get(i);
@@ -123,7 +137,9 @@ public class MaxRectsPacker implements Packer{
         minHeight = Math.max(minHeight, settings.minHeight);
 
         // BinarySearch uses the max size. Rects are packed with right and top padding, so the max size is increased to match.
+        // BinarySearch 使用最大尺寸。矩形打包时带有右侧和顶部填充,因此最大尺寸会相应增加。
         // After packing the padding is subtracted from the page size.
+        // 打包完成后,再从页面尺寸中减去填充。
         int adjustX = paddingX, adjustY = paddingY;
         if(settings.edgePadding){
             if(settings.duplicatePadding){
@@ -138,9 +154,11 @@ public class MaxRectsPacker implements Packer{
         if(!settings.silent) out().print("| Packing");
 
         //the width/height searches revisit many of the same sizes, and packing at a size is a pure function of that size
+        // 宽度和高度的搜索会重复访问许多相同的尺寸,而在某一尺寸下打包是该尺寸的纯函数
         Map<Long, Page> cache = new HashMap<>();
 
         // Find the minimal page size that fits all rects.
+        // 找出能容纳所有矩形的最小页面尺寸。
         Page bestResult = null;
         if(settings.square){
             int minSize = Math.max(minWidth, minHeight);
@@ -159,6 +177,7 @@ public class MaxRectsPacker implements Packer{
             }
             if(!settings.silent) out().println();
             // Rects don't fit on one page. Fill a whole page and return.
+            // 矩形无法放入一页。填满一整页并返回。
             if(bestResult == null) bestResult = packAtSize(false, maxSize + adjustX, maxSize + adjustY, inputRects);
             sort.sort(bestResult.outputRects, rectComparator);
             bestResult.width = Math.max(bestResult.width, bestResult.height) - paddingX;
@@ -191,6 +210,7 @@ public class MaxRectsPacker implements Packer{
             }
             if(!settings.silent) out().println();
             // Rects don't fit on one page. Fill a whole page and return.
+            // 矩形无法放入一页。填满一整页并返回。
             if(bestResult == null)
                 bestResult = packAtSize(false, settings.maxWidth + adjustX, settings.maxHeight + adjustY, inputRects);
             sort.sort(bestResult.outputRects, rectComparator);
@@ -200,7 +220,10 @@ public class MaxRectsPacker implements Packer{
         }
     }
 
-    /** Same as {@link #packAtSize(boolean, int, int, Ar)} with fully = true, but remembers results per size. */
+    /**
+     * Same as {@link #packAtSize(boolean, int, int, Ar)} with fully = true, but remembers results per size.
+     * 与 {@link #packAtSize(boolean, int, int, Ar)} 的 fully = true 情况相同,但会记住每个尺寸的结果。
+     */
     private Page packAtSizeCached(Map<Long, Page> cache, int width, int height, Ar<Rect> inputRects){
         Long key = ((long)width << 32) | (height & 0xffffffffL);
         Page result = cache.get(key);
@@ -213,7 +236,7 @@ public class MaxRectsPacker implements Packer{
 
     /**
      * @param fully If true, the only results that pack all rects will be considered. If false, all results are considered, not
-     * all rects may be packed.
+     * all rects may be packed. 如果为 true,只考虑能打包所有矩形的结果。如果为 false,则考虑所有结果,并非所有矩形都会被打包。
      */
     private Page packAtSize(boolean fully, int width, int height, Ar<Rect> inputRects){
         int count = methods.length;
@@ -221,6 +244,7 @@ public class MaxRectsPacker implements Packer{
 
         if(Tasks.parallel() && inputRects.size >= parallelThreshold){
             //each heuristic is independent and only reads the input rects
+            // 每个启发式算法相互独立,且只读取输入的矩形
             Ar<FutureTask<Page>> tasks = new Ar<>(count);
             for(int i = 0; i < count; i++){
                 final int index = i;
@@ -236,6 +260,7 @@ public class MaxRectsPacker implements Packer{
         }
 
         //combine in a fixed order so the outcome doesn't depend on thread timing
+        // 以固定顺序合并,使结果不依赖于线程时序
         Page bestResult = null;
         for(int i = 0; i < count; i++){
             if(results[i] != null) bestResult = getBest(bestResult, results[i]);
@@ -243,7 +268,9 @@ public class MaxRectsPacker implements Packer{
         return bestResult;
     }
 
-    /** @return the page produced by a single heuristic, or null if it doesn't qualify. */
+    /**
+     * @return the page produced by a single heuristic, or null if it doesn't qualify. 单个启发式算法生成的页面,如果不符合条件则为 null。
+     */
     private Page packWithMethod(int index, boolean fully, int width, int height, Ar<Rect> inputRects){
         FreeRectChoiceHeuristic method = methods[index];
         MaxRects maxRects = this.maxRects[index];
@@ -260,6 +287,7 @@ public class MaxRectsPacker implements Packer{
             }
             if(ii < nn){
                 //a rect didn't fit
+                // 某个矩形放不下了
                 if(fully) return null;
 
                 Ar<Rect> remaining = new Ar<>(nn - ii);
@@ -329,6 +357,9 @@ public class MaxRectsPacker implements Packer{
     /**
      * Maximal rectangles bin packing algorithm. Adapted from this C++ public domain source:
      * http://clb.demon.fi/projects/even-more-rectangle-bin-packing
+     * <p>
+     * 最大矩形装箱算法。改编自此 C++ 公有领域源代码:
+     * http://clb.demon.fi/projects/even-more-rectangle-bin-packing
      * @author Jukka Jyl�nki
      * @author Nathan Sweet
      */
@@ -337,17 +368,24 @@ public class MaxRectsPacker implements Packer{
         private final Ar<Rect> usedRectangles = new Ar<>();
         private final Ar<Rect> freeRectangles = new Ar<>();
         private final Ar<Rect> rectanglesToCheckWhenPruning = new Ar<>();
-        /** Scratch space for pruneFreeList, indexed like freeRectangles. */
+        /**
+         * Scratch space for pruneFreeList, indexed like freeRectangles.
+         * 供 pruneFreeList 使用的临时空间,按 freeRectangles 的方式索引。
+         */
         private boolean[] pruneMarks = new boolean[64];
 
         /**
          * Used rects indexed by each of their four edge coordinates, only maintained for the contact point heuristic. This lets
          * the contact score look at just the rects that can touch a candidate instead of scanning all of them.
+         * <p>
+         * 按已使用矩形的四条边坐标索引的已用矩形,仅为接触点启发式算法维护。这样接触点评分只需查看能与候选矩形接触的矩形,而无需扫描全部矩形。
          */
         private boolean trackEdges;
         private Ar<Rect>[] byLeft, byRight, byBottom, byTop;
 
-        /** @param trackEdges must be true if the contact point heuristic is going to be used. */
+        /**
+         * @param trackEdges must be true if the contact point heuristic is going to be used. 如果要使用接触点启发式算法,则必须为 true。
+         */
         @SuppressWarnings("unchecked")
         public void init(int width, int height, boolean trackEdges){
             binWidth = width;
@@ -394,12 +432,16 @@ public class MaxRectsPacker implements Packer{
 
         private void index(Ar<Rect>[] edges, int coordinate, Rect rect){
             if(coordinate < 0 || coordinate >= edges.length) return; //can't touch anything inside the bin
+            // 容器内部没有任何东西可接触
             Ar<Rect> list = edges[coordinate];
             if(list == null) list = edges[coordinate] = new Ar<>(4);
             list.add(rect);
         }
 
-        /** Packs a single image. Order is defined externally. */
+        /**
+         * Packs a single image. Order is defined externally.
+         * 打包单个图片。顺序在外部定义。
+         */
         public Rect insert(Rect rect, FreeRectChoiceHeuristic method){
             Rect newNode = scoreRect(rect, method);
             if(newNode.height == 0) return null;
@@ -429,7 +471,10 @@ public class MaxRectsPacker implements Packer{
             return bestNode;
         }
 
-        /** For each rectangle, packs each one then chooses the best and packs that. Slow! */
+        /**
+         * For each rectangle, packs each one then chooses the best and packs that. Slow!
+         * 对每个矩形逐一尝试打包并选择最佳的一个。很慢!
+         */
         public Page pack(Ar<Rect> rects, FreeRectChoiceHeuristic method){
             rects = new Ar<>(rects);
             while(rects.size > 0){
@@ -439,6 +484,7 @@ public class MaxRectsPacker implements Packer{
                 bestNode.score2 = Integer.MAX_VALUE;
 
                 // Find the next rectangle that packs best.
+                // 找出下一个能以最佳方式打包的矩形。
                 for(int i = 0; i < rects.size; i++){
                     Rect newNode = scoreRect(rects.get(i), method);
                     if(newNode.score1 < bestNode.score1 || (newNode.score1 == bestNode.score1 && newNode.score2 < bestNode.score2)){
@@ -513,6 +559,7 @@ public class MaxRectsPacker implements Packer{
                 case ContactPointRule:
                     newNode = findPositionForNewNodeContactPoint(width, height, rotatedWidth, rotatedHeight, rotate);
                     newNode.score1 = -newNode.score1; // Reverse since we are minimizing, but for contact point score bigger is better.
+                    // 取反,因为我们在做最小化,而接触点评分越大越好。
                     break;
                 case BestLongSideFit:
                     newNode = findPositionForNewNodeBestLongSideFit(width, height, rotatedWidth, rotatedHeight, rotate);
@@ -523,6 +570,7 @@ public class MaxRectsPacker implements Packer{
             }
 
             // Cannot fit the current rectangle.
+            // 无法容纳当前矩形。
             if(newNode.height == 0){
                 newNode.score1 = Integer.MAX_VALUE;
                 newNode.score2 = Integer.MAX_VALUE;
@@ -532,6 +580,7 @@ public class MaxRectsPacker implements Packer{
         }
 
         // / Computes the ratio of used surface area.
+        // 计算已使用表面积的比例。
         private float getOccupancy(){
             int usedSurfaceArea = 0;
             for(int i = 0; i < usedRectangles.size; i++)
@@ -543,10 +592,12 @@ public class MaxRectsPacker implements Packer{
             Rect bestNode = new Rect();
 
             bestNode.score1 = Integer.MAX_VALUE; // best y, score2 is best x
+            // 最佳 y,score2 为最佳 x
 
             for(int i = 0, n = freeRectangles.size; i < n; i++){
                 Rect free = freeRectangles.get(i);
                 // Try to place the rectangle in upright (non-rotated) orientation.
+                // 尝试以竖直(未旋转)方向放置矩形。
                 if(free.width >= width && free.height >= height){
                     int topSideY = free.y + height;
                     if(topSideY < bestNode.score1 || (topSideY == bestNode.score1 && free.x < bestNode.score2)){
@@ -583,6 +634,7 @@ public class MaxRectsPacker implements Packer{
             for(int i = 0, n = freeRectangles.size; i < n; i++){
                 Rect free = freeRectangles.get(i);
                 // Try to place the rectangle in upright (non-rotated) orientation.
+                // 尝试以竖直(未旋转)方向放置矩形。
                 if(free.width >= width && free.height >= height){
                     int leftoverHoriz = Math.abs(free.width - width);
                     int leftoverVert = Math.abs(free.height - height);
@@ -631,6 +683,7 @@ public class MaxRectsPacker implements Packer{
             for(int i = 0, n = freeRectangles.size; i < n; i++){
                 Rect free = freeRectangles.get(i);
                 // Try to place the rectangle in upright (non-rotated) orientation.
+                // 尝试以竖直(未旋转)方向放置矩形。
                 if(free.width >= width && free.height >= height){
                     int leftoverHoriz = Math.abs(free.width - width);
                     int leftoverVert = Math.abs(free.height - height);
@@ -673,12 +726,14 @@ public class MaxRectsPacker implements Packer{
             Rect bestNode = new Rect();
 
             bestNode.score1 = Integer.MAX_VALUE; // best area fit, score2 is best short side fit
+            // 最佳面积适配,score2 为最佳短边适配
 
             for(int i = 0, n = freeRectangles.size; i < n; i++){
                 Rect free = freeRectangles.get(i);
                 int areaFit = free.width * free.height - width * height;
 
                 // Try to place the rectangle in upright (non-rotated) orientation.
+                // 尝试以竖直(未旋转)方向放置矩形。
                 if(free.width >= width && free.height >= height){
                     int leftoverHoriz = Math.abs(free.width - width);
                     int leftoverVert = Math.abs(free.height - height);
@@ -715,12 +770,16 @@ public class MaxRectsPacker implements Packer{
         }
 
         // / Returns 0 if the two intervals i1 and i2 are disjoint, or the length of their overlap otherwise.
+        // 如果两个区间 i1 和 i2 不相交则返回 0,否则返回它们重叠的长度。
         private int commonIntervalLength(int i1start, int i1end, int i2start, int i2end){
             if(i1end < i2start || i2end < i1start) return 0;
             return Math.min(i1end, i2end) - Math.max(i1start, i2start);
         }
 
-        /** Total length of the contacts between a candidate placement and everything already placed. */
+        /**
+         * Total length of the contacts between a candidate placement and everything already placed.
+         * 候选放置位置与所有已放置矩形之间的接触总长度。
+         */
         private int contactPointScoreNode(int x, int y, int width, int height){
             int score = 0;
 
@@ -730,10 +789,13 @@ public class MaxRectsPacker implements Packer{
             int right = x + width, top = y + height;
 
             //rects touching the left or right side of the candidate have an edge at exactly x or x + width
+            // 与候选矩形左侧或右侧接触的矩形,其边恰好位于 x 或 x + width
             score += touchingY(edge(byLeft, right), y, top, Integer.MIN_VALUE);
             score += touchingY(edge(byRight, x), y, top, right); //those already found by the call above aren't counted twice
+            // 上面那次调用已找到的不会被重复计算
 
             //same for the bottom and top side
+            // 底部和顶部同理
             score += touchingX(edge(byBottom, top), x, right, Integer.MIN_VALUE);
             score += touchingX(edge(byTop, y), x, right, top);
             return score;
@@ -743,7 +805,10 @@ public class MaxRectsPacker implements Packer{
             return coordinate < 0 || coordinate >= edges.length ? null : edges[coordinate];
         }
 
-        /** Overlap of the rects' y ranges with [y1, y2], skipping rects whose x is skipX. */
+        /**
+         * Overlap of the rects' y ranges with [y1, y2], skipping rects whose x is skipX.
+         * 各矩形的 y 区间与 [y1, y2] 的重叠,跳过 x 为 skipX 的矩形。
+         */
         private int touchingY(Ar<Rect> rects, int y1, int y2, int skipX){
             if(rects == null) return 0;
             int score = 0;
@@ -755,7 +820,10 @@ public class MaxRectsPacker implements Packer{
             return score;
         }
 
-        /** Overlap of the rects' x ranges with [x1, x2], skipping rects whose y is skipY. */
+        /**
+         * Overlap of the rects' x ranges with [x1, x2], skipping rects whose y is skipY.
+         * 各矩形的 x 区间与 [x1, x2] 的重叠,跳过 y 为 skipY 的矩形。
+         */
         private int touchingX(Ar<Rect> rects, int x1, int x2, int skipY){
             if(rects == null) return 0;
             int score = 0;
@@ -772,10 +840,12 @@ public class MaxRectsPacker implements Packer{
 
             Rect bestNode = new Rect();
             bestNode.score1 = -1; // best contact score
+            // 最佳接触评分
 
             Ar<Rect> freeRectangles = this.freeRectangles;
             for(int i = 0, n = freeRectangles.size; i < n; i++){
                 // Try to place the rectangle in upright (non-rotated) orientation.
+                // 尝试以竖直(未旋转)方向放置矩形。
                 Rect free = freeRectangles.get(i);
                 if(free.width >= width && free.height >= height){
                     int score = contactPointScoreNode(free.x, free.y, width, height);
@@ -805,11 +875,13 @@ public class MaxRectsPacker implements Packer{
 
         private boolean splitFreeNode(Rect freeNode, Rect usedNode){
             // Test with SAT if the rectangles even intersect.
+            // 先用 SAT 测试矩形是否真的相交。
             if(usedNode.x >= freeNode.x + freeNode.width || usedNode.x + usedNode.width <= freeNode.x
             || usedNode.y >= freeNode.y + freeNode.height || usedNode.y + usedNode.height <= freeNode.y) return false;
 
             if(usedNode.x < freeNode.x + freeNode.width && usedNode.x + usedNode.width > freeNode.x){
                 // New node at the top side of the used node.
+                // 在已使用节点的顶部创建新节点。
                 if(usedNode.y > freeNode.y && usedNode.y < freeNode.y + freeNode.height){
                     Rect newNode = new Rect(freeNode);
                     newNode.height = usedNode.y - newNode.y;
@@ -818,6 +890,7 @@ public class MaxRectsPacker implements Packer{
                 }
 
                 // New node at the bottom side of the used node.
+                // 在已使用节点的底部创建新节点。
                 if(usedNode.y + usedNode.height < freeNode.y + freeNode.height){
                     Rect newNode = new Rect(freeNode);
                     newNode.y = usedNode.y + usedNode.height;
@@ -829,6 +902,7 @@ public class MaxRectsPacker implements Packer{
 
             if(usedNode.y < freeNode.y + freeNode.height && usedNode.y + usedNode.height > freeNode.y){
                 // New node at the left side of the used node.
+                // 在已使用节点的左侧创建新节点。
                 if(usedNode.x > freeNode.x && usedNode.x < freeNode.x + freeNode.width){
                     Rect newNode = new Rect(freeNode);
                     newNode.width = usedNode.x - newNode.x;
@@ -837,6 +911,7 @@ public class MaxRectsPacker implements Packer{
                 }
 
                 // New node at the right side of the used node.
+                // 在已使用节点的右侧创建新节点。
                 if(usedNode.x + usedNode.width < freeNode.x + freeNode.width){
                     Rect newNode = new Rect(freeNode);
                     newNode.x = usedNode.x + usedNode.width;
@@ -877,6 +952,7 @@ public class MaxRectsPacker implements Packer{
             if(!any) return;
 
             //remove marked rects in place, keeping the order of the rest
+            // 原地移除标记的矩形,保持其余部分的顺序
             int kept = 0;
             for(int i = 0; i < freeSize; i++){
                 if(!marks[i]) free.set(kept++, free.get(i));
@@ -890,15 +966,30 @@ public class MaxRectsPacker implements Packer{
     }
 
     public enum FreeRectChoiceHeuristic{
-        /** BSSF: Positions the rectangle against the short side of a free rectangle into which it fits the best. */
+        /**
+         * BSSF: Positions the rectangle against the short side of a free rectangle into which it fits the best.
+         * BSSF:将矩形靠在它能最好适配的自由矩形的短边上。
+         */
         BestShortSideFit,
-        /** BLSF: Positions the rectangle against the long side of a free rectangle into which it fits the best. */
+        /**
+         * BLSF: Positions the rectangle against the long side of a free rectangle into which it fits the best.
+         * BLSF:将矩形靠在它能最好适配的自由矩形的长边上。
+         */
         BestLongSideFit,
-        /** BAF: Positions the rectangle into the smallest free rect into which it fits. */
+        /**
+         * BAF: Positions the rectangle into the smallest free rect into which it fits.
+         * BAF:将矩形放入能容纳它的最小的自由矩形中。
+         */
         BestAreaFit,
-        /** BL: Does the Tetris placement. */
+        /**
+         * BL: Does the Tetris placement.
+         * BL:俄罗斯方块式放置。
+         */
         BottomLeftRule,
-        /** CP: Choosest the placement where the rectangle touches other rects as much as possible. */
+        /**
+         * CP: Choosest the placement where the rectangle touches other rects as much as possible.
+         * CP:选择矩形与其他矩形接触尽可能多的放置方式。
+         */
         ContactPointRule
     }
 }

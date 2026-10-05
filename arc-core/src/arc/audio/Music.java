@@ -27,6 +27,19 @@ import static arc.audio.Soloud.*;
  * <p>
  * <b>Note</b>: any values provided will not be clamped, it is the developer's responsibility to do so
  * </p>
+ * <p>
+ * <p>
+ * Music 实例表示一个流式音频文件。该接口支持暂停、恢复等操作。使用完 Music 实例后,必须通过 {@link #dispose()} 方法销毁它。
+ * </p>
+ * <p>
+ * Music 实例通过 {@link Audio#newMusic(Fi)} 创建。
+ * </p>
+ * <p>
+ * 当 {@link Application} 暂停或恢复时,Music 实例会自动暂停和恢复。参见 {@link ApplicationListener}。
+ * </p>
+ * <p>
+ * <b>注意</b>:提供的任何值都不会被钳制,开发者有责任自行处理
+ * </p>
  * @author mzechner
  */
 public class Music extends AudioSource{
@@ -36,7 +49,10 @@ public class Music extends AudioSource{
     boolean looping;
     float volume = 1f, pitch = 1f, pan = 0f;
 
-    /** Creates music from an external file without copying it. */
+    /**
+     * Creates music from an external file without copying it.
+     * 从外部文件创建音乐,不进行复制。
+     */
     public static Music create(Fi file){
         Music music = new Music();
         try{
@@ -48,12 +64,18 @@ public class Music extends AudioSource{
         return music;
     }
 
-    /** Loads music from a file. */
+    /**
+     * Loads music from a file.
+     * 从文件加载音乐。
+     */
     public Music(Fi file) throws Exception{
         load(file);
     }
 
-    /** Creates an empty music instance. This instance cannot be played until loaded. */
+    /**
+     * Creates an empty music instance. This instance cannot be played until loaded.
+     * 创建一个空的音乐实例。该实例在加载之前无法播放。
+     */
     public Music(){
 
     }
@@ -66,6 +88,7 @@ public class Music extends AudioSource{
         this.file = file;
 
         //on iOS, try to load from internal storage instead, as that prevents unnecessary copies
+        // 在 iOS 上,尝试从内部存储加载,以避免不必要的复制
         if(OS.isIos && file.type() == FileType.internal){
             try{
                 String path = Core.files.getInternalStoragePath();
@@ -78,8 +101,10 @@ public class Music extends AudioSource{
 
         for(Fi result : caches(file.nameWithoutExtension() + "__" + file.length() + "." + file.extension())){
             //check if file already exists (use length as "hash")
+            // 检查文件是否已存在(用文件长度作为“哈希值”)
             if(!(result.exists() && !result.isDirectory() && result.length() == file.length())){
                 //save to the cached file
+                // 保存到缓存文件
                 file.copyTo(result);
             }
 
@@ -173,7 +198,9 @@ public class Music extends AudioSource{
         idSeek(voice, position);
     }
 
-    /** @return length in seconds */
+    /**
+     * @return length in seconds 时长(秒)
+     */
     @Override
     public float getLength(){
         if(handle == 0 || !Core.audio.initialized) return 0f;
@@ -189,6 +216,7 @@ public class Music extends AudioSource{
         String dir = System.getProperty("java.io.tmpdir");
 
         //prefer cache dir on android
+        // 在 Android 上优先使用缓存目录
         if(Core.app.isAndroid()){
             return new Fi[]{
             Core.files.cache(name), Core.settings.getDataDirectory().child("cache").child(name),

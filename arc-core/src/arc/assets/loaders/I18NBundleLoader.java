@@ -26,6 +26,16 @@ import java.util.Locale;
  * <li>If you want to load the English bundle so to replace the Italian bundle you have to unload the Italian bundle first.
  * <li>If you want to load the English bundle without replacing the Italian bundle you should use another asset manager.
  * </ul>
+ * <p>
+ * 用于 {@link I18NBundle} 实例的 {@link AssetLoader}。I18NBundle 是异步加载的。
+ * <p>
+ * 注意:不能使用同一个 {@link AssetManager} 加载两个基名相同但区域设置或编码不同的 bundle。
+ * 例如,如果尝试加载这样的两个 bundle,由于名称相同,资产管理器会认为它们是同一个 bundle,后加载的英文 bundle 将不会被加载。
+ * 此时有两种处理方式:
+ * <ul>
+ * <li>如果想用英文 bundle 替换意大利语 bundle,必须先卸载意大利语 bundle。
+ * <li>如果想加载英文 bundle 且不替换意大利语 bundle,则应使用另一个资产管理器。
+ * </ul>
  * @author davebaol
  */
 public class I18NBundleLoader extends AsynchronousAssetLoader<I18NBundle, I18NBundleLoader.I18NBundleParameter>{

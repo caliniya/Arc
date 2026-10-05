@@ -1,6 +1,9 @@
 package arc.audio;
 
-/** JNI bindings for the Soloud library. */
+/**
+ * JNI bindings for the Soloud library.
+ * Soloud 库的 JNI 绑定。
+ */
 public class Soloud{
 
     /*JNI
@@ -310,6 +313,7 @@ public class Soloud{
     */
 
     //iOS only functions below:
+    // 以下为 iOS 专用函数:
 
     static native int pauseDevice(); /*
         return soloud.pause();

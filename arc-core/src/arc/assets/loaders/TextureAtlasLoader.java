@@ -16,6 +16,8 @@ import java.util.concurrent.*;
  * {@link AssetLoader} to load {@link TextureAtlas} instances. Passing a {@link TextureAtlasParameter} to
  * {@link AssetManager#load(String, Class, AssetLoaderParameters)} allows to specify whether the atlas regions should be flipped
  * on the y-axis or not.
+ * <p>
+ * 用于加载 {@link TextureAtlas} 实例的 {@link AssetLoader}。向 {@link AssetManager#load(String, Class, AssetLoaderParameters)} 传入 {@link TextureAtlasParameter} 可以指定图集区域是否应在 y 轴上翻转。
  * @author mzechner
  */
 public class TextureAtlasLoader extends AsynchronousAssetLoader<TextureAtlas, TextureAtlasLoader.TextureAtlasParameter>{
@@ -81,7 +83,10 @@ public class TextureAtlasLoader extends AsynchronousAssetLoader<TextureAtlas, Te
     }
 
     public static class TextureAtlasParameter extends AssetLoaderParameters<TextureAtlas>{
-        /** whether to flip the texture atlas vertically **/
+        /**
+         * whether to flip the texture atlas vertically
+         * 是否垂直翻转纹理图集
+         */
         public boolean flip = false;
 
         public TextureAtlasParameter(){

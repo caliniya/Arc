@@ -5,6 +5,8 @@ import arc.util.Time;
 
 /**
  * Queues events that are later passed to the wrapped {@link InputProcessor}.
+ * <p>
+ * 将事件排入队列,稍后再传递给被包装的 {@link InputProcessor}。
  * @author Nathan Sweet
  */
 public class InputEventQueue implements InputProcessor{
@@ -182,6 +184,7 @@ public class InputEventQueue implements InputProcessor{
     @Override
     public synchronized boolean touchDragged(int screenX, int screenY, int pointer){
         // Skip any queued touch dragged events for the same pointer.
+        // 跳过同一指针所有已排队的触摸拖动事件。
         for(int i = next(TOUCH_DRAGGED, 0); i >= 0; i = next(TOUCH_DRAGGED, i + 6)){
             if(queue.get(i + 5) == pointer){
                 queue.set(i, SKIP);
@@ -199,6 +202,7 @@ public class InputEventQueue implements InputProcessor{
     @Override
     public synchronized boolean mouseMoved(int screenX, int screenY){
         // Skip any queued mouse moved events.
+        // 跳过所有已排队的鼠标移动事件。
         for(int i = next(MOUSE_MOVED, 0); i >= 0; i = next(MOUSE_MOVED, i + 5)){
             queue.set(i, SKIP);
             queue.set(i + 3, 2);

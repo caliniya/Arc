@@ -3,9 +3,13 @@ package arc.input;
 import arc.*;
 import arc.input.KeyBind.*;
 
-/** Enum for storing input codes of mouse, keyboard and controllers. */
+/**
+ * Enum for storing input codes of mouse, keyboard and controllers.
+ * 用于存储鼠标、键盘和手柄输入代码的枚举。
+ */
 public enum KeyCode implements KeybindValue{
     //controller general
+    // 手柄通用按键
     controllerA(KeyType.controller, "A"),
     controllerB(KeyType.controller, "B"),
     controllerX(KeyType.controller, "X"),
@@ -18,11 +22,13 @@ public enum KeyCode implements KeybindValue{
     controllerLStick(KeyType.controller, "L Stick"),
     controllerRStick(KeyType.controller, "R Stick"),
     //pov
+    // POV(方向帽)
     controllerdPadUp(KeyType.controller, "D-Pad Up"),
     controllerdPadDown(KeyType.controller, "D-Pad Down"),
     controllerdPadLeft(KeyType.controller, "D-Pad Left"),
     controllerdPadRight(KeyType.controller, "D-Pad Right"),
     //controller axes
+    // 手柄轴
     controllerLTrigger(KeyType.controller, "L Trigger", true),
     controllerRTrigger(KeyType.controller, "R Trigger", true),
     controllerLStickYAxis(KeyType.controller, "L Stick Y Axis", true),
@@ -30,14 +36,17 @@ public enum KeyCode implements KeybindValue{
     controllerRStickYAxis(KeyType.controller, "R Stick Y Axis", true),
     controllerRStickXAxis(KeyType.controller, "R Stick X Axis", true),
     //mouse
+    // 鼠标
     mouseLeft(KeyType.mouse, "Mouse Left"),
     mouseRight(KeyType.mouse, "Mouse Right"),
     mouseMiddle(KeyType.mouse, "Mouse Middle"),
     mouseBack(KeyType.mouse, "Mouse Back"),
     mouseForward(KeyType.mouse, "Mouse Forward"),
     //scroll
+    // 滚轮
     scroll(KeyType.scroll, "Scrollwheel", true),
     //keyboard
+    // 键盘
     anyKey(KeyType.key, "Any Key"),
     num0(KeyType.key, "0"),
     num1(KeyType.key, "1"),
@@ -224,7 +233,9 @@ public enum KeyCode implements KeybindValue{
         return all[id];
     }
 
-    /** @return a human-friendly name based on keyboard layout. */
+    /**
+     * @return a human-friendly name based on keyboard layout. 基于键盘布局的、对人类友好的名称。
+     */
     public String getName(){
         if(cachedName == null){
             cachedName = Core.input == null ? value : Core.input.getKeyName(this);

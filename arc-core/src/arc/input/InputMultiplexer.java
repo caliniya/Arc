@@ -5,6 +5,8 @@ import arc.struct.*;
 /**
  * An {@link InputProcessor} that delegates to an ordered list of other InputProcessors. Delegation for an event stops if a
  * processor returns true, which indicates that the event was handled.
+ * <p>
+ * 将事件委托给一组有序 InputProcessor 的 {@link InputProcessor}。如果某个处理器返回 true(表示事件已被处理),则该事件的委托停止。
  * @author Nathan Sweet
  */
 public class InputMultiplexer implements InputProcessor{
@@ -35,7 +37,9 @@ public class InputMultiplexer implements InputProcessor{
         processors.remove(processor, true);
     }
 
-    /** @return the number of processors in this multiplexer */
+    /**
+     * @return the number of processors in this multiplexer 此多路复用器中处理器的数量
+     */
     public int size(){
         return processors.size;
     }

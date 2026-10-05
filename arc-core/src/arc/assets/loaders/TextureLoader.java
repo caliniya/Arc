@@ -10,6 +10,8 @@ import arc.util.*;
  * rendering thread, synchronously. Passing a {@link TextureParameter} to
  * {@link AssetManager#load(String, Class, AssetLoaderParameters)} allows one to specify parameters as can be passed to the
  * various Texture constructors, e.g. filtering, whether to generate mipmaps and so on.
+ * <p>
+ * 用于 {@link Texture} 实例的 {@link AssetLoader}。像素数据是异步加载的,而纹理则在渲染线程上同步创建。向 {@link AssetManager#load(String, Class, AssetLoaderParameters)} 传入 {@link TextureParameter} 可以指定参数,与传递给各种 Texture 构造函数的参数相同,例如过滤方式、是否生成 mipmap 等。
  * @author mzechner
  */
 public class TextureLoader extends AsynchronousAssetLoader<Texture, TextureLoader.TextureParameter>{
@@ -44,9 +46,15 @@ public class TextureLoader extends AsynchronousAssetLoader<Texture, TextureLoade
     }
 
     public static class TextureParameter extends AssetLoaderParameters<Texture>{
-        /** whether to generate mipmaps **/
+        /**
+         * whether to generate mipmaps
+         * 是否生成 mipmap
+         */
         public boolean genMipMaps = false;
-        /** The texture to put the data in, optional. **/
+        /**
+         * The texture to put the data in, optional.
+         * 要放入数据的纹理,可选。
+         */
         public @Nullable Texture texture = null;
         public TextureFilter minFilter = TextureFilter.nearest;
         public TextureFilter magFilter = TextureFilter.nearest;

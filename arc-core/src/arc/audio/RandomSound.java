@@ -3,7 +3,10 @@ package arc.audio;
 import arc.files.*;
 import arc.util.*;
 
-/** Plays a sound from an array at random. */
+/**
+ * Plays a sound from an array at random.
+ * 从数组中随机播放一个音效。
+ */
 public class RandomSound extends Sound{
     public Sound[] sounds = {};
 

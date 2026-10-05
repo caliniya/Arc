@@ -20,7 +20,10 @@ public class ImageProcessor{
     private final Ar<Rect> rects = new Ar<>();
     private float scale = 1;
     private boolean resampling;
-    /** Where messages are printed. Null means System.out. */
+    /**
+     * Where messages are printed. Null means System.out.
+     * 消息打印的位置。为 null 表示 System.out。
+     */
     PrintStream log;
 
     public ImageProcessor(Settings settings){
@@ -32,7 +35,7 @@ public class ImageProcessor{
     }
 
     /**
-     * @param rootPath Used to strip the root directory prefix from image file names, can be null.
+     * @param rootPath Used to strip the root directory prefix from image file names, can be null. 用于剥离图片文件名中的根目录前缀,可以为 null。
      */
     public void addImage(File file, String rootPath){
         merge(prepare(file, rootPath));
@@ -40,13 +43,18 @@ public class ImageProcessor{
 
     /**
      * The image will be kept in-memory during packing.
+     * <p>
+     * 图片将在打包期间保留在内存中。
      * @see #addImage(File, String)
      */
     public Rect addImage(Pixmap image, String name){
         return merge(prepare(image, name, false));
     }
 
-    /** Loads, processes and hashes all inputs in parallel, then adds them in the order given. */
+    /**
+     * Loads, processes and hashes all inputs in parallel, then adds them in the order given.
+     * 并行加载、处理和哈希所有输入,然后按给定顺序添加它们。
+     */
     void addAll(Ar<InputImage> inputs){
         Ar<FutureTask<Prepared>> tasks = new Ar<>(inputs.size);
         try{
@@ -66,16 +74,26 @@ public class ImageProcessor{
             }
         }finally{
             //only matters on failure: don't keep decoding images nobody is going to use
+            // 只在失败时有影响:不要继续解码没人会使用的图片
             Tasks.cancelAll(tasks);
         }
     }
 
-    /** The result of loading and processing a single image. Safe to create on any thread. */
+    /**
+     * The result of loading and processing a single image. Safe to create on any thread.
+     * 加载并处理单个图片的结果。可以在任何线程上安全创建。
+     */
     private static final class Prepared{
         final String name;
-        /** Null if the image is to be ignored. */
+        /**
+         * Null if the image is to be ignored.
+         * 如果图片应被忽略,则为 null。
+         */
         final Rect rect;
-        /** Only set if aliasing is enabled and rect is not null. */
+        /**
+         * Only set if aliasing is enabled and rect is not null.
+         * 仅在启用别名检测且 rect 不为 null 时设置。
+         */
         final String hash;
 
         Prepared(String name, Rect rect, String hash){
@@ -91,6 +109,7 @@ public class ImageProcessor{
         String name = file.getAbsolutePath().replace('\\', '/');
 
         // Strip root dir off front of image path.
+        // 剥离图片路径开头的根目录。
         if(rootPath != null){
             if(!name.startsWith(rootPath)){
                 image.dispose();
@@ -100,10 +119,12 @@ public class ImageProcessor{
         }
 
         // Strip extension.
+        // 剥离扩展名。
         int dotIndex = name.lastIndexOf('.');
         if(dotIndex != -1) name = name.substring(0, dotIndex);
 
         //the pixmap was loaded here, so it is ours to dispose
+        // 此 pixmap 在这里加载,因此由我们负责销毁
         return prepare(image, name, true);
     }
 
@@ -112,7 +133,10 @@ public class ImageProcessor{
         return new Prepared(name, rect, rect != null && settings.alias ? hash(rect.pixmap) : null);
     }
 
-    /** Sequential part of adding an image: alias detection and bookkeeping. */
+    /**
+     * Sequential part of adding an image: alias detection and bookkeeping.
+     * 添加图片的串行部分:别名检测和记录工作。
+     */
     private Rect merge(Prepared prepared){
         Rect rect = prepared.rect;
 
@@ -155,13 +179,16 @@ public class ImageProcessor{
         crcs.clear();
     }
 
-    /** Returns a rect for the image describing the texture region to be packed, or null if the image should not be packed. */
+    /**
+     * Returns a rect for the image describing the texture region to be packed, or null if the image should not be packed.
+     * 返回描述要打包的纹理区域的图片矩形,如果不应打包该图片则返回 null。
+     */
     Rect processImage(Pixmap image, String name){
         return processImage(image, name, false);
     }
 
     /**
-     * @param owned whether the input pixmap may be disposed once it is no longer needed. Intermediate pixmaps created here are always disposed.
+     * @param owned whether the input pixmap may be disposed once it is no longer needed. Intermediate pixmaps created here are always disposed. 是否允许在不再需要输入 pixmap 时将其销毁。此处创建的中间 pixmap 总是会被销毁。
      */
     private Rect processImage(Pixmap input, String name, boolean owned){
         if(scale <= 0) throw new IllegalArgumentException("scale cannot be <= 0: " + scale);
@@ -174,10 +201,12 @@ public class ImageProcessor{
         Rect rect;
         if(isPatch){
             // Strip ".9" from file name, read ninepatch split pixels, and strip ninepatch split pixels.
+            // 从文件名中剥离“.9”,读取 ninepatch 分割像素,并剥离 ninepatch 分割像素。
             name = name.substring(0, name.length() - 2);
             splits = getSplits(image, name);
             pads = getPads(image, name, splits);
             // Strip split pixels.
+            // 剥离分割像素。
             width -= 2;
             height -= 2;
             Pixmap newImage = new Pixmap(width, height);
@@ -187,6 +216,7 @@ public class ImageProcessor{
         }
 
         // Scale image.
+        // 缩放图片。
         if(scale != 1){
             width = Math.max(1, Math.round(width * scale));
             height = Math.max(1, Math.round(height * scale));
@@ -197,10 +227,12 @@ public class ImageProcessor{
         }
 
         //whether the current image is something this method may dispose
+        // 当前图片是否属于本方法可以销毁的内容
         boolean ownsImage = image != input || owned;
 
         if(isPatch){
             // Ninepatches aren't rotated or whitespace stripped.
+            // Ninepatch 不进行旋转或空白裁剪。
             rect = new Rect(image, 0, 0, width, height, true);
             rect.splits = splits;
             rect.pads = pads;
@@ -219,13 +251,17 @@ public class ImageProcessor{
             rect.ownsPixmap = ownsImage;
         }else{
             //the rect got a cropped copy (or the shared empty image), so the source is no longer needed
+            // 矩形已获得裁剪副本(或共享的空图片),因此不再需要源图片
             rect.ownsPixmap = rect.pixmap != emptyImage;
             if(ownsImage) image.dispose();
         }
         return rect;
     }
 
-    /** Strips whitespace and returns the rect, or null if the image should be ignored. */
+    /**
+     * Strips whitespace and returns the rect, or null if the image should be ignored.
+     * 裁剪空白并返回矩形,如果图片应被忽略则返回 null。
+     */
     private Rect stripWhitespace(Pixmap source, String name){
         int thresh = settings.alphaThreshold;
 
@@ -239,6 +275,7 @@ public class ImageProcessor{
             outer:
             while(cropY < maxCrop){
                 //bottom and top
+                // 底部和顶部
                 for(int x = 0; x < source.width; x++){
                     if(source.getA(x, cropY) > thresh) break outer;
                     if(source.getA(x, source.height - 1 - cropY) > thresh) break outer;
@@ -250,6 +287,7 @@ public class ImageProcessor{
             outer:
             while(cropX < maxCrop){
                 //sides
+                // 两侧
                 for(int y = 0; y < source.height; y++){
                     if(source.getA(cropX, y) > thresh) break outer;
                     if(source.getA(source.width - 1 - cropX, y) > thresh) break outer;
@@ -259,6 +297,7 @@ public class ImageProcessor{
             }
 
             //add a pixel of padding
+            // 添加一个像素的填充
             int realCropX = Math.max(cropX - 1, 0), realCropY = Math.max(cropY - 1, 0);
 
             if(realCropX > 0 || realCropY > 0){
@@ -289,6 +328,7 @@ public class ImageProcessor{
                 bottom--;
             }
             // Leave 1px so nothing is copied into padding.
+            // 保留 1px,确保不会有内容被复制到填充中。
             if(settings.duplicatePadding){
                 if(top > 0) top--;
                 if(bottom < source.height) bottom++;
@@ -314,6 +354,7 @@ public class ImageProcessor{
                 right--;
             }
             // Leave 1px so nothing is copied into padding.
+            // 保留 1px,确保不会有内容被复制到填充中。
             if(settings.duplicatePadding){
                 if(left > 0) left--;
                 if(right < source.width) right++;
@@ -333,6 +374,8 @@ public class ImageProcessor{
     /**
      * Returns the splits, or null if the image had no splits or the splits were only a single region. Splits are an int[4] that
      * has left, right, top, bottom.
+     * <p>
+     * 返回分割值,如果图片没有分割或分割只构成单一区域,则返回 null。分割值是一个 int[4],依次为左、右、上、下。
      */
     private int[] getSplits(Pixmap image, String name){
         int startX = getSplitPoint(image, name, 1, 0, true, true);
@@ -341,18 +384,22 @@ public class ImageProcessor{
         int endY = getSplitPoint(image, name, 0, startY, false, false);
 
         // Ensure pixels after the end are not invalid.
+        // 确保结尾之后的像素不是无效的。
         getSplitPoint(image, name, endX + 1, 0, true, true);
         getSplitPoint(image, name, 0, endY + 1, true, false);
 
         // No splits, or all splits.
+        // 没有分割,或全部为分割。
         if(startX == 0 && endX == 0 && startY == 0 && endY == 0) return null;
 
         // Subtraction here is because the coordinates were computed before the 1px border was stripped.
+        // 这里做减法是因为坐标是在剥离 1px 边框之前计算的。
         if(startX != 0){
             startX--;
             endX = image.getWidth() - 2 - (endX - 1);
         }else{
             // If no start point was ever found, we assume full stretch.
+            // 如果从未找到起点,则假定完全拉伸。
             endX = image.getWidth() - 2;
         }
         if(startY != 0){
@@ -360,6 +407,7 @@ public class ImageProcessor{
             endY = image.getHeight() - 2 - (endY - 1);
         }else{
             // If no start point was ever found, we assume full stretch.
+            // 如果从未找到起点,则假定完全拉伸。
             endY = image.getHeight() - 2;
         }
 
@@ -376,6 +424,8 @@ public class ImageProcessor{
     /**
      * Returns the pads, or null if the image had no pads or the pads match the splits. Pads are an int[4] that has left, right,
      * top, bottom.
+     * <p>
+     * 返回填充值,如果图片没有填充或填充与分割相同,则返回 null。填充值是一个 int[4],依次为左、右、上、下。
      */
     private int[] getPads(Pixmap image, String name, int[] splits){
         int bottom = image.height - 1;
@@ -385,21 +435,25 @@ public class ImageProcessor{
         int startY = getSplitPoint(image, name, right, 1, true, false);
 
         // No need to hunt for the end if a start was never found.
+        // 如果从未找到起点,就无需寻找终点。
         int endX = 0;
         int endY = 0;
         if(startX != 0) endX = getSplitPoint(image, name, startX + 1, bottom, false, true);
         if(startY != 0) endY = getSplitPoint(image, name, right, startY + 1, false, false);
 
         // Ensure pixels after the end are not invalid.
+        // 确保结尾之后的像素不是无效的。
         getSplitPoint(image, name, endX + 1, bottom, true, true);
         getSplitPoint(image, name, right, endY + 1, true, false);
 
         // No pads.
+        // 没有填充。
         if(startX == 0 && endX == 0 && startY == 0 && endY == 0){
             return null;
         }
 
         // -2 here is because the coordinates were computed before the 1px border was stripped.
+        // 这里的 -2 是因为坐标是在剥离 1px 边框之前计算的。
         if(startX == 0 && endX == 0){
             startX = -1;
             endX = -1;
@@ -409,6 +463,7 @@ public class ImageProcessor{
                 endX = image.getWidth() - 2 - (endX - 1);
             }else{
                 // If no start point was ever found, we assume full stretch.
+                // 如果从未找到起点,则假定完全拉伸。
                 endX = image.getWidth() - 2;
             }
         }
@@ -421,6 +476,7 @@ public class ImageProcessor{
                 endY = image.getHeight() - 2 - (endY - 1);
             }else{
                 // If no start point was ever found, we assume full stretch.
+                // 如果从未找到起点,则假定完全拉伸。
                 endY = image.getHeight() - 2;
             }
         }
@@ -446,6 +502,8 @@ public class ImageProcessor{
      * y axis (depending on value of xAxis) for the first non-transparent pixel if startPoint is true, or the first transparent
      * pixel if startPoint is false. Returns 0 if none found, as 0 is considered an invalid split point being in the outer border
      * which will be stripped.
+     * <p>
+     * 寻找分割像素序列的起点或终点。从 (startX, startY) 开始搜索,然后沿 x 轴或 y 轴(取决于 xAxis 的值)寻找:如果 startPoint 为 true,则寻找第一个非透明像素;如果为 false,则寻找第一个透明像素。如果未找到则返回 0,因为 0 位于会被剥离的外边框中,被视为无效的分割点。
      */
     private static int getSplitPoint(Pixmap image, String name, int startX, int startY, boolean startPoint, boolean xAxis){
         int next = xAxis ? startX : startY;
@@ -480,6 +538,7 @@ public class ImageProcessor{
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
 
             //hash straight from the native buffer through a view, no copying and no shared position state
+            // 直接通过视图从原生缓冲区计算哈希,无需复制,也没有共享的位置状态
             ByteBuffer pixels = image.pixels.duplicate();
             pixels.clear();
             digest.update(pixels);

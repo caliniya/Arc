@@ -9,6 +9,8 @@ import arc.util.*;
 
 /**
  * {@link AssetLoader} for {@link Music} instances. The Music instance is loaded synchronously.
+ * <p>
+ * 用于 {@link Music} 实例的 {@link AssetLoader}。Music 实例是同步加载的。
  * @author mzechner
  */
 public class MusicLoader extends AsynchronousAssetLoader<Music, MusicLoader.MusicParameter>{
@@ -21,8 +23,10 @@ public class MusicLoader extends AsynchronousAssetLoader<Music, MusicLoader.Musi
     /**
      * Returns the {@link Music} instance currently loaded by this
      * {@link MusicLoader}.
+     * <p>
+     * 返回此 {@link MusicLoader} 当前加载的 {@link Music} 实例。
      * @return the currently loaded {@link Music}, otherwise {@code null} if
-     * no {@link Music} has been loaded yet.
+     * no {@link Music} has been loaded yet. 当前加载的 {@link Music};如果尚未加载任何 {@link Music},则为 {@code null}
      */
     protected Music getLoadedMusic(){
         return music;

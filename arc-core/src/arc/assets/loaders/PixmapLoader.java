@@ -9,6 +9,8 @@ import arc.graphics.Pixmap;
 
 /**
  * {@link AssetLoader} for {@link Pixmap} instances. The Pixmap is loaded asynchronously.
+ * <p>
+ * 用于 {@link Pixmap} 实例的 {@link AssetLoader}。Pixmap 是异步加载的。
  * @author mzechner
  */
 public class PixmapLoader extends AsynchronousAssetLoader<Pixmap, PixmapLoader.PixmapParameter>{

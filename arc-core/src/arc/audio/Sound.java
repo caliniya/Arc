@@ -23,6 +23,16 @@ import static arc.audio.Soloud.*;
  * can use this id to modify the playback of that sound instance.
  * </p>
  *
+ * <p>
+ * <p>
+ * Sound 是可以多次并行播放的短音频片段。它会被完全加载到内存中,因此只应加载较小的音频文件。
+ * </p>
+ * <p>
+ * Sound 实例通过调用 {@link Audio#newSound(Fi)} 创建。
+ * </p>
+ * <p>
+ * 调用 {@link #play()} 或 {@link #play(float)} 方法会返回一个 long 值,它是该音效实例的 id。可以使用这个 id 修改该音效实例的播放。
+ * </p>
  */
 public class Sound extends AudioSource{
     public AudioBus bus = Core.audio == null ? null : Core.audio.soundBus;
@@ -39,7 +49,10 @@ public class Sound extends AudioSource{
     boolean lazyLoad = false;
     volatile boolean currentlyLoading;
 
-    /** Creates music from an external file without copying it. */
+    /**
+     * Creates music from an external file without copying it.
+     * 从外部文件创建音乐,不进行复制。
+     */
     public static Sound createStream(Fi file){
         Sound sound = new Sound();
         try{
@@ -52,19 +65,28 @@ public class Sound extends AudioSource{
         return sound;
     }
 
-    /** Creates a sound that only loads itself once played. */
+    /**
+     * Creates a sound that only loads itself once played.
+     * 创建一个仅在播放时才加载的音效。
+     */
     public static Sound createLazy(Fi file){
         Sound sound = new Sound();
         sound.loadLazy(file);
         return sound;
     }
 
-    /** Creates an empty sound. This sound cannot be played until it is loaded. */
+    /**
+     * Creates an empty sound. This sound cannot be played until it is loaded.
+     * 创建一个空的音效。该音效在加载之前无法播放。
+     */
     public Sound(){
 
     }
 
-    /** Loads a sound from a file. */
+    /**
+     * Loads a sound from a file.
+     * 从文件加载音效。
+     */
     public Sound(Fi file){
         load(file);
     }
@@ -99,6 +121,7 @@ public class Sound extends AudioSource{
             Core.executor.submit(() -> {
                 try{
                     //make sure it doesn't attempt lazy loading again
+                    // 确保它不会再次尝试延迟加载
                     lazyLoad = false;
                     load(file);
                     setParamsAfterLoad();
@@ -115,11 +138,13 @@ public class Sound extends AudioSource{
 
     /**
      * Plays the sound. If the sound is already playing, it will be played again, concurrently.
-     * @param volume the volume in the range [0,1]
-     * @param pitch the pitch multiplier, 1 == default, >1 == faster, <1 == slower, the value has to be between 0.5 and 2.0
-     * @param pan panning in the range -1 (full left) to 1 (full right). 0 is center position.
-     * @param checkFrame if true, this sound will not be able to be played twice in the same frame.
-     * @return the id of the sound instance if successful, or -1 on failure.
+     * <p>
+     * 播放该音效。如果音效已在播放,则会再次播放(并行)。
+     * @param volume the volume in the range [0,1] 音量,范围 [0,1]
+     * @param pitch the pitch multiplier, 1 == default, >1 == faster, <1 == slower, the value has to be between 0.5 and 2.0 音调倍率,1 为默认,大于 1 更快,小于 1 更慢,取值必须在 0.5 到 2.0 之间
+     * @param pan panning in the range -1 (full left) to 1 (full right). 0 is center position. 声像定位,范围 -1(完全左)到 1(完全右),0 为中间位置
+     * @param checkFrame if true, this sound will not be able to be played twice in the same frame. 如果为 true,该音效将无法在同一帧内被播放两次
+     * @return the id of the sound instance if successful, or -1 on failure. 成功时返回该音效实例的 id,失败时返回 -1
      */
     public int play(float volume, float pitch, float pan, boolean loop, boolean checkFrame, AudioBus bus){
         if(!Core.audio.initialized || currentlyLoading) return -1;
@@ -137,6 +162,7 @@ public class Sound extends AudioSource{
 
         if((checkFrame && Time.timeSinceMillis(lastTimePlayed) <= minInterval)){
             //when a sound was already played this frame, intensify the volume of the last played voice instead of playing a new one
+            // 当音效在本帧内已被播放过时,增强上一个已播放声音的音量,而不是播放新的声音
             if(volume > lastVolume){
                 Core.audio.set(lastVoice, pan, lastVolume = Math.max(lastVolume, Math.min(lastVolume + volume, volume * 1.25f)));
             }
@@ -158,7 +184,10 @@ public class Sound extends AudioSource{
         return play(volume, pitch, pan, loop, checkFrame, this.bus);
     }
 
-    /** Sets the bus that will be used for the next play of this SFX. */
+    /**
+     * Sets the bus that will be used for the next play of this SFX.
+     * 设置下一次播放此音效时将使用的总线。
+     */
     public void setBus(AudioBus bus){
         this.bus = bus;
     }
@@ -183,6 +212,8 @@ public class Sound extends AudioSource{
     /**
      * Plays this sound at a certain position, with correct panning and volume applied.
      * Automatically uses the "sfxvolume" setting.
+     * <p>
+     * 在某个位置播放此音效,并应用正确的声像和音量。自动使用“sfxvolume”设置。
      */
     public int at(float x, float y, float pitch){
         return at(x, y, pitch, 1f);
@@ -191,26 +222,34 @@ public class Sound extends AudioSource{
     /**
      * Plays this sound at a certain position, with correct panning and volume applied.
      * Automatically uses the "sfxvolume" setting.
+     * <p>
+     * 在某个位置播放此音效,并应用正确的声像和音量。自动使用“sfxvolume”设置。
      */
     public int at(float x, float y, float pitch, float volume, boolean checkFrame){
         float vol = calcVolume(x, y) * volume;
         if(vol < 0.005f) return -1; //discard
+        // 丢弃
         return play(vol, pitch, calcPan(x, y), false, checkFrame);
     }
 
     /**
      * Plays this sound at a certain position, with correct panning and volume applied.
      * Automatically uses the "sfxvolume" setting.
+     * <p>
+     * 在某个位置播放此音效,并应用正确的声像和音量。自动使用“sfxvolume”设置。
      */
     public int at(float x, float y, float pitch, float volume, AudioBus bus){
         float vol = calcVolume(x, y) * volume;
         if(vol < 0.005f) return -1; //discard
+        // 丢弃
         return play(vol, pitch, calcPan(x, y), false, true, bus);
     }
 
     /**
      * Plays this sound at a certain position, with correct panning and volume applied.
      * Automatically uses the "sfxvolume" setting.
+     * <p>
+     * 在某个位置播放此音效,并应用正确的声像和音量。自动使用“sfxvolume”设置。
      */
     public int at(Position pos, float pitch, float volume){
         return at(pos.getX(), pos.getY(), pitch, volume);
@@ -219,6 +258,8 @@ public class Sound extends AudioSource{
     /**
      * Plays this sound at a certain position, with correct panning and volume applied.
      * Automatically uses the "sfxvolume" setting.
+     * <p>
+     * 在某个位置播放此音效,并应用正确的声像和音量。自动使用“sfxvolume”设置。
      */
     public int at(float x, float y, float pitch, float volume){
         return at(x, y, pitch, volume, true);
@@ -227,17 +268,25 @@ public class Sound extends AudioSource{
     /**
      * Plays this sound at a certain position, with correct panning and volume applied.
      * Automatically uses the "sfxvolume" setting.
+     * <p>
+     * 在某个位置播放此音效,并应用正确的声像和音量。自动使用“sfxvolume”设置。
      */
     public int at(float x, float y){
         return at(x, y, 1f);
     }
 
-    /** Plays #at() with this position. */
+    /**
+     * Plays #at() with this position.
+     * 以该位置播放 #at()。
+     */
     public int at(Position pos){
         return at(pos.getX(), pos.getY());
     }
 
-    /** Plays #at() with this position. */
+    /**
+     * Plays #at() with this position.
+     * 以该位置播放 #at()。
+     */
     public int at(Position pos, float pitch){
         return at(pos.getX(), pos.getY(), pitch);
     }
@@ -245,7 +294,9 @@ public class Sound extends AudioSource{
     /**
      * Plays the sound. If the sound is already playing, it will be played again, concurrently.
      * Automatically uses the "sfxvolume" setting.
-     * @return the id of the sound instance if successful, or -1 on failure.
+     * <p>
+     * 播放该音效。如果音效已在播放,则会再次播放(并行)。自动使用“sfxvolume”设置。
+     * @return the id of the sound instance if successful, or -1 on failure. 成功时返回该音效实例的 id,失败时返回 -1
      */
     public int play(){
         return play(Core.audio.sfxVolume);
@@ -255,7 +306,9 @@ public class Sound extends AudioSource{
     /**
      * Plays the sound. If the sound is already playing, it will be played again, concurrently.
      * Automatically uses the "sfxvolume" setting.
-     * @return the id of the sound instance if successful, or -1 on failure.
+     * <p>
+     * 播放该音效。如果音效已在播放,则会再次播放(并行)。自动使用“sfxvolume”设置。
+     * @return the id of the sound instance if successful, or -1 on failure. 成功时返回该音效实例的 id,失败时返回 -1
      */
     public int play(AudioBus bus){
         return play(Core.audio.sfxVolume, 1f, 0f, false, true, bus);
@@ -264,8 +317,10 @@ public class Sound extends AudioSource{
     /**
      * Plays the sound. If the sound is already playing, it will be played again, concurrently.
      * Ignores SFX volume setting.
-     * @param volume the volume in the range [0,1]
-     * @return the id of the sound instance if successful, or -1 on failure.
+     * <p>
+     * 播放该音效。如果音效已在播放,则会再次播放(并行)。忽略音效音量设置。
+     * @param volume the volume in the range [0,1] 音量,范围 [0,1]
+     * @return the id of the sound instance if successful, or -1 on failure. 成功时返回该音效实例的 id,失败时返回 -1
      */
     public int play(float volume){
         return play(volume, 1f, 0f);
@@ -277,10 +332,12 @@ public class Sound extends AudioSource{
 
     /**
      * Plays the sound. If the sound is already playing, it will be played again, concurrently.
-     * @param volume the volume in the range [0,1]
-     * @param pitch the pitch multiplier, 1 == default, >1 == faster, <1 == slower, the value has to be between 0.5 and 2.0
-     * @param pan panning in the range -1 (full left) to 1 (full right). 0 is center position.
-     * @return the id of the sound instance if successful, or -1 on failure.
+     * <p>
+     * 播放该音效。如果音效已在播放,则会再次播放(并行)。
+     * @param volume the volume in the range [0,1] 音量,范围 [0,1]
+     * @param pitch the pitch multiplier, 1 == default, >1 == faster, <1 == slower, the value has to be between 0.5 and 2.0 音调倍率,1 为默认,大于 1 更快,小于 1 更慢,取值必须在 0.5 到 2.0 之间
+     * @param pan panning in the range -1 (full left) to 1 (full right). 0 is center position. 声像定位,范围 -1(完全左)到 1(完全右),0 为中间位置
+     * @return the id of the sound instance if successful, or -1 on failure. 成功时返回该音效实例的 id,失败时返回 -1
      */
     public int play(float volume, float pitch, float pan){
         return play(volume, pitch, pan, false);
@@ -288,7 +345,9 @@ public class Sound extends AudioSource{
 
     /**
      * Plays the sound, looping. If the sound is already playing, it will be played again, concurrently.
-     * @return the id of the sound instance if successful, or -1 on failure.
+     * <p>
+     * 循环播放该音效。如果音效已在播放,则会再次播放(并行)。
+     * @return the id of the sound instance if successful, or -1 on failure. 成功时返回该音效实例的 id,失败时返回 -1
      */
     public int loop(){
         return loop(1f);
@@ -296,8 +355,10 @@ public class Sound extends AudioSource{
 
     /**
      * Plays the sound, looping. If the sound is already playing, it will be played again, concurrently.
-     * @param volume the volume in the range [0, 1]
-     * @return the id of the sound instance if successful, or -1 on failure.
+     * <p>
+     * 循环播放该音效。如果音效已在播放,则会再次播放(并行)。
+     * @param volume the volume in the range [0, 1] 音量,范围 [0, 1]
+     * @return the id of the sound instance if successful, or -1 on failure. 成功时返回该音效实例的 id,失败时返回 -1
      */
     public int loop(float volume){
         return loop(volume, 1f, 0f);
@@ -305,23 +366,30 @@ public class Sound extends AudioSource{
 
     /**
      * Plays the sound, looping. If the sound is already playing, it will be played again, concurrently.
-     * @param volume the volume in the range [0,1]
-     * @param pitch the pitch multiplier, 1 == default, >1 == faster, <1 == slower, the value has to be between 0.5 and 2.0
-     * @param pan panning in the range -1 (full left) to 1 (full right). 0 is center position.
-     * @return the id of the sound instance if successful, or -1 on failure.
+     * <p>
+     * 循环播放该音效。如果音效已在播放,则会再次播放(并行)。
+     * @param volume the volume in the range [0,1] 音量,范围 [0,1]
+     * @param pitch the pitch multiplier, 1 == default, >1 == faster, <1 == slower, the value has to be between 0.5 and 2.0 音调倍率,1 为默认,大于 1 更快,小于 1 更慢,取值必须在 0.5 到 2.0 之间
+     * @param pan panning in the range -1 (full left) to 1 (full right). 0 is center position. 声像定位,范围 -1(完全左)到 1(完全右),0 为中间位置
+     * @return the id of the sound instance if successful, or -1 on failure. 成功时返回该音效实例的 id,失败时返回 -1
      */
     public int loop(float volume, float pitch, float pan){
         return play(volume, pitch, pan, true);
     }
 
-    /** @return length in seconds */
+    /**
+     * @return length in seconds 时长(秒)
+     */
     @Override
     public float getLength(){
         if(handle == 0 || !Core.audio.initialized) return 0f;
         return stream ? (float)Soloud.streamLength(handle) : (float)Soloud.wavLength(handle);
     }
 
-    /** Sets the minimum interval for playbacks of this sound, in milliseconds. Additional playback within this interval will not play a new sound instance. */
+    /**
+     * Sets the minimum interval for playbacks of this sound, in milliseconds. Additional playback within this interval will not play a new sound instance.
+     * 设置此音效两次播放之间的最小间隔(毫秒)。在此间隔内的额外播放不会产生新的音效实例。
+     */
     public void setMinInterval(long interval){
         minInterval = interval;
     }

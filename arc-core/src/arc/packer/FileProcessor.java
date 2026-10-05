@@ -12,6 +12,8 @@ import java.util.regex.*;
  * either {@link #processFile(Entry)} or {@link #processDir(Entry, Ar)} can be overridden, or both. The entries provided to
  * the callbacks have the original file, the output directory, and the output file. If {@link #setFlattenOutput(boolean)} is
  * false, the output will match the directory structure of the input.
+ * <p>
+ * 递归收集文件并按文件名过滤。提供回调来处理文件并收集结果,{@link #processFile(Entry)} 或 {@link #processDir(Entry, Ar)} 可以被覆盖,或两者同时覆盖。传递给回调的条目包含原始文件、输出目录和输出文件。如果 {@link #setFlattenOutput(boolean)} 为 false,输出将与输入的目录结构保持一致。
  * @author Nathan Sweet
  */
 public class FileProcessor{
@@ -28,7 +30,10 @@ public class FileProcessor{
     public FileProcessor(){
     }
 
-    /** Copy constructor. */
+    /**
+     * Copy constructor.
+     * 复制构造函数。
+     */
     public FileProcessor(FileProcessor processor){
         inputFilter = processor.inputFilter;
         comparator = processor.comparator;
@@ -43,13 +48,19 @@ public class FileProcessor{
         return this;
     }
 
-    /** Sets the comparator for {@link #processDir(Entry, Ar)}. By default the files are sorted by alpha. */
+    /**
+     * Sets the comparator for {@link #processDir(Entry, Ar)}. By default the files are sorted by alpha.
+     * 设置 {@link #processDir(Entry, Ar)} 使用的比较器。默认按字母顺序排序文件。
+     */
     public FileProcessor setComparator(Comparator<File> comparator){
         this.comparator = comparator;
         return this;
     }
 
-    /** Adds a case insensitive suffix for matching input files. */
+    /**
+     * Adds a case insensitive suffix for matching input files.
+     * 添加一个用于匹配输入文件的不区分大小写的后缀。
+     */
     public FileProcessor addInputSuffix(String... suffixes){
         for(String suffix : suffixes)
             addInputRegex("(?i).*" + Pattern.quote(suffix));
@@ -62,7 +73,10 @@ public class FileProcessor{
         return this;
     }
 
-    /** Sets the suffix for output files, replacing the extension of the input file. */
+    /**
+     * Sets the suffix for output files, replacing the extension of the input file.
+     * 设置输出文件的后缀,替换输入文件的扩展名。
+     */
     public FileProcessor setOutputSuffix(String outputSuffix){
         this.outputSuffix = outputSuffix;
         return this;
@@ -73,14 +87,17 @@ public class FileProcessor{
         return this;
     }
 
-    /** Default is true. */
+    /**
+     * Default is true.
+     * 默认为 true。
+     */
     public FileProcessor setRecursive(boolean recursive){
         this.recursive = recursive;
         return this;
     }
 
     /**
-     * @param outputRoot May be null.
+     * @param outputRoot May be null. 可以为 null。
      * @see #process(File, File)
      */
     public Ar<Entry> process(String inputFileOrDir, String outputRoot) throws Exception{
@@ -89,8 +106,10 @@ public class FileProcessor{
 
     /**
      * Processes the specified input file or directory.
-     * @param outputRoot May be null if there is no output from processing the files.
-     * @return the processed files added with {@link #addProcessedFile(Entry)}.
+     * <p>
+     * 处理指定的输入文件或目录。
+     * @param outputRoot May be null if there is no output from processing the files. 如果处理文件没有输出,可以为 null。
+     * @return the processed files added with {@link #addProcessedFile(Entry)}. 通过 {@link #addProcessedFile(Entry)} 添加的已处理文件
      */
     public Ar<Entry> process(File inputFileOrDir, File outputRoot) throws Exception{
         if(!inputFileOrDir.exists())
@@ -103,8 +122,10 @@ public class FileProcessor{
 
     /**
      * Processes the specified input files.
-     * @param outputRoot May be null if there is no output from processing the files.
-     * @return the processed files added with {@link #addProcessedFile(Entry)}.
+     * <p>
+     * 处理指定的输入文件。
+     * @param outputRoot May be null if there is no output from processing the files. 如果处理文件没有输出,可以为 null。
+     * @return the processed files added with {@link #addProcessedFile(Entry)}. 通过 {@link #addProcessedFile(Entry)} 添加的已处理文件
      */
     public Ar<Entry> process(File[] files, File outputRoot) throws Exception{
         if(outputRoot == null) outputRoot = new File("");
@@ -156,6 +177,7 @@ public class FileProcessor{
     private void process(File[] files, File outputRoot, File outputDir, LinkedHashMap<File, Ar<Entry>> dirToEntries,
                          int depth){
         // Store empty entries for every directory.
+        // 为每个目录存储空条目。
         for(File file : files){
             File dir = file.getParentFile();
             Ar<Entry> entries = dirToEntries.get(dir);
@@ -205,13 +227,18 @@ public class FileProcessor{
         }
     }
 
-    /** Called with each input file. */
+    /**
+     * Called with each input file.
+     * 对每个输入文件调用。
+     */
     protected void processFile(Entry entry) throws Exception{
     }
 
     /**
      * Called for each input directory. The files will be {@link #setComparator(Comparator) sorted}. The specified files list can
      * be modified to change which files are processed.
+     * <p>
+     * 对每个输入目录调用。文件将按 {@link #setComparator(Comparator) 排序}。可以修改指定的文件列表来更改要处理的文件。
      */
     protected void processDir(Entry entryDir, Ar<Entry> files) throws Exception{
     }
@@ -219,6 +246,8 @@ public class FileProcessor{
     /**
      * This method should be called by {@link #processFile(Entry)} or {@link #processDir(Entry, Ar)} if the return value of
      * {@link #process(File, File)} or {@link #process(File[], File)} should return all the processed files.
+     * <p>
+     * 如果 {@link #process(File, File)} 或 {@link #process(File[], File)} 的返回值应包含所有已处理的文件,则 {@link #processFile(Entry)} 或 {@link #processDir(Entry, Ar)} 应调用此方法。
      */
     protected void addProcessedFile(Entry entry){
         outputFiles.add(entry);
@@ -227,7 +256,10 @@ public class FileProcessor{
     /** @author Nathan Sweet */
     public static class Entry{
         public File inputFile;
-        /** May be null. */
+        /**
+         * May be null.
+         * 可以为 null。
+         */
         public File outputDir;
         public File outputFile;
         public int depth;

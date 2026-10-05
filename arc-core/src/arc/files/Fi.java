@@ -22,6 +22,10 @@ import java.util.zip.*;
  * Because some of the file types are backed by composite files and may be compressed (for example, if they are in an Android .apk
  * or are found via the classpath), the methods for extracting a {@link #path()} or {@link #file()} may not be appropriate for all
  * types. Use the Reader or Stream methods here to hide these dependencies from your platform independent code.
+ * <p>
+ * 表示文件系统、类路径、Android SD 卡或 Android 资产目录中的文件或目录。FileHandle 通过 {@link Files} 实例创建。
+ * <p>
+ * 由于某些文件类型由复合文件支持且可能是压缩的(例如位于 Android .apk 中或通过类路径找到),提取 {@link #path()} 或 {@link #file()} 的方法可能并不适用于所有类型。请使用此处的 Reader 或 Stream 方法,以便在平台无关的代码中隐藏这些差异。
  * @author mzechner
  * @author Nathan Sweet
  */
@@ -35,7 +39,9 @@ public class Fi implements Comparable<Fi>{
     /**
      * Creates a new absolute FileHandle for the file name. Use this for tools on the desktop that don't need any of the backends.
      * Do not use this constructor in case you write something cross-platform. Use the {@link Files} interface instead.
-     * @param fileName the filename.
+     * <p>
+     * 为文件名创建一个新的绝对路径 FileHandle。适用于不需要任何后端的桌面工具。如果要编写跨平台代码,请不要使用此构造函数,而应使用 {@link Files} 接口。
+     * @param fileName the filename. 文件名。
      */
     public Fi(String fileName){
         this.file = new File(fileName);
@@ -45,7 +51,9 @@ public class Fi implements Comparable<Fi>{
     /**
      * Creates a new absolute FileHandle for the {@link File}. Use this for tools on the desktop that don't need any of the
      * backends. Do not use this constructor in case you write something cross-platform. Use the {@link Files} interface instead.
-     * @param file the file.
+     * <p>
+     * 为 {@link File} 创建一个新的绝对路径 FileHandle。适用于不需要任何后端的桌面工具。如果要编写跨平台代码,请不要使用此构造函数,而应使用 {@link Files} 接口。
+     * @param file the file. 文件。
      */
     public Fi(File file){
         this.file = file;
@@ -128,28 +136,37 @@ public class Fi implements Comparable<Fi>{
     }
 
     /**
-     * @return the path of the file as specified on construction. Backward slashes will be replaced by forward slashes.
+     * @return the path of the file as specified on construction. Backward slashes will be replaced by forward slashes. 构造时指定的文件路径。反斜杠会被替换为正斜杠。
      */
     public String path(){
         return file.getPath().replace('\\', '/');
     }
 
-    /** @return the absolute path to this file without backslashes.*/
+    /**
+     * @return the absolute path to this file without backslashes. 此文件的绝对路径,不含反斜杠。
+     */
     public String absolutePath(){
         return file.getAbsolutePath().replace('\\', '/');
     }
 
-    /** @return the name of the file, without any parent paths. */
+    /**
+     * @return the name of the file, without any parent paths. 文件名,不含任何父路径。
+     */
     public String name(){
         return file.getName().isEmpty() ? file.getPath() : file.getName();
     }
 
-    /** @return whether this file's extension is equal to the specified string. */
+    /**
+     * @return whether this file's extension is equal to the specified string. 此文件的扩展名是否等于指定字符串。
+     */
     public boolean extEquals(String ext){
         return extension().equalsIgnoreCase(ext);
     }
 
-    /** Returns the file extension (without the dot) or an empty string if the file name doesn't contain a dot. */
+    /**
+     * Returns the file extension (without the dot) or an empty string if the file name doesn't contain a dot.
+     * 返回文件扩展名(不含点),如果文件名不含点则返回空字符串。
+     */
     public String extension(){
         String name = file.getName();
         int dotIndex = name.lastIndexOf('.');
@@ -157,7 +174,9 @@ public class Fi implements Comparable<Fi>{
         return name.substring(dotIndex + 1);
     }
 
-    /** @return the name of the file, without parent paths or the extension. */
+    /**
+     * @return the name of the file, without parent paths or the extension. 文件名,不含父路径和扩展名。
+     */
     public String nameWithoutExtension(){
         String name = file.getName();
         int dotIndex = name.lastIndexOf('.');
@@ -167,7 +186,7 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * @return the path and filename without the extension, e.g. dir/dir2/file.png -> dir/dir2/file. backward slashes will be
-     * returned as forward slashes.
+     * returned as forward slashes. 不含扩展名的路径和文件名,例如 dir/dir2/file.png -> dir/dir2/file。反斜杠将作为正斜杠返回。
      */
     public String pathWithoutExtension(){
         String path = file.getPath().replace('\\', '/');
@@ -183,13 +202,17 @@ public class Fi implements Comparable<Fi>{
     /**
      * Returns a java.io.File that represents this file handle. Note the returned file will only be usable for
      * {@link FileType#absolute} and {@link FileType#external} file handles.
+     * <p>
+     * 返回表示此文件句柄的 java.io.File。注意,返回的文件仅对 {@link FileType#absolute} 和 {@link FileType#external} 类型的文件句柄可用。
      */
     public File file(){
         if(type == FileType.external) return new File(Core.files.getExternalStoragePath(), file.getPath());
         return file;
     }
 
-    /** @return the sha256 hash of this file. */
+    /**
+     * @return the sha256 hash of this file. 此文件的 sha256 哈希值。
+     */
     public byte[] sha256(){
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -206,7 +229,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Returns a stream for reading this file as bytes.
-     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read.
+     * <p>
+     * 返回以字节形式读取此文件的流。
+     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. 如果文件句柄表示目录、不存在或无法读取
      */
     public InputStream read(){
         if(type == FileType.classpath || (type == FileType.internal && !file().exists())
@@ -226,7 +251,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Returns a buffered stream for reading this file as bytes.
-     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read.
+     * <p>
+     * 返回以字节形式读取此文件的缓冲流。
+     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. 如果文件句柄表示目录、不存在或无法读取
      */
     public BufferedInputStream read(int bufferSize){
         return new BufferedInputStream(read(), bufferSize);
@@ -234,7 +261,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Returns a reader for reading this file as characters.
-     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read.
+     * <p>
+     * 返回以字符形式读取此文件的 reader。
+     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. 如果文件句柄表示目录、不存在或无法读取
      */
     public Reader reader(){
         return reader("UTF-8");
@@ -242,7 +271,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Returns a reader for reading this file as characters.
-     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read.
+     * <p>
+     * 返回以字符形式读取此文件的 reader。
+     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. 如果文件句柄表示目录、不存在或无法读取
      */
     public Reader reader(String charset){
         InputStream stream = read();
@@ -256,7 +287,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Returns a buffered reader for reading this file as characters.
-     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read.
+     * <p>
+     * 返回以字符形式读取此文件的缓冲 reader。
+     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. 如果文件句柄表示目录、不存在或无法读取
      */
     public BufferedReader reader(int bufferSize){
         return reader(bufferSize, "UTF-8");
@@ -264,7 +297,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Returns a buffered reader for reading this file as characters.
-     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read.
+     * <p>
+     * 返回以字符形式读取此文件的缓冲 reader。
+     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. 如果文件句柄表示目录、不存在或无法读取
      */
     public BufferedReader reader(int bufferSize, String charset){
         try{
@@ -276,7 +311,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Reads the entire file into a string using the platform's default charset.
-     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read.
+     * <p>
+     * 使用平台默认字符集将整个文件读入字符串。
+     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. 如果文件句柄表示目录、不存在或无法读取
      */
     public String readString(){
         return readString("UTF-8");
@@ -284,8 +321,10 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Reads the entire file into a string using the specified charset.
-     * @param charset If null the default charset is used.
-     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read.
+     * <p>
+     * 使用指定字符集将整个文件读入字符串。
+     * @param charset If null the default charset is used. 如果为 null,则使用默认字符集。
+     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. 如果文件句柄表示目录、不存在或无法读取
      */
     public String readString(String charset){
         StringBuilder output = new StringBuilder(estimateLength());
@@ -311,7 +350,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Reads the entire file into a byte array.
-     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read.
+     * <p>
+     * 将整个文件读入字节数组。
+     * @throws ArcRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. 如果文件句柄表示目录、不存在或无法读取
      */
     public byte[] readBytes(){
         InputStream input = read();
@@ -324,7 +365,9 @@ public class Fi implements Comparable<Fi>{
         }
     }
 
-    /** @return a new ByteArrayInputStream containing all the bytes in this file. */
+    /**
+     * @return a new ByteArrayInputStream containing all the bytes in this file. 一个包含此文件所有字节的新 ByteArrayInputStream。
+     */
     public ByteArrayInputStream readByteStream(){
         return new ByteArrayInputStream(readBytes());
     }
@@ -336,10 +379,12 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Reads the entire file into the byte array. The byte array must be big enough to hold the file's data.
-     * @param bytes the array to load the file into
-     * @param offset the offset to start writing bytes
-     * @param size the number of bytes to read, see {@link #length()}
-     * @return the number of read bytes
+     * <p>
+     * 将整个文件读入字节数组。字节数组必须足够大以容纳文件的数据。
+     * @param bytes the array to load the file into 要载入文件的数组
+     * @param offset the offset to start writing bytes 开始写入字节的偏移量
+     * @param size the number of bytes to read, see {@link #length()} 要读取的字节数,参见 {@link #length()}
+     * @return the number of read bytes 读取的字节数
      */
     public int readBytes(byte[] bytes, int offset, int size){
         InputStream input = read();
@@ -360,7 +405,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Attempts to memory map this file in READ_ONLY mode. Android files must not be compressed.
-     * @throws ArcRuntimeException if this file handle represents a directory, doesn't exist, or could not be read, or memory mapping fails, or is a {@link FileType#classpath} file.
+     * <p>
+     * 尝试以 READ_ONLY 模式内存映射此文件。Android 文件不能是压缩的。
+     * @throws ArcRuntimeException if this file handle represents a directory, doesn't exist, or could not be read, or memory mapping fails, or is a {@link FileType#classpath} file. 如果此文件句柄表示目录、不存在、无法读取、内存映射失败,或是 {@link FileType#classpath} 文件
      */
     public ByteBuffer map(){
         return map(MapMode.READ_ONLY);
@@ -368,7 +415,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Attempts to memory map this file. Android files must not be compressed.
-     * @throws ArcRuntimeException if this file handle represents a directory, doesn't exist, or could not be read, or memory mapping fails, or is a {@link FileType#classpath} file.
+     * <p>
+     * 尝试内存映射此文件。Android 文件不能是压缩的。
+     * @throws ArcRuntimeException if this file handle represents a directory, doesn't exist, or could not be read, or memory mapping fails, or is a {@link FileType#classpath} file. 如果此文件句柄表示目录、不存在、无法读取、内存映射失败,或是 {@link FileType#classpath} 文件
      */
     public ByteBuffer map(FileChannel.MapMode mode){
         if(type == FileType.classpath) throw new ArcRuntimeException("Cannot map a classpath file: " + this);
@@ -412,9 +461,11 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Returns a stream for writing to this file. Parent directories will be created if necessary.
-     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended.
+     * <p>
+     * 返回写入此文件的流。必要时会创建父目录。
+     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended. 如果为 false,文件已存在时将被覆盖,否则为追加写入
      * @throws ArcRuntimeException if this file handle represents a directory, if it is a {@link FileType#classpath} or
-     * {@link FileType#internal} file, or if it could not be written.
+     * {@link FileType#internal} file, or if it could not be written. 如果此文件句柄表示目录,或是 {@link FileType#classpath} 或 {@link FileType#internal} 文件,或无法写入
      */
     public OutputStream write(boolean append){
         if(type == FileType.classpath) throw new ArcRuntimeException("Cannot write to a classpath file: " + file);
@@ -431,10 +482,12 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Returns a buffered stream for writing to this file. Parent directories will be created if necessary.
-     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended.
-     * @param bufferSize The size of the buffer.
+     * <p>
+     * 返回写入此文件的缓冲流。必要时会创建父目录。
+     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended. 如果为 false,文件已存在时将被覆盖,否则为追加写入
+     * @param bufferSize The size of the buffer. 缓冲区大小。
      * @throws ArcRuntimeException if this file handle represents a directory, if it is a {@link FileType#classpath} or
-     * {@link FileType#internal} file, or if it could not be written.
+     * {@link FileType#internal} file, or if it could not be written. 如果此文件句柄表示目录,或是 {@link FileType#classpath} 或 {@link FileType#internal} 文件,或无法写入
      */
     public OutputStream write(boolean append, int bufferSize){
         return new BufferedOutputStream(write(append), bufferSize);
@@ -443,9 +496,11 @@ public class Fi implements Comparable<Fi>{
     /**
      * Reads the remaining bytes from the specified stream and writes them to this file. The stream is closed. Parent directories
      * will be created if necessary.
-     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended.
+     * <p>
+     * 读取指定流中剩余的字节并将其写入此文件。流会被关闭。必要时会创建父目录。
+     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended. 如果为 false,文件已存在时将被覆盖,否则为追加写入
      * @throws ArcRuntimeException if this file handle represents a directory, if it is a {@link FileType#classpath} or
-     * {@link FileType#internal} file, or if it could not be written.
+     * {@link FileType#internal} file, or if it could not be written. 如果此文件句柄表示目录,或是 {@link FileType#classpath} 或 {@link FileType#internal} 文件,或无法写入
      */
     public void write(InputStream input, boolean append){
         OutputStream output = null;
@@ -463,9 +518,11 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Returns a writer for writing to this file using the default charset. Parent directories will be created if necessary.
-     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended.
+     * <p>
+     * 返回使用默认字符集写入此文件的 writer。必要时会创建父目录。
+     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended. 如果为 false,文件已存在时将被覆盖,否则为追加写入
      * @throws ArcRuntimeException if this file handle represents a directory, if it is a {@link FileType#classpath} or
-     * {@link FileType#internal} file, or if it could not be written.
+     * {@link FileType#internal} file, or if it could not be written. 如果此文件句柄表示目录,或是 {@link FileType#classpath} 或 {@link FileType#internal} 文件,或无法写入
      */
     public Writer writer(boolean append){
         return writer(append, "UTF-8");
@@ -473,10 +530,12 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Returns a writer for writing to this file. Parent directories will be created if necessary.
-     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended.
-     * @param charset May be null to use the default charset.
+     * <p>
+     * 返回写入此文件的 writer。必要时会创建父目录。
+     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended. 如果为 false,文件已存在时将被覆盖,否则为追加写入
+     * @param charset May be null to use the default charset. 可以为 null 以使用默认字符集。
      * @throws ArcRuntimeException if this file handle represents a directory, if it is a {@link FileType#classpath} or
-     * {@link FileType#internal} file, or if it could not be written.
+     * {@link FileType#internal} file, or if it could not be written. 如果此文件句柄表示目录,或是 {@link FileType#classpath} 或 {@link FileType#internal} 文件,或无法写入
      */
     public Writer writer(boolean append, String charset){
         if(type == FileType.classpath) throw new ArcRuntimeException("Cannot write to a classpath file: " + file);
@@ -502,6 +561,8 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Writes a string without appending it.
+     * <p>
+     * 写入字符串,不追加。
      * @see #writeString(String, boolean)
      */
     public void writeString(String string){
@@ -510,9 +571,11 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Writes the specified string to the file using the default charset. Parent directories will be created if necessary.
-     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended.
+     * <p>
+     * 使用默认字符集将指定字符串写入文件。必要时会创建父目录。
+     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended. 如果为 false,文件已存在时将被覆盖,否则为追加写入
      * @throws ArcRuntimeException if this file handle represents a directory, if it is a {@link FileType#classpath} or
-     * {@link FileType#internal} file, or if it could not be written.
+     * {@link FileType#internal} file, or if it could not be written. 如果此文件句柄表示目录,或是 {@link FileType#classpath} 或 {@link FileType#internal} 文件,或无法写入
      */
     public void writeString(String string, boolean append){
         writeString(string, append, "UTF-8");
@@ -520,10 +583,12 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Writes the specified string to the file using the specified charset. Parent directories will be created if necessary.
-     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended.
-     * @param charset May be null to use the default charset.
+     * <p>
+     * 使用指定字符集将指定字符串写入文件。必要时会创建父目录。
+     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended. 如果为 false,文件已存在时将被覆盖,否则为追加写入
+     * @param charset May be null to use the default charset. 可以为 null 以使用默认字符集。
      * @throws ArcRuntimeException if this file handle represents a directory, if it is a {@link FileType#classpath} or
-     * {@link FileType#internal} file, or if it could not be written.
+     * {@link FileType#internal} file, or if it could not be written. 如果此文件句柄表示目录,或是 {@link FileType#classpath} 或 {@link FileType#internal} 文件,或无法写入
      */
     public void writeString(String string, boolean append, String charset){
         Writer writer = null;
@@ -543,9 +608,11 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Writes the specified bytes to the file. Parent directories will be created if necessary.
-     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended.
+     * <p>
+     * 将指定的字节写入文件。必要时会创建父目录。
+     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended. 如果为 false,文件已存在时将被覆盖,否则为追加写入
      * @throws ArcRuntimeException if this file handle represents a directory, if it is a {@link FileType#classpath} or
-     * {@link FileType#internal} file, or if it could not be written.
+     * {@link FileType#internal} file, or if it could not be written. 如果此文件句柄表示目录,或是 {@link FileType#classpath} 或 {@link FileType#internal} 文件,或无法写入
      */
     public void writeBytes(byte[] bytes, boolean append){
         OutputStream output = write(append);
@@ -560,9 +627,11 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Writes the specified bytes to the file. Parent directories will be created if necessary.
-     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended.
+     * <p>
+     * 将指定的字节写入文件。必要时会创建父目录。
+     * @param append If false, this file will be overwritten if it exists, otherwise it will be appended. 如果为 false,文件已存在时将被覆盖,否则为追加写入
      * @throws ArcRuntimeException if this file handle represents a directory, if it is a {@link FileType#classpath} or
-     * {@link FileType#internal} file, or if it could not be written.
+     * {@link FileType#internal} file, or if it could not be written. 如果此文件句柄表示目录,或是 {@link FileType#classpath} 或 {@link FileType#internal} 文件,或无法写入
      */
     public void writeBytes(byte[] bytes, int offset, int length, boolean append){
         OutputStream output = write(append);
@@ -576,7 +645,10 @@ public class Fi implements Comparable<Fi>{
     }
 
     /** Recursively iterates through all files in this directory.
-     * Directories are not handled.*/
+     * <p>
+     * 递归遍历此目录中的所有文件。
+     * 不处理目录。
+     * Directories are not handled. */
     public void walk(Cons<Fi> cons){
         if(isDirectory()){
             for(Fi file : list()){
@@ -588,6 +660,9 @@ public class Fi implements Comparable<Fi>{
     }
 
     /** Recursively iterates through all files in this directory and adds them to an array.
+     * <p>
+     * 递归遍历此目录中的所有文件并将其添加到数组中。
+     * 不处理目录。
      * Directories are not handled. */
     public Ar<Fi> findAll(Boolf<Fi> test){
         Ar<Fi> out = new Ar<>();
@@ -599,14 +674,20 @@ public class Fi implements Comparable<Fi>{
         return out;
     }
 
-    /** Recursively iterates through all files in this directory and adds them to a newly allocated array.*/
+    /**
+     * Recursively iterates through all files in this directory and adds them to a newly allocated array.
+     * 递归遍历此目录中的所有文件并将它们添加到新分配的数组中。
+     */
     public Ar<Fi> findAll(){
         Ar<Fi> out = new Ar<>();
         walk(out::add);
         return out;
     }
 
-    /** Equivalent to {@link #list()}, but returns a Ar. */
+    /**
+     * Equivalent to {@link #list()}, but returns a Ar.
+     * 等价于 {@link #list()},但返回 Ar。
+     */
     public Ar<Fi> seq(){
         return Ar.with(list());
     }
@@ -615,7 +696,9 @@ public class Fi implements Comparable<Fi>{
      * Returns the paths to the children of this directory. Returns an empty list if this file handle represents a file and not a
      * directory. On the desktop, an {@link FileType#internal} handle to a directory on the classpath will return a zero length
      * array.
-     * @throws ArcRuntimeException if this file is an {@link FileType#classpath} file.
+     * <p>
+     * 返回此目录子项的路径。如果此文件句柄表示的是文件而非目录,则返回空列表。在桌面上,指向类路径中目录的 {@link FileType#internal} 句柄将返回长度为零的数组。
+     * @throws ArcRuntimeException if this file is an {@link FileType#classpath} file. 如果此文件是 {@link FileType#classpath} 文件
      */
     public Fi[] list(){
         if(type == FileType.classpath) throw new ArcRuntimeException("Cannot list a classpath directory: " + file);
@@ -631,8 +714,10 @@ public class Fi implements Comparable<Fi>{
      * Returns the paths to the children of this directory that satisfy the specified filter. Returns an empty list if this file
      * handle represents a file and not a directory. On the desktop, an {@link FileType#internal} handle to a directory on the
      * classpath will return a zero length array.
-     * @param filter the {@link FileFilter} to filter files
-     * @throws ArcRuntimeException if this file is an {@link FileType#classpath} file.
+     * <p>
+     * 返回此目录中满足指定过滤条件的子项路径。如果此文件句柄表示的是文件而非目录,则返回空列表。在桌面上,指向类路径中目录的 {@link FileType#internal} 句柄将返回长度为零的数组。
+     * @param filter the {@link FileFilter} to filter files 用于过滤文件的 {@link FileFilter}
+     * @throws ArcRuntimeException if this file is an {@link FileType#classpath} file. 如果此文件是 {@link FileType#classpath} 文件
      */
     public Fi[] list(FileFilter filter){
         if(type == FileType.classpath) throw new ArcRuntimeException("Cannot list a classpath directory: " + file);
@@ -659,8 +744,10 @@ public class Fi implements Comparable<Fi>{
      * Returns the paths to the children of this directory that satisfy the specified filter. Returns an empty list if this file
      * handle represents a file and not a directory. On the desktop, an {@link FileType#internal} handle to a directory on the
      * classpath will return a zero length array.
-     * @param filter the {@link FilenameFilter} to filter files
-     * @throws ArcRuntimeException if this file is an {@link FileType#classpath} file.
+     * <p>
+     * 返回此目录中满足指定过滤条件的子项路径。如果此文件句柄表示的是文件而非目录,则返回空列表。在桌面上,指向类路径中目录的 {@link FileType#internal} 句柄将返回长度为零的数组。
+     * @param filter the {@link FilenameFilter} to filter files 用于过滤文件的 {@link FilenameFilter}
+     * @throws ArcRuntimeException if this file is an {@link FileType#classpath} file. 如果此文件是 {@link FileType#classpath} 文件
      */
     public Fi[] list(FilenameFilter filter){
         if(type == FileType.classpath) throw new ArcRuntimeException("Cannot list a classpath directory: " + file);
@@ -686,7 +773,9 @@ public class Fi implements Comparable<Fi>{
      * Returns the paths to the children of this directory with the specified suffix. Returns an empty list if this file handle
      * represents a file and not a directory. On the desktop, an {@link FileType#internal} handle to a directory on the classpath
      * will return a zero length array.
-     * @throws ArcRuntimeException if this file is an {@link FileType#classpath} file.
+     * <p>
+     * 返回此目录中具有指定后缀的子项路径。如果此文件句柄表示的是文件而非目录,则返回空列表。在桌面上,指向类路径中目录的 {@link FileType#internal} 句柄将返回长度为零的数组。
+     * @throws ArcRuntimeException if this file is an {@link FileType#classpath} file. 如果此文件是 {@link FileType#classpath} 文件
      */
     public Fi[] list(String suffix){
         if(type == FileType.classpath) throw new ArcRuntimeException("Cannot list a classpath directory: " + file);
@@ -711,13 +800,18 @@ public class Fi implements Comparable<Fi>{
      * Returns true if this file is a directory. Always returns false for classpath files. On Android, an
      * {@link FileType#internal} handle to an empty directory will return false. On the desktop, an {@link FileType#internal}
      * handle to a directory on the classpath will return false.
+     * <p>
+     * 如果此文件是目录则返回 true。对 classpath 文件始终返回 false。在 Android 上,指向空目录的 {@link FileType#internal} 句柄将返回 false。在桌面上,指向类路径中目录的 {@link FileType#internal} 句柄将返回 false。
      */
     public boolean isDirectory(){
         if(type == FileType.classpath) return false;
         return file().isDirectory();
     }
 
-    /** Returns a handle to the child with the specified name. */
+    /**
+     * Returns a handle to the child with the specified name.
+     * 返回指定名称子项的句柄。
+     */
     public Fi child(String name){
         if(file.getPath().length() == 0) return new Fi(new File(name), type);
         return new Fi(new File(file, name), type);
@@ -725,7 +819,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Returns a handle to the sibling with the specified name.
-     * @throws ArcRuntimeException if this file is the root.
+     * <p>
+     * 返回指定名称同级项的句柄。
+     * @throws ArcRuntimeException if this file is the root. 如果此文件是根目录
      */
     public Fi sibling(String name){
         if(file.getPath().length() == 0) throw new ArcRuntimeException("Cannot get the sibling of the root.");
@@ -780,7 +876,9 @@ public class Fi implements Comparable<Fi>{
         return new Fi(parent, type);
     }
 
-    /** @throws ArcRuntimeException if this file handle is a {@link FileType#classpath} or {@link FileType#internal} file. */
+    /**
+     * @throws ArcRuntimeException if this file handle is a {@link FileType#classpath} or {@link FileType#internal} file. 如果此文件句柄是 {@link FileType#classpath} 或 {@link FileType#internal} 文件。
+     */
     public boolean mkdirs(){
         if(type == FileType.classpath) throw new ArcRuntimeException("Cannot mkdirs with a classpath file: " + file);
         if(type == FileType.internal) throw new ArcRuntimeException("Cannot mkdirs with an internal file: " + file);
@@ -790,12 +888,15 @@ public class Fi implements Comparable<Fi>{
     /**
      * Returns true if the file exists. On Android, a {@link FileType#classpath} or {@link FileType#internal} handle to a
      * directory will always return false. Note that this can be very slow for internal files on Android!
+     * <p>
+     * 如果文件存在则返回 true。在 Android 上,指向目录的 {@link FileType#classpath} 或 {@link FileType#internal} 句柄始终返回 false。注意,对 Android 上的 internal 文件这可能非常慢!
      */
     public boolean exists(){
         switch(type){
             case internal:
                 if(file().exists()) return true;
                 // Fall through.
+                // 继续向下执行。
             case classpath:
                 return Fi.class.getResource("/" + file.getPath().replace('\\', '/')) != null;
         }
@@ -804,7 +905,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Deletes this file or empty directory and returns success. Will not delete a directory that has children.
-     * @throws ArcRuntimeException if this file handle is a {@link FileType#classpath} or {@link FileType#internal} file.
+     * <p>
+     * 删除此文件或空目录并返回是否成功。不会删除含有子项的目录。
+     * @throws ArcRuntimeException if this file handle is a {@link FileType#classpath} or {@link FileType#internal} file. 如果此文件句柄是 {@link FileType#classpath} 或 {@link FileType#internal} 文件
      */
     public boolean delete(){
         if(type == FileType.classpath) throw new ArcRuntimeException("Cannot delete a classpath file: " + file);
@@ -814,7 +917,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Deletes this file or directory and all children, recursively.
-     * @throws ArcRuntimeException if this file handle is a {@link FileType#classpath} or {@link FileType#internal} file.
+     * <p>
+     * 递归删除此文件或目录及其所有子项。
+     * @throws ArcRuntimeException if this file handle is a {@link FileType#classpath} or {@link FileType#internal} file. 如果此文件句柄是 {@link FileType#classpath} 或 {@link FileType#internal} 文件
      */
     public boolean deleteDirectory(){
         if(type == FileType.classpath) throw new ArcRuntimeException("Cannot delete a classpath file: " + file);
@@ -824,7 +929,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Deletes all children of this directory, recursively.
-     * @throws ArcRuntimeException if this file handle is a {@link FileType#classpath} or {@link FileType#internal} file.
+     * <p>
+     * 递归删除此目录的所有子项。
+     * @throws ArcRuntimeException if this file handle is a {@link FileType#classpath} or {@link FileType#internal} file. 如果此文件句柄是 {@link FileType#classpath} 或 {@link FileType#internal} 文件
      */
     public void emptyDirectory(){
         emptyDirectory(false);
@@ -832,7 +939,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Deletes all children of this directory, recursively. Optionally preserving the folder structure.
-     * @throws ArcRuntimeException if this file handle is a {@link FileType#classpath} or {@link FileType#internal} file.
+     * <p>
+     * 递归删除此目录的所有子项。可选择保留文件夹结构。
+     * @throws ArcRuntimeException if this file handle is a {@link FileType#classpath} or {@link FileType#internal} file. 如果此文件句柄是 {@link FileType#classpath} 或 {@link FileType#internal} 文件
      */
     public void emptyDirectory(boolean preserveTree){
         if(type == FileType.classpath) throw new ArcRuntimeException("Cannot delete a classpath file: " + file);
@@ -847,8 +956,10 @@ public class Fi implements Comparable<Fi>{
      * this handle is a directory, then 1) if the destination is a file, ArcRuntimeException is thrown, or 2) if the destination is
      * a directory, this directory is copied into it recursively, overwriting existing files, or 3) if the destination doesn't
      * exist, {@link #mkdirs()} is called on the destination and this directory is copied into it recursively.
+     * <p>
+     * 将此文件或目录复制到指定的文件或目录。如果此句柄是文件:1) 目标是文件时,目标被覆盖;2) 目标是目录时,此文件被复制到其中;3) 目标不存在时,对目标的父目录调用 {@link #mkdirs()},并将此文件以新名称复制到其中。如果此句柄是目录:1) 目标是文件时,抛出 ArcRuntimeException;2) 目标是目录时,此目录被递归复制到其中并覆盖现有文件;3) 目标不存在时,对目标调用 {@link #mkdirs()},并将此目录递归复制到其中。
      * @throws ArcRuntimeException if the destination file handle is a {@link FileType#classpath} or {@link FileType#internal}
-     * file, or copying failed.
+     * file, or copying failed. 如果目标文件句柄是 {@link FileType#classpath} 或 {@link FileType#internal} 文件,或复制失败
      */
     public void copyTo(Fi dest){
         if(!isDirectory()){
@@ -867,7 +978,9 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Copies the contents of this folder into another folder. Unlike copyTo, this only copies the *contents*, not this folder itself.
-     * @throws ArcRuntimeException if this or {@param dest} is not a valid directory, or copying fails.
+     * <p>
+     * 将此文件夹的内容复制到另一个文件夹。与 copyTo 不同,这只复制*内容*,而不复制此文件夹本身。
+     * @throws ArcRuntimeException if this or {@param dest} is not a valid directory, or copying fails. 如果此文件夹或 {@param dest} 不是有效目录,或复制失败
      * */
     public void copyFilesTo(Fi dest){
         if(!isDirectory()) throw new ArcRuntimeException("Source folder must be a directory: " + this);
@@ -880,8 +993,10 @@ public class Fi implements Comparable<Fi>{
 
     /**
      * Moves this file to the specified file, overwriting the file if it already exists.
+     * <p>
+     * 将此文件移动到指定文件,如果文件已存在则覆盖。
      * @throws ArcRuntimeException if the source or destination file handle is a {@link FileType#classpath} or
-     * {@link FileType#internal} file.
+     * {@link FileType#internal} file. 如果源或目标文件句柄是 {@link FileType#classpath} 或 {@link FileType#internal} 文件
      */
     public void moveTo(Fi dest){
         switch(type){
@@ -892,6 +1007,7 @@ public class Fi implements Comparable<Fi>{
             case absolute:
             case external:
                 // Try rename for efficiency and to change case on case-insensitive file systems.
+                // 尝试重命名以提高效率,并在大小写不敏感的文件系统上更改大小写。
                 if(file().renameTo(dest.file())) return;
         }
         copyTo(dest);
@@ -902,6 +1018,8 @@ public class Fi implements Comparable<Fi>{
     /**
      * Returns the length in bytes of this file, or 0 if this file is a directory, does not exist, or the size cannot otherwise be
      * determined.
+     * <p>
+     * 返回此文件的长度(字节),如果此文件是目录、不存在或无法确定大小,则返回 0。
      */
     public long length(){
         if(type == FileType.classpath || (type == FileType.internal && !file.exists())){
@@ -921,6 +1039,8 @@ public class Fi implements Comparable<Fi>{
      * Returns the last modified time in milliseconds for this file. Zero is returned if the file doesn't exist. Zero is returned
      * for {@link FileType#classpath} files. On Android, zero is returned for {@link FileType#internal} files. On the desktop, zero
      * is returned for {@link FileType#internal} files on the classpath.
+     * <p>
+     * 返回此文件的最后修改时间(毫秒)。文件不存在时返回 0。{@link FileType#classpath} 文件返回 0。在 Android 上,{@link FileType#internal} 文件返回 0。在桌面上,类路径中的 {@link FileType#internal} 文件返回 0。
      */
     public long lastModified(){
         return file().lastModified();

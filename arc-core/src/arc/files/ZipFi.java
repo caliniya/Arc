@@ -8,7 +8,10 @@ import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 
-/** A FileHandle meant for easily representing and reading the contents of a zip/jar file.*/
+/**
+ * A FileHandle meant for easily representing and reading the contents of a zip/jar file.
+ * 用于方便地表示和读取 zip/jar 文件内容的 FileHandle。
+ */
 public class ZipFi extends Fi{
     private @Nullable ZipFi[] children;
     private @Nullable ZipFi parent;
@@ -116,6 +119,7 @@ public class ZipFi extends Fi{
     @Override
     public Fi child(String name){
         //trigger cache
+        // 触发缓存
         list();
 
         for(ZipFi child : children){
@@ -146,12 +150,14 @@ public class ZipFi extends Fi{
         return dir != file
             && file.path().startsWith(dir.path())
             && (file.path().substring(1 + dir.path().length()).indexOf('/') == -1 || //do not allow extra slashes in the path
+            // 路径中不允许出现多余的斜杠
             (file.path().endsWith("/") && countSlashes(file.path().substring(1 + dir.path().length())) == 1));
     }
 
     @Override
     public Fi parent(){
         //root
+        // 根目录
         if(path.length() == 0) return null;
 
         if(parent == null){

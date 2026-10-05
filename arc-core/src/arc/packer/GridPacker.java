@@ -8,7 +8,10 @@ import java.io.*;
 /** @author Nathan Sweet */
 public class GridPacker implements Packer{
     private final Settings settings;
-    /** Where progress is printed. Null means System.out. */
+    /**
+     * Where progress is printed. Null means System.out.
+     * 进度打印的位置。为 null 表示 System.out。
+     */
     PrintStream log;
 
     public GridPacker(Settings settings){
@@ -20,7 +23,9 @@ public class GridPacker implements Packer{
         if(!settings.silent) (log == null ? System.out : log).print("| Packing");
 
         // Rects are packed with right and top padding, so the max size is increased to match. After packing the padding is
+        // 矩形打包时带有右侧和顶部填充,因此最大尺寸会相应增加。
         // subtracted from the page size.
+        // 打包完成后,再从页面尺寸中减去填充。
         int paddingX = settings.paddingX, paddingY = settings.paddingY;
         int adjustX = paddingX, adjustY = paddingY;
         if(settings.edgePadding){
@@ -80,6 +85,7 @@ public class GridPacker implements Packer{
         }
 
         // Flip so rows start at top.
+        // 翻转使行从顶部开始。
         for(int i = page.outputRects.size - 1; i >= 0; i--){
             Rect rect = page.outputRects.get(i);
             rect.y = page.height - rect.y - rect.height;

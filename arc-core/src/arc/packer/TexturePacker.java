@@ -21,12 +21,20 @@ public class TexturePacker{
     private final ImageProcessor imageProcessor;
     private final Ar<InputImage> inputImages = new Ar<>();
 
-    /** Page image names claimed by this packer, or by every packer taking part in the same batch. Page rendering is asynchronous, so a claimed file may not exist on disk yet. */
+    /**
+     * Page image names claimed by this packer, or by every packer taking part in the same batch. Page rendering is asynchronous, so a claimed file may not exist on disk yet.
+     * 此打包器(或参与同一批次的每个打包器)已占用的页面图片名称。页面渲染是异步的,因此被占用的文件可能尚不存在于磁盘上。
+     */
     private Set<File> claimedFiles = Collections.synchronizedSet(new HashSet<File>());
-    /** Buffers messages so that the output of packers running concurrently doesn't interleave. Null if messages are printed directly. */
+    /**
+     * Buffers messages so that the output of packers running concurrently doesn't interleave. Null if messages are printed directly.
+     * 缓冲消息,使并发运行的打包器的输出不会交错。如果消息直接打印则为 null。
+     */
     private ByteArrayOutputStream logBuffer;
 
-    /** @param rootDir See {@link #setRootDir(File)}. */
+    /**
+     * @param rootDir See {@link #setRootDir(File)}. 参见 {@link #setRootDir(File)}。
+     */
     public TexturePacker(File rootDir, Settings settings){
         this.settings = settings;
 
@@ -57,7 +65,9 @@ public class TexturePacker{
         this(null, settings);
     }
 
-    /** @param rootDir Used to strip the root directory prefix from image file names, can be null. */
+    /**
+     * @param rootDir Used to strip the root directory prefix from image file names, can be null. 用于剥离图片文件名中的根目录前缀,可以为 null。
+     */
     public void setRootDir(File rootDir){
         if(rootDir == null){
             rootPath = null;
@@ -67,18 +77,27 @@ public class TexturePacker{
         if(!rootPath.endsWith("/")) rootPath += "/";
     }
 
-    /** Shares the set of claimed page files between packers that write to the same directory, see {@link #claimedFiles}. */
+    /**
+     * Shares the set of claimed page files between packers that write to the same directory, see {@link #claimedFiles}.
+     * 在写入同一目录的打包器之间共享已占用的页面文件集合,参见 {@link #claimedFiles}。
+     */
     void setClaimedFiles(Set<File> claimedFiles){
         this.claimedFiles = claimedFiles;
     }
 
-    /** Messages are held back until {@link #flushLog()} is called. */
+    /**
+     * Messages are held back until {@link #flushLog()} is called.
+     * 消息将被暂存,直到调用 {@link #flushLog()}。
+     */
     void bufferLog(){
         logBuffer = new ByteArrayOutputStream();
         setLog(new PrintStream(logBuffer));
     }
 
-    /** Prints held back messages, and everything from here on is printed directly. */
+    /**
+     * Prints held back messages, and everything from here on is printed directly.
+     * 打印暂存的消息,之后的所有消息都会直接打印。
+     */
     void flushLog(){
         if(logBuffer == null) return;
         ByteArrayOutputStream buffer = logBuffer;
@@ -92,7 +111,9 @@ public class TexturePacker{
 
     private PrintStream log;
 
-    /** @return the stream messages should be printed to. */
+    /**
+     * @return the stream messages should be printed to. 消息应打印到的流。
+     */
     PrintStream log(){
         return log == null ? System.out : log;
     }
@@ -128,7 +149,9 @@ public class TexturePacker{
 
     /**
      * Loads and packs the images for every scale. No files are written, so this can run concurrently with other packers.
-     * @return the pages for each scale, in the order of {@link Settings#scale}.
+     * <p>
+     * 加载并打包每个缩放级别的图片。不写入任何文件,因此可以与其他打包器并发运行。
+     * @return the pages for each scale, in the order of {@link Settings#scale}. 每个缩放级别的页面,顺序与 {@link Settings#scale} 一致
      */
     Ar<Ar<Page>> packScales(){
         int n = settings.scale.length;
@@ -150,7 +173,9 @@ public class TexturePacker{
      * Assigns page file names, writes the pack files and starts rendering the page images in the background. This is the only
      * part of packing which depends on what is already in the output directory, so when several packers write to the same place
      * it must be called for each of them in the same order every time. Rendering does not depend on any shared state.
-     * @return the running page renders. Wait for all of them before using the output.
+     * <p>
+     * 分配页面文件名,写入打包文件,并在后台开始渲染页面图片。这是打包过程中唯一依赖于输出目录中已有内容的部分,因此当多个打包器写入同一位置时,必须每次以相同的顺序对每个打包器调用此方法。渲染不依赖任何共享状态。
+     * @return the running page renders. Wait for all of them before using the output. 正在运行的页面渲染任务。使用输出之前应等待它们全部完成
      */
     Ar<FutureTask<Void>> write(File outputDir, String packFileName, Ar<Ar<Page>> scaled){
         if(packFileName.endsWith(settings.atlasExtension))
@@ -176,7 +201,10 @@ public class TexturePacker{
         return renders;
     }
 
-    /** Computes page sizes and names, then queues rendering of each page into the list. */
+    /**
+     * Computes page sizes and names, then queues rendering of each page into the list.
+     * 计算页面尺寸和名称,然后将每页的渲染任务加入列表。
+     */
     private void writeImages(File outputDir, String scaledPackFileName, Ar<Page> pages, Ar<FutureTask<Void>> renders){
         File packFileNoExt = new File(outputDir, scaledPackFileName);
         File packDir = packFileNoExt.getParentFile();
@@ -214,6 +242,7 @@ public class TexturePacker{
             page.imageHeight = height;
 
             //sync point: pick a free file name and claim it, since the file itself isn't written until later
+            // 同步点:选择一个空闲文件名并占用它,因为文件本身要到之后才会写入
             final File outputFile;
             while(true){
                 File candidate = new File(packDir, imageName + (fileIndex++ == 0 ? "" : fileIndex) + ".png");
@@ -228,6 +257,7 @@ public class TexturePacker{
             if(!settings.silent) log().println("| Writing " + width + "x" + height + ": " + outputFile);
 
             //take a snapshot of the draw order, as writing the pack file re-sorts the page's rects
+            // 对绘制顺序拍一个快照,因为写入打包文件会重新排序页面的矩形
             final Ar<Rect> drawOrder = new Ar<>(page.outputRects);
             final int canvasWidth = width, canvasHeight = height;
             renders.add(Tasks.submit(() -> {
@@ -237,7 +267,10 @@ public class TexturePacker{
         }
     }
 
-    /** Draws all rects onto a canvas and saves it. Must be safe to run on any thread, at the same time as other pages. */
+    /**
+     * Draws all rects onto a canvas and saves it. Must be safe to run on any thread, at the same time as other pages.
+     * 将所有矩形绘制到画布上并保存。必须保证可以在任何线程上与其他页面同时安全运行。
+     */
     private void renderPage(Page page, Ar<Rect> drawOrder, File outputFile, int width, int height){
         Pixmap canvas = new Pixmap(width, height);
         try{
@@ -252,6 +285,7 @@ public class TexturePacker{
                     int amountY = settings.paddingY / 2;
                     if(rect.rotated){
                         // Copy corner pixels to fill corners of the padding.
+                        // 复制角落像素以填充填充区域的四角。
                         for(int i = 1; i <= amountX; i++){
                             for(int j = 1; j <= amountY; j++){
                                 canvas.set(rectX - j, rectY + iw - 1 + i, image.getRaw(0, 0));
@@ -261,6 +295,7 @@ public class TexturePacker{
                             }
                         }
                         // Copy edge pixels into padding.
+                        // 将边缘像素复制到填充中。
                         for(int i = 1; i <= amountY; i++){
                             for(int j = 0; j < iw; j++){
                                 canvas.set(rectX - i, rectY + iw - 1 - j, image.getRaw(j, 0));
@@ -275,6 +310,7 @@ public class TexturePacker{
                         }
                     }else{
                         // Copy corner pixels to fill corners of the padding.
+                        // 复制角落像素以填充填充区域的四角。
                         for(int i = 1; i <= amountX; i++){
                             for(int j = 1; j <= amountY; j++){
                                 canvas.set(rectX - i, rectY - j, image.getRaw(0, 0));
@@ -284,6 +320,7 @@ public class TexturePacker{
                             }
                         }
                         // Copy edge pixels into padding.
+                        // 将边缘像素复制到填充中。
                         for(int i = 1; i <= amountY; i++){
                             copy(image, 0, 0, iw, 1, canvas, rectX, rectY - i, rect.rotated);
                             copy(image, 0, ih - 1, iw, 1, canvas, rectX, rectY + ih - 1 + i, rect.rotated);
@@ -297,6 +334,7 @@ public class TexturePacker{
                 copy(image, 0, 0, iw, ih, canvas, rectX, rectY, rect.rotated);
 
                 //the source image has been fully drawn, release its memory right away
+                // 源图片已完全绘制,立即释放其内存
                 if(rect.ownsPixmap) image.dispose();
             }
 
@@ -326,30 +364,37 @@ public class TexturePacker{
         packDir.mkdirs();
 
         //sync point
+        // 同步点
         boolean existed = packFile.exists() && packFile.length() > 0;
 
         try(Writes write = packFile.writes(true)){
             //write meta to start of file
+            // 将元数据写入文件开头
             if(!existed){
                 write.b(TextureAtlasData.formatHeader);
                 write.b(TextureAtlasData.formatVersion);
             }
 
             //write every page; reader is expected to read until EOF
+            // 写入每一页;读取方应读取到 EOF 为止
             for(Page page : pages){
                 //write a single byte to check for EOF
+                // 写入单个字节以检查 EOF
                 write.b(1);
                 write.str(page.imageName);
                 //size
+                // 尺寸
                 write.s(page.imageWidth);
                 write.s(page.imageHeight);
                 //filters, wrapping
+                // 过滤器、环绕方式
                 write.b(settings.filterMin.ordinal());
                 write.b(settings.filterMag.ordinal());
                 write.b(settings.wrapX.ordinal());
                 write.b(settings.wrapY.ordinal());
 
                 //write total rects
+                // 写入矩形总数
                 write.i(page.outputRects.sum(i -> 1 + i.aliases.size()));
 
                 page.outputRects.sort();
@@ -372,26 +417,33 @@ public class TexturePacker{
         boolean offsets = rect.originalWidth != rect.regionWidth || rect.originalHeight != rect.regionHeight;
 
         //name
+        // 名称
         write.str(Rect.getAtlasName(name, settings.flattenPaths));
         //xy
+        // xy 坐标
         write.s(page.x + rect.x);
         write.s((page.y + page.height - rect.y - (rect.height - settings.paddingY)));
         //size
+        // 尺寸
         write.s(rect.regionWidth);
         write.s(rect.regionHeight);
 
         //optional offsets
+        // 可选的偏移量
         write.bool(offsets);
         if(offsets){
             //offset xy
+            // 偏移 xy
             write.s(rect.offsetX);
             write.s((rect.originalHeight - rect.regionHeight - rect.offsetY));
             //original size
+            // 原始尺寸
             write.s(rect.originalWidth);
             write.s(rect.originalHeight);
         }
 
         //optional splits
+        // 可选的分割值
         write.bool(rect.splits != null);
         if(rect.splits != null){
             for(int i = 0; i < 4; i++){
@@ -399,6 +451,7 @@ public class TexturePacker{
             }
         }
         //optional pads
+        // 可选的填充值
         write.bool(rect.pads != null);
         if(rect.pads != null){
             for(int i = 0; i < 4; i++){
@@ -458,6 +511,7 @@ public class TexturePacker{
         public int offsetX, offsetY, regionWidth, regionHeight, originalWidth, originalHeight;
         public int x, y;
         public int width, height; // Portion of page taken by this region, including padding.
+        // 此区域占用的页面部分,包括填充。
         public boolean rotated;
         public Set<Alias> aliases;
         public int[] splits;
@@ -466,7 +520,10 @@ public class TexturePacker{
 
         boolean isPatch;
         Pixmap pixmap;
-        /** Whether pixmap was created by the packer, and can be disposed once it has been drawn. */
+        /**
+         * Whether pixmap was created by the packer, and can be disposed once it has been drawn.
+         * pixmap 是否由打包器创建,绘制完成后即可销毁。
+         */
         boolean ownsPixmap;
         Fi file;
         int score1, score2;
@@ -498,7 +555,10 @@ public class TexturePacker{
             return imageProcessor.processImage(image, name).getImage(null);
         }
 
-        /** Creates a bare node for use by the packing algorithm. Node rects never have aliases. */
+        /**
+         * Creates a bare node for use by the packing algorithm. Node rects never have aliases.
+         * 创建供打包算法使用的裸节点。节点矩形从不会有别名。
+         */
         Rect(){
             aliases = Collections.emptySet();
         }
@@ -564,6 +624,8 @@ public class TexturePacker{
 
     /**
      * Packs using defaults settings.
+     * <p>
+     * 使用默认设置打包。
      * @see TexturePacker#process(Settings, String, String, String)
      */
     public static void process(String input, String output, String packFileName){
@@ -571,9 +633,9 @@ public class TexturePacker{
     }
 
     /**
-     * @param input Directory containing individual images to be packed.
-     * @param output Directory where the pack file and page images will be written.
-     * @param packFileName The name of the pack file. Also used to name the page images.
+     * @param input Directory containing individual images to be packed. 包含要打包的单独图片的目录。
+     * @param output Directory where the pack file and page images will be written. 打包文件和页面图片的写入目录。
+     * @param packFileName The name of the pack file. Also used to name the page images. 打包文件的名称。也用于命名页面图片。
      */
     public static void process(Settings settings, String input, String output, String packFileName){
         try{
@@ -586,7 +648,7 @@ public class TexturePacker{
 
     /**
      * @return true if the output file does not yet exist or its last modification date is before the last modification date of
-     * the input file
+     * the input file 如果输出文件尚不存在,或其最后修改时间早于输入文件的最后修改时间,则为 true
      */
     public static boolean isModified(String input, String output, String packFileName, Settings settings){
         String packFullFileName = output;
@@ -596,7 +658,9 @@ public class TexturePacker{
         }
 
         // Check against the only file we know for sure will exist and will be changed if any asset changes:
+        // 与我们确定唯一会存在、且任何资产变更时都会改变的文件进行比较:
         // the atlas file
+        // 图集文件
         packFullFileName += packFileName;
         packFullFileName += settings.atlasExtension;
         File outputFile = new File(packFullFileName);
@@ -625,6 +689,7 @@ public class TexturePacker{
 
     public static boolean processIfModified(String input, String output, String packFileName){
         // Default settings (Needed to access the default atlas extension string)
+        // 默认设置(需要访问默认图集扩展名字符串)
         Settings settings = new Settings();
 
         if(isModified(input, output, packFileName, settings)){
@@ -664,9 +729,15 @@ public class TexturePacker{
         public int maxWidth = 1024, maxHeight = 1024;
         public boolean square = false;
         public boolean stripWhitespaceX, stripWhitespaceY;
-        /** Whether to strip whitespace in a way that keeps the region rectangle centered. */
+        /**
+         * Whether to strip whitespace in a way that keeps the region rectangle centered.
+         * 是否以保持区域矩形居中的方式裁剪空白。
+         */
         public boolean stripWhitespaceCenter;
-        /** Paths containing these strings do not have whitespace stripped. */
+        /**
+         * Paths containing these strings do not have whitespace stripped.
+         * 包含这些字符串的路径不进行空白裁剪。
+         */
         public String[] ignoredWhitespaceStrings = {};
         public int alphaThreshold;
         public TextureFilter filterMin = TextureFilter.nearest, filterMag = TextureFilter.nearest;
@@ -674,6 +745,7 @@ public class TexturePacker{
         public boolean alias = true;
         public boolean ignoreBlankImages = true;
         public boolean fast = true; //with fast = false packing takes an eternity, I have no idea why that wasn't the default before
+        // fast = false 时打包耗时极长,我不明白为什么之前它不是默认值
         public boolean silent;
         public boolean printAliases;
         public boolean combineSubdirectories;
@@ -697,10 +769,12 @@ public class TexturePacker{
 
         public String getScaledPackFileName(String packFileName, int scaleIndex){
             // Use suffix if not empty string.
+            // 如果后缀非空字符串,则使用后缀。
             if(scaleSuffix[scaleIndex].length() > 0)
                 packFileName += scaleSuffix[scaleIndex];
             else{
                 // Otherwise if scale != 1 or multiple scales, use subdirectory.
+                // 否则,如果 scale != 1 或有多个缩放级别,则使用子目录。
                 float scaleValue = scale[scaleIndex];
                 if(scale.length != 1){
                     packFileName = (scaleValue == (int)scaleValue ? Integer.toString((int)scaleValue) : Float.toString(scaleValue))
