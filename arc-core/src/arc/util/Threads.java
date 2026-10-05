@@ -8,6 +8,8 @@ import java.util.concurrent.*;
 
 /**
  * Utilities for threaded programming.
+ * <p>
+ * 多线程编程工具类。
  */
 public class Threads{
 
@@ -38,12 +40,12 @@ public class Threads{
         }
     }
 
-    /** @return an executor with a fixed number of threads which do not expire */
+    /** @return an executor with a fixed number of threads which do not expire 一个拥有固定数量线程且线程不会过期的执行器 */
     public static ExecutorService executor(@Nullable String name, int threads){
         return Executors.newFixedThreadPool(threads, r -> newThread(r, name, true));
     }
 
-    /** @return an executor with a fixed number of threads which do not expire */
+    /** @return an executor with a fixed number of threads which do not expire 一个拥有固定数量线程且线程不会过期的执行器 */
     public static ExecutorService executor(int threads){
         return Executors.newFixedThreadPool(threads, r -> newThread(r, null, true));
     }
@@ -58,8 +60,8 @@ public class Threads{
         return executor(null);
     }
 
-    /** @return an executor with no max thread count. threads expire after 1 minute of inactivity
-     *  @param min the number of threads to keep alive at all times after they are first started */
+    /** @return an executor with no max thread count. threads expire after 1 minute of inactivity 一个没有最大线程数限制的执行器。线程在闲置 1 分钟后过期
+     *  @param min the number of threads to keep alive at all times after they are first started 首次启动后始终保持存活的线程数量 */
     public static ExecutorService unboundedExecutor(@Nullable String name, int min){
         return new ThreadPoolExecutor(min, Integer.MAX_VALUE, 1, TimeUnit.MINUTES, new SynchronousQueue<>(), r -> newThread(r, name, true));
     }
@@ -74,15 +76,18 @@ public class Threads{
         return unboundedExecutor(null);
     }
 
-    /** @return an executor with a max thread count. threads expire after 1 minute of inactivity
-     *  @param max maximum number of threads to create */
+    /** @return an executor with a max thread count. threads expire after 1 minute of inactivity 一个有最大线程数限制的执行器。线程在闲置 1 分钟后过期
+     *  @param max maximum number of threads to create 可创建的最大线程数 */
     public static ExecutorService boundedExecutor(@Nullable String name, int max){
         ThreadPoolExecutor exec = new ThreadPoolExecutor(max, max, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>(), r -> newThread(r, name, true));
         exec.allowCoreThreadTimeOut(true);
         return exec;
     }
 
-    /** Shuts down the executor and waits for its termination indefinitely. */
+    /**
+     * Shuts down the executor and waits for its termination indefinitely.
+     * 关闭执行器并无限期等待其终止。
+     */
     public static void await(ExecutorService exec){
         try{
             exec.shutdown();
@@ -108,7 +113,10 @@ public class Threads{
         }
     }
 
-    /** Throws an exception in the main game thread.*/
+    /**
+     * Throws an exception in the main game thread.
+     * 在主游戏线程中抛出异常。
+     */
     public static void throwAppException(Throwable t){
         Core.app.post(() -> {
             if(t instanceof RuntimeException){
@@ -119,24 +127,36 @@ public class Threads{
         });
     }
 
-    /** Starts a new non-daemon thread.*/
+    /**
+     * Starts a new non-daemon thread.
+     * 启动一个新的非守护线程。
+     */
     public static Thread thread(Runnable runnable){
         return thread(null, runnable);
     }
 
-    /** Starts a new non-daemon thread.*/
+    /**
+     * Starts a new non-daemon thread.
+     * 启动一个新的非守护线程。
+     */
     public static Thread thread(@Nullable String name, Runnable runnable){
         Thread thread = newThread(runnable, name, false);
         thread.start();
         return thread;
     }
 
-    /** Starts a new daemon thread.*/
+    /**
+     * Starts a new daemon thread.
+     * 启动一个新的守护线程。
+     */
     public static Thread daemon(Runnable runnable){
         return daemon(null, runnable);
     }
 
-    /** Starts a new daemon thread.*/
+    /**
+     * Starts a new daemon thread.
+     * 启动一个新的守护线程。
+     */
     public static Thread daemon(@Nullable String name, Runnable runnable){
         Thread thread = newThread(runnable, name, true);
         thread.start();

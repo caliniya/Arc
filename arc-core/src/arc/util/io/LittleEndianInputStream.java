@@ -4,6 +4,8 @@ import java.io.*;
 
 /**
  * Taken from http://www.javafaq.nu/java-example-code-1079.html
+ * <p>
+ * 摘自 http://www.javafaq.nu/java-example-code-1079.html
  * @author mzechner
  */
 public class LittleEndianInputStream extends FilterInputStream implements DataInput{

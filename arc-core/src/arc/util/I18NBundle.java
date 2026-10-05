@@ -40,25 +40,63 @@ import java.util.*;
  * It's also possible to create variants for languages or countries. This can be done by just skipping the country or language
  * abbreviation: BaseName_us__POSIX or BaseName__DE_PREEURO. But it's not allowed to circumvent both language and country:
  * BaseName___VARIANT is illegal.
+ * <p>
+ * 一个 {@code I18NBundle} 提供从属性文件加载的、特定于 {@code Locale} 的资源。bundle 包含多个命名资源,其名称和值都是 {@code String}。bundle 可以有父 bundle,当在某个 bundle 中找不到资源时,会在其父 bundle 中查找该资源。若回退机制到达基础 bundle 后仍找不到资源,则抛出 {@code MissingResourceException}。
+ *
+ * <ul>
+ * <li>同一组资源的所有 bundle 共享一个共同的基础 bundle。该基础 bundle 作为根,是所有子 bundle 都无法响应请求时的最后回退。</li>
+ * <li>第一层包含不同语言之间的差异。某种语言与基础 bundle 的语言之间的差异,只需由特定于该语言的 {@code I18NBundle} 处理。</li>
+ * <li>第二层包含使用同一语言的不同国家之间的差异。某个国家与该语言 bundle 的国家之间的差异,只需由特定于该国家的 {@code I18NBundle} 处理。</li>
+ * <li>第三层包含没有地理原因的差异(例如在某个时间点做出的更改,如 {@code PREEURO}:某些国家的货币发生了变化。国家 bundle 会返回当前货币(欧元),而 {@code PREEURO} 变体 bundle 会返回旧货币(如德国的 DM))。</li>
+ * </ul>
+ *
+ * <strong>示例</strong>
+ * <ul>
+ * <li>BaseName(基础 bundle)
+ * <li>BaseName_de(德语语言 bundle)
+ * <li>BaseName_fr(法语语言 bundle)
+ * <li>BaseName_de_DE(用德语表示的德国特定资源 bundle)
+ * <li>BaseName_de_CH(用德语表示的瑞士特定资源 bundle)
+ * <li>BaseName_fr_CH(用法语表示的瑞士特定资源 bundle)
+ * <li>BaseName_de_DE_PREEURO(用德语表示的欧元时代之前德国特定资源的 bundle)
+ * <li>BaseName_fr_FR_PREEURO(用法语表示的欧元时代之前法国特定资源的 bundle)
+ * </ul>
+ * <p>
+ * 也可以为语言或国家创建变体,只需省略国家或语言缩写即可:BaseName_us__POSIX 或 BaseName__DE_PREEURO。但不允许同时省略语言和国家:BaseName___VARIANT 是非法的。
  * @author davebaol
  * @see PropertiesUtils
  */
 public class I18NBundle{
     private static final String DEFAULT_ENCODING = "UTF-8";
     // Locale.ROOT does not exist in Android API level 8
+    // Android API level 8 中不存在 Locale.ROOT
     private static final Locale ROOT_LOCALE = new Locale("", "", "");
     private static boolean simpleFormatter = false;
-    /** The parent of this {@code I18NBundle} that is used if this bundle doesn't include the requested resource. */
+    /**
+     * The parent of this {@code I18NBundle} that is used if this bundle doesn't include the requested resource.
+     * 此 {@code I18NBundle} 的父 bundle,当此 bundle 不包含所请求的资源时使用。
+     */
     private I18NBundle parent;
-    /** The locale for this bundle. */
+    /**
+     * The locale for this bundle.
+     * 此 bundle 的 locale。
+     */
     private Locale locale;
-    /** The properties for this bundle. */
+    /**
+     * The properties for this bundle.
+     * 此 bundle 的属性。
+     */
     private ObjectMap<String, String> properties;
-    /** The formatter used for argument replacement. */
+    /**
+     * The formatter used for argument replacement.
+     * 用于参数替换的格式化器。
+     */
     private TextFormatter formatter;
 
     /**
      * Returns the flag indicating whether to use the simplified message pattern syntax (default is false).
+     * <p>
+     * 返回指示是否使用简化消息模式语法的标志(默认为 false)。
      */
     public static boolean getSimpleFormatter(){
         return simpleFormatter;
@@ -67,12 +105,17 @@ public class I18NBundle{
     /**
      * Sets the flag indicating whether to use the simplified message pattern. The flag must be set before calling the factory
      * methods {@code createBundle}.
+     * <p>
+     * 设置指示是否使用简化消息模式的标志。该标志必须在调用工厂方法 {@code createBundle} 之前设置。
      */
     public static void setSimpleFormatter(boolean enabled){
         simpleFormatter = enabled;
     }
 
-    /** Returns an empty bundle with no keys. */
+    /**
+     * Returns an empty bundle with no keys.
+     * 返回一个没有任何键的空 bundle。
+     */
     public static I18NBundle createEmptyBundle(){
         I18NBundle bundle = new I18NBundle();
         bundle.locale = ROOT_LOCALE;
@@ -83,10 +126,12 @@ public class I18NBundle{
 
     /**
      * Creates a new bundle using the specified <code>baseFileHandle</code>, the default locale and the default encoding "UTF-8".
-     * @param baseFileHandle the file handle to the base of the bundle
-     * @return a bundle for the given base file handle and the default locale
-     * @throws NullPointerException if <code>baseFileHandle</code> is <code>null</code>
-     * @throws MissingResourceException if no bundle for the specified base file handle can be found
+     * <p>
+     * 使用指定的 <code>baseFileHandle</code>、默认 locale 和默认编码 "UTF-8" 创建新 bundle。
+     * @param baseFileHandle the file handle to the base of the bundle bundle 基础的文件句柄
+     * @return a bundle for the given base file handle and the default locale 给定基础文件句柄和默认 locale 对应的 bundle
+     * @throws NullPointerException if <code>baseFileHandle</code> is <code>null</code> 若 <code>baseFileHandle</code> 为 <code>null</code>
+     * @throws MissingResourceException if no bundle for the specified base file handle can be found 若找不到指定基础文件句柄对应的 bundle
      */
     public static I18NBundle createBundle(Fi baseFileHandle){
         return createBundleImpl(baseFileHandle, Locale.getDefault(), DEFAULT_ENCODING);
@@ -95,11 +140,13 @@ public class I18NBundle{
     /**
      * Creates a new bundle using the specified <code>baseFileHandle</code> and <code>locale</code>; the default encoding "UTF-8"
      * is used.
-     * @param baseFileHandle the file handle to the base of the bundle
-     * @param locale the locale for which a bundle is desired
-     * @return a bundle for the given base file handle and locale
-     * @throws NullPointerException if <code>baseFileHandle</code> or <code>locale</code> is <code>null</code>
-     * @throws MissingResourceException if no bundle for the specified base file handle can be found
+     * <p>
+     * 使用指定的 <code>baseFileHandle</code> 和 <code>locale</code> 创建新 bundle;使用默认编码 "UTF-8"。
+     * @param baseFileHandle the file handle to the base of the bundle bundle 基础的文件句柄
+     * @param locale the locale for which a bundle is desired 需要为其获取 bundle 的 locale
+     * @return a bundle for the given base file handle and locale 给定基础文件句柄和 locale 对应的 bundle
+     * @throws NullPointerException if <code>baseFileHandle</code> or <code>locale</code> is <code>null</code> 若 <code>baseFileHandle</code> 或 <code>locale</code> 为 <code>null</code>
+     * @throws MissingResourceException if no bundle for the specified base file handle can be found 若找不到指定基础文件句柄对应的 bundle
      */
     public static I18NBundle createBundle(Fi baseFileHandle, Locale locale){
         return createBundleImpl(baseFileHandle, locale, DEFAULT_ENCODING);
@@ -107,11 +154,13 @@ public class I18NBundle{
 
     /**
      * Creates a new bundle using the specified <code>baseFileHandle</code> and <code>encoding</code>; the default locale is used.
-     * @param baseFileHandle the file handle to the base of the bundle
-     * @param encoding the charter encoding
-     * @return a bundle for the given base file handle and locale
-     * @throws NullPointerException if <code>baseFileHandle</code> or <code>encoding</code> is <code>null</code>
-     * @throws MissingResourceException if no bundle for the specified base file handle can be found
+     * <p>
+     * 使用指定的 <code>baseFileHandle</code> 和 <code>encoding</code> 创建新 bundle;使用默认 locale。
+     * @param baseFileHandle the file handle to the base of the bundle bundle 基础的文件句柄
+     * @param encoding the charter encoding 字符编码
+     * @return a bundle for the given base file handle and locale 给定基础文件句柄和 locale 对应的 bundle
+     * @throws NullPointerException if <code>baseFileHandle</code> or <code>encoding</code> is <code>null</code> 若 <code>baseFileHandle</code> 或 <code>encoding</code> 为 <code>null</code>
+     * @throws MissingResourceException if no bundle for the specified base file handle can be found 若找不到指定基础文件句柄对应的 bundle
      */
     public static I18NBundle createBundle(Fi baseFileHandle, String encoding){
         return createBundleImpl(baseFileHandle, Locale.getDefault(), encoding);
@@ -119,13 +168,15 @@ public class I18NBundle{
 
     /**
      * Creates a new bundle using the specified <code>baseFileHandle</code>, <code>locale</code> and <code>encoding</code>.
-     * @param baseFileHandle the file handle to the base of the bundle
-     * @param locale the locale for which a bundle is desired
-     * @param encoding the charter encoding
-     * @return a bundle for the given base file handle and locale
+     * <p>
+     * 使用指定的 <code>baseFileHandle</code>、<code>locale</code> 和 <code>encoding</code> 创建新 bundle。
+     * @param baseFileHandle the file handle to the base of the bundle bundle 基础的文件句柄
+     * @param locale the locale for which a bundle is desired 需要为其获取 bundle 的 locale
+     * @param encoding the charter encoding 字符编码
+     * @return a bundle for the given base file handle and locale 给定基础文件句柄和 locale 对应的 bundle
      * @throws NullPointerException if <code>baseFileHandle</code>, <code>locale</code> or <code>encoding</code> is
-     * <code>null</code>
-     * @throws MissingResourceException if no bundle for the specified base file handle can be found
+     * <code>null</code> 若 <code>baseFileHandle</code>、<code>locale</code> 或 <code>encoding</code> 为 <code>null</code>
+     * @throws MissingResourceException if no bundle for the specified base file handle can be found 若找不到指定基础文件句柄对应的 bundle
      */
     public static I18NBundle createBundle(Fi baseFileHandle, Locale locale, String encoding){
         return createBundleImpl(baseFileHandle, locale, encoding);
@@ -139,31 +190,38 @@ public class I18NBundle{
         Locale targetLocale = locale;
         do{
             // Create the candidate locales
+            // 创建候选 locale
             Ar<Locale> candidateLocales = getCandidateLocales(targetLocale);
 
             // Load the bundle and its parents recursively
+            // 递归加载该 bundle 及其父 bundle
             bundle = loadBundleChain(baseFileHandle, encoding, candidateLocales, 0, baseBundle);
 
             // Check the loaded bundle (if any)
+            // 检查已加载的 bundle(如有)
             if(bundle != null){
                 Locale bundleLocale = bundle.locale;
                 boolean isBaseBundle = bundleLocale.equals(ROOT_LOCALE);
 
                 if(!isBaseBundle || bundleLocale.equals(locale)){
                     // Found the bundle for the requested locale
+                    // 找到了所请求 locale 对应的 bundle
                     break;
                 }
                 if(candidateLocales.size == 1 && bundleLocale.equals(candidateLocales.get(0))){
                     // Found the bundle for the only candidate locale
+                    // 为唯一的候选 locale 找到了 bundle
                     break;
                 }
                 if(baseBundle == null){
                     // Store the base bundle and keep on processing the remaining fallback locales
+                    // 保存基础 bundle,并继续处理剩余的回退 locale
                     baseBundle = bundle;
                 }
             }
 
             // Set next fallback locale
+            // 设置下一个回退 locale
             targetLocale = getFallbackLocale(targetLocale);
 
         }while(targetLocale != null);
@@ -171,10 +229,12 @@ public class I18NBundle{
         if(bundle == null){
             if(baseBundle == null){
                 // No bundle found
+                // 未找到 bundle
                 throw new MissingResourceException("Can't find bundle for base file handle " + baseFileHandle.path() + ", locale "
                 + locale, baseFileHandle + "_" + locale, "");
             }
             // Set the base bundle to be returned
+            // 设置要返回的基础 bundle
             bundle = baseBundle;
         }
 
@@ -226,9 +286,44 @@ public class I18NBundle{
      * <pre>
      *     Messages_ja -> Messages
      * </pre>
-     * @param locale the locale for which a resource bundle is desired
-     * @return a <code>List</code> of candidate <code>Locale</code>s for the given <code>locale</code>
-     * @throws NullPointerException if <code>locale</code> is <code>null</code>
+     * <p>
+     * 返回一个 <code>List</code>,其中包含给定 <code>locale</code> 的候选 locale。<code>createBundle</code> 工厂方法每次尝试为目标 <code>Locale</code> 查找资源 bundle 时都会调用此方法。
+     *
+     * <p>
+     * 候选 locale 的序列也对应于运行时资源查找路径(也称为<I>父链</I>),前提是候选 locale 对应的资源 bundle 存在,且其父级并非由已加载的资源 bundle 自身定义。列表的最后一个元素始终是 {@linkplain Locale#ROOT 根 locale},即基础 bundle 是父链的终点。
+     *
+     * <p>
+     * 如果给定的 locale 等于 <code>Locale.ROOT</code>(根 locale),则返回仅包含根 <code>Locale</code> 的 <code>List</code>。此时 <code>createBundle</code> 工厂方法只加载基础 bundle 作为结果资源 bundle。
+     *
+     * <p>
+     * 此实现返回按以下序列包含 <code>Locale</code> 的 <code>List</code>:
+     *
+     * <pre>
+     *     Locale(language, country, variant)
+     *     Locale(language, country)
+     *     Locale(language)
+     *     Locale.ROOT
+     * </pre>
+     * <p>
+     * 其中 <code>language</code>、<code>country</code> 和 <code>variant</code> 分别是给定 <code>locale</code> 的语言、国家和变体值。末尾组成部分为空字符串的 locale 会被省略。
+     *
+     * <p>
+     * 例如,若给定基础名称为 "Messages",给定 <code>locale</code> 为 <code>Locale("ja",&nbsp;"",&nbsp;"XX")</code>,则返回的 <code>Locale</code> 列表为:
+     *
+     * <pre>
+     *     Locale("ja", "", "XX")
+     *     Locale("ja")
+     *     Locale.ROOT
+     * </pre>
+     * <p>
+     * 若找到了 "ja" 和 "" <code>Locale</code> 对应的资源 bundle,则运行时资源查找路径(父链)为:
+     *
+     * <pre>
+     *     Messages_ja -> Messages
+     * </pre>
+     * @param locale the locale for which a resource bundle is desired 需要为其获取资源 bundle 的 locale
+     * @return a <code>List</code> of candidate <code>Locale</code>s for the given <code>locale</code> 给定 <code>locale</code> 的候选 <code>Locale</code> 列表
+     * @throws NullPointerException if <code>locale</code> is <code>null</code> 若 <code>locale</code> 为 <code>null</code>
      */
     private static Ar<Locale> getCandidateLocales(Locale locale){
         String language = locale.getLanguage();
@@ -258,10 +353,15 @@ public class I18NBundle{
      * <p>
      * This method returns the {@linkplain Locale#getDefault() default <code>Locale</code>} if the given <code>locale</code> isn't
      * the default one. Otherwise, <code>null</code> is returned.
+     * <p>
+     * 返回一个 <code>Locale</code>,用作 <code>createBundle</code> 工厂方法继续查找 bundle 时的回退 locale。当工厂方法未能为 <code>baseFileHandler</code> 和 <code>locale</code> 找到结果 bundle 时会调用此方法,其中 locale 是 <code>createBundle</code> 的参数,或此方法上次返回的回退 locale。
+     *
+     * <p>
+     * 若给定的 <code>locale</code> 不是默认 locale,此方法返回 {@linkplain Locale#getDefault() 默认 <code>Locale</code>};否则返回 <code>null</code>。
      * @param locale the <code>Locale</code> for which <code>createBundle</code> has been unable to find any resource bundles
-     * (except for the base bundle)
-     * @return a <code>Locale</code> for the fallback search, or <code>null</code> if no further fallback search is needed.
-     * @throws NullPointerException if <code>locale</code> is <code>null</code>
+     * (except for the base bundle) <code>createBundle</code> 未能为其找到任何资源 bundle(基础 bundle 除外)的 <code>Locale</code>
+     * @return a <code>Locale</code> for the fallback search, or <code>null</code> if no further fallback search is needed. 用于回退查找的 <code>Locale</code>,若无需进一步回退查找则为 <code>null</code>。
+     * @throws NullPointerException if <code>locale</code> is <code>null</code> 若 <code>locale</code> 为 <code>null</code>
      */
     private static Locale getFallbackLocale(Locale locale){
         Locale defaultLocale = Locale.getDefault();
@@ -274,12 +374,14 @@ public class I18NBundle{
         I18NBundle parent = null;
         if(candidateIndex != candidateLocales.size - 1){
             // Load recursively the parent having the next candidate locale
+            // 递归加载具有下一个候选 locale 的父 bundle
             parent = loadBundleChain(baseFileHandle, encoding, candidateLocales, candidateIndex + 1, baseBundle);
         }else if(baseBundle != null && targetLocale.equals(ROOT_LOCALE)){
             return baseBundle;
         }
 
         // Load the bundle
+        // 加载该 bundle
         I18NBundle bundle = loadBundle(baseFileHandle, encoding, targetLocale);
         if(bundle != null){
             bundle.parent = parent;
@@ -290,6 +392,7 @@ public class I18NBundle{
     }
 
     // Tries to load the bundle for the given locale.
+    // 尝试加载给定 locale 对应的 bundle。
     private static I18NBundle loadBundle(Fi baseFileHandle, String encoding, Locale targetLocale){
         I18NBundle bundle = null;
         Reader reader = null;
@@ -297,9 +400,11 @@ public class I18NBundle{
             Fi fileHandle = toFileHandle(baseFileHandle, targetLocale);
             if(checkFileExistence(fileHandle)){
                 // Instantiate the bundle
+                // 实例化该 bundle
                 bundle = new I18NBundle();
 
                 // Load bundle properties from the stream with the specified encoding
+                // 以指定编码从流中加载 bundle 属性
                 reader = fileHandle.reader(encoding);
                 bundle.load(reader);
             }
@@ -314,6 +419,7 @@ public class I18NBundle{
     }
 
     //Fixes some problems with fh.exists(), see #2342 / #2345
+    // 修复 fh.exists() 的一些问题,参见 #2342 / #2345
     private static boolean checkFileExistence(Fi fh){
         try{
             fh.read().close();
@@ -336,10 +442,21 @@ public class I18NBundle{
      * where <code>language</code>, <code>country</code> and <code>variant</code> are the language, country and variant values of
      * <code>locale</code>, respectively. Final component values that are empty Strings are omitted along with the preceding '_'.
      * If all of the values are empty strings, then <code>baseFileHandle.name()</code> is returned with ".properties" appended.
-     * @param baseFileHandle the file handle to the base of the bundle
-     * @param locale the locale for which a resource bundle should be loaded
-     * @return the file handle for the bundle
-     * @throws NullPointerException if <code>baseFileHandle</code> or <code>locale</code> is <code>null</code>
+     * <p>
+     * 将给定的 <code>baseFileHandle</code> 和 <code>locale</code> 转换为对应的文件句柄。
+     *
+     * <p>
+     * 此实现返回 <code>baseFileHandle</code> 的同级文件句柄,其值为:
+     *
+     * <pre>
+     * baseFileHandle.name() + &quot;_&quot; + language + &quot;_&quot; + country + &quot;_&quot; + variant + &quot;.properties&quot;
+     * </pre>
+     * <p>
+     * 其中 <code>language</code>、<code>country</code> 和 <code>variant</code> 分别是 <code>locale</code> 的语言、国家和变体值。为空字符串的末尾组成部分会连同其前面的 '_' 一起省略。若所有值都是空字符串,则返回 <code>baseFileHandle.name()</code> 并追加 ".properties"。
+     * @param baseFileHandle the file handle to the base of the bundle bundle 基础的文件句柄
+     * @param locale the locale for which a resource bundle should be loaded 需要为其加载资源 bundle 的 locale
+     * @return the file handle for the bundle 该 bundle 的文件句柄
+     * @throws NullPointerException if <code>baseFileHandle</code> or <code>locale</code> is <code>null</code> 若 <code>baseFileHandle</code> 或 <code>locale</code> 为 <code>null</code>
      */
     private static Fi toFileHandle(Fi baseFileHandle, Locale locale){
         StringBuilder sb = new StringBuilder(baseFileHandle.name());
@@ -367,7 +484,9 @@ public class I18NBundle{
 
     /**
      * Load the properties from the specified reader.
-     * @param reader the reader
+     * <p>
+     * 从指定的 reader 加载属性。
+     * @param reader the reader 读取器
      */
     private void load(Reader reader){
         properties = new ObjectMap<>();
@@ -377,7 +496,9 @@ public class I18NBundle{
     /**
      * Returns the locale of this bundle. This method can be used after a call to <code>createBundle()</code> to determine whether
      * the resource bundle returned really corresponds to the requested locale or is a fallback.
-     * @return the locale of this bundle
+     * <p>
+     * 返回此 bundle 的 locale。可在调用 <code>createBundle()</code> 之后使用此方法,以确定返回的资源 bundle 是真正对应所请求的 locale,还是回退结果。
+     * @return the locale of this bundle 此 bundle 的 locale
      */
     public Locale getLocale(){
         return locale;
@@ -385,6 +506,8 @@ public class I18NBundle{
 
     /**
      * Sets the bundle locale. This method is private because a bundle can't change the locale during its life.
+     * <p>
+     * 设置 bundle 的 locale。此方法是私有的,因为 bundle 在其生命周期内不能更改 locale。
      */
     private void setLocale(Locale locale){
         this.locale = locale;
@@ -393,9 +516,11 @@ public class I18NBundle{
 
     /**
      * Gets a string for the given key from this bundle or one of its parents.
-     * @param key the key for the desired string
-     * @return the string for the given key or the key surrounded by {@code ???} if it cannot be found
-     * @throws NullPointerException if <code>key</code> is <code>null</code>
+     * <p>
+     * 从此 bundle 或其某个父 bundle 中获取给定键对应的字符串。
+     * @param key the key for the desired string 所需字符串的键
+     * @return the string for the given key or the key surrounded by {@code ???} if it cannot be found 给定键对应的字符串;若找不到,则返回被 {@code ???} 包围的键
+     * @throws NullPointerException if <code>key</code> is <code>null</code> 若 <code>key</code> 为 <code>null</code>
      */
     public final String get(String key){
         String result = properties.get(key);
@@ -408,7 +533,10 @@ public class I18NBundle{
         return result;
     }
 
-    /** Returns the string for this given key, or def. */
+    /**
+     * Returns the string for this given key, or def.
+     * 返回给定键对应的字符串,若无则返回 def。
+     */
     public String get(String key, String def){
         return has(key) ? get(key) : def;
     }
@@ -425,12 +553,15 @@ public class I18NBundle{
         return s;
     }
 
-    /**Returns all keys in this bundle. Does not check parent bundles.*/
+    /**
+     * Returns all keys in this bundle. Does not check parent bundles.
+     * 返回此 bundle 中的所有键。不检查父 bundle。
+     */
     public Iterable<String> getKeys(){
         return properties.keys();
     }
 
-    /** @return the internal property map. Can be modified. */
+    /** @return the internal property map. Can be modified. 内部属性 Map,可以被修改。 */
     public ObjectMap<String, String> getProperties(){
         return properties;
     }
@@ -439,7 +570,10 @@ public class I18NBundle{
         this.properties = properties;
     }
 
-    /** Checks whether a specified key is present in this bundle. */
+    /**
+     * Checks whether a specified key is present in this bundle.
+     * 检查此 bundle 中是否存在指定的键。
+     */
     public boolean has(String key){
         if(properties.containsKey(key)){
             return true;
@@ -454,11 +588,13 @@ public class I18NBundle{
     /**
      * Gets the string with the specified key from this bundle or one of its parent after replacing the given arguments if they
      * occur.
-     * @param key the key for the desired string
-     * @param args the arguments to be replaced in the string associated to the given key.
-     * @return the string for the given key formatted with the given arguments
-     * @throws NullPointerException if <code>key</code> is <code>null</code>
-     * @throws MissingResourceException if no string for the given key can be found
+     * <p>
+     * 从此 bundle 或其某个父 bundle 中获取指定键对应的字符串,并在出现给定参数时进行替换。
+     * @param key the key for the desired string 所需字符串的键
+     * @param args the arguments to be replaced in the string associated to the given key. 要在给定键关联的字符串中替换的参数。
+     * @return the string for the given key formatted with the given arguments 给定键对应的字符串,并使用给定参数完成格式化
+     * @throws NullPointerException if <code>key</code> is <code>null</code> 若 <code>key</code> 为 <code>null</code>
+     * @throws MissingResourceException if no string for the given key can be found 若找不到给定键对应的字符串
      */
     public String format(String key, Object... args){
         return formatter.format(get(key), args);
@@ -468,7 +604,10 @@ public class I18NBundle{
         return formatter.format(string, args);
     }
 
-    /**Format, but with a number with fixed decimal places.*/
+    /**
+     * Format, but with a number with fixed decimal places.
+     * 格式化,但数字使用固定的小数位数。
+     */
     public String formatFloat(String key, float value, int places){
         return formatter.format(get(key), Strings.fixed(value, places));
     }
@@ -476,6 +615,8 @@ public class I18NBundle{
     /**
      * Sets the value of all localized strings to String placeholder so hardcoded, unlocalized values can be easily spotted.
      * The I18NBundle won't be able to reset values after calling debug and should only be using during testing.
+     * <p>
+     * 将所有本地化字符串的值设置为占位字符串,以便轻松发现硬编码的、未本地化的值。调用 debug 后 I18NBundle 将无法重置这些值,因此只应在测试期间使用。
      */
     public void debug(String placeholder){
         ObjectMap.Keys<String> keys = properties.keys();
@@ -486,7 +627,7 @@ public class I18NBundle{
         }
     }
 
-    /** @return the parent bundle. */
+    /** @return the parent bundle. 父 bundle。 */
     public I18NBundle getParent(){
         return parent;
     }

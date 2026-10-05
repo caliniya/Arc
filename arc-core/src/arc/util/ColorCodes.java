@@ -2,7 +2,10 @@ package arc.util;
 
 import arc.struct.*;
 
-/** Note that these color codes will only work on linux or mac terminals. */
+/**
+ * Note that these color codes will only work on linux or mac terminals.
+ * 注意,这些颜色代码只能在 linux 或 mac 终端上使用。
+ */
 public class ColorCodes{
     public static String
     flush = "\033[H\033[2J",
@@ -38,6 +41,7 @@ public class ColorCodes{
     static{
 
         //disable color codes on windows/android (ignore windows terminal which supports colors)
+        // 在 windows/android 上禁用颜色代码(忽略支持颜色的 windows 终端)
         if((OS.isWindows && !OS.hasEnv("WT_SESSION")) || OS.isAndroid){
             flush = reset = bold = underline = black = red = green = yellow = blue = purple = cyan = lightWhite
             = lightBlack = lightRed = lightGreen = lightYellow = lightBlue = lightMagenta = lightCyan

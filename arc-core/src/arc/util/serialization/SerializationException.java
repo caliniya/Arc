@@ -2,6 +2,8 @@ package arc.util.serialization;
 
 /**
  * Indicates an error during serialization due to misconfiguration or during deserialization due to invalid input data.
+ * <p>
+ * 表示序列化期间因配置错误、或反序列化期间因输入数据无效而产生的错误。
  * @author Nathan Sweet
  */
 public class SerializationException extends RuntimeException{
@@ -23,7 +25,10 @@ public class SerializationException extends RuntimeException{
         super("", cause);
     }
 
-    /** Returns true if any of the exceptions that caused this exception are of the specified type. */
+    /**
+     * Returns true if any of the exceptions that caused this exception are of the specified type.
+     * 如果导致此异常的任一异常属于指定类型,则返回 true。
+     */
     public boolean causedBy(Class type){
         return causedBy(this, type);
     }
@@ -48,6 +53,8 @@ public class SerializationException extends RuntimeException{
     /**
      * Adds information to the exception message about where in the the object graph serialization failure occurred. Serializers
      * can catch {@link SerializationException}, add trace information, and rethrow the exception.
+     * <p>
+     * 向异常消息中添加有关对象图中序列化失败发生位置的信息。序列化器可以捕获 {@link SerializationException},添加跟踪信息后重新抛出异常。
      */
     public void addTrace(String info){
         if(info == null) throw new IllegalArgumentException("info cannot be null.");

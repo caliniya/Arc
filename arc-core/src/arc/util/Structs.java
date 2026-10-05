@@ -17,12 +17,18 @@ public class Structs{
         return array;
     }
 
-    /** Remove all values that match this predicate. */
+    /**
+     * Remove all values that match this predicate.
+     * 移除所有匹配此谓词的值。
+     */
     public static <T> void filter(Iterable<T> iterable, Boolf<T> removal){
         filter(iterable.iterator(), removal);
     }
 
-    /** Remove all values that match this predicate. */
+    /**
+     * Remove all values that match this predicate.
+     * 移除所有匹配此谓词的值。
+     */
     public static <T> void filter(Iterator<T> it, Boolf<T> removal){
         while(it.hasNext()){
             if(removal.get(it.next())){
@@ -49,7 +55,10 @@ public class Structs{
         return total;
     }
 
-    /**Uses identity comparisons.*/
+    /**
+     * Uses identity comparisons.
+     * 使用同一性(引用)比较。
+     */
     public static <T> boolean contains(T[] array, T value){
         for(T t : array){
             if(t == value || (value != null && value.equals(t))) return true;
@@ -136,7 +145,10 @@ public class Structs{
         return out.toArray();
     }
 
-    /** Equivalent to Comparator#thenComparsing, but more compatible. */
+    /**
+     * Equivalent to Comparator#thenComparsing, but more compatible.
+     * 等效于 Comparator#thenComparsing,但兼容性更好。
+     */
     public static <T> Comparator<T> comps(Comparator<T> first, Comparator<T> second){
         return (a, b) -> {
             int value = first.compare(a, b);

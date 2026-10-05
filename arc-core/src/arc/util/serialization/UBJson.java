@@ -7,7 +7,10 @@ import arc.util.serialization.Jval.*;
 
 import java.io.*;
 
-/** Reads UBJSON from a stream into a {@link Jval} tree. */
+/**
+ * Reads UBJSON from a stream into a {@link Jval} tree.
+ * 从流中读取 UBJSON 并构建 {@link Jval} 树。
+ */
 public class UBJson{
 
     public static void write(Jval value, OutputStream output) throws IOException{

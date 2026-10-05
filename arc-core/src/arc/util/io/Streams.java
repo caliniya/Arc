@@ -7,7 +7,10 @@ import java.io.*;
 import java.nio.*;
 import java.security.*;
 
-/** Provides utility methods to copy streams. */
+/**
+ * Provides utility methods to copy streams.
+ * 提供复制流的实用方法。
+ */
 public final class Streams{
     public static final int defaultBufferSize = 8192;
     public static final byte[] emptyBytes = new byte[0];
@@ -15,6 +18,8 @@ public final class Streams{
     /**
      * Allocates a {@value #defaultBufferSize} byte[] for use as a temporary buffer and calls
      * {@link #copy(InputStream, OutputStream, byte[])}.
+     * <p>
+     * 分配 {@value #defaultBufferSize} 大小的 byte[] 作为临时缓冲区,并调用 {@link #copy(InputStream, OutputStream, byte[])}。
      */
     public static void copy(InputStream input, OutputStream output) throws IOException{
         copy(input, output, new byte[defaultBufferSize]);
@@ -23,6 +28,8 @@ public final class Streams{
     /**
      * Allocates a byte[] of the specified size for use as a temporary buffer and calls
      * {@link #copy(InputStream, OutputStream, byte[])}.
+     * <p>
+     * 分配指定大小的 byte[] 作为临时缓冲区,并调用 {@link #copy(InputStream, OutputStream, byte[])}。
      */
     public static void copy(InputStream input, OutputStream output, int bufferSize) throws IOException{
         copy(input, output, new byte[bufferSize]);
@@ -31,6 +38,8 @@ public final class Streams{
     /**
      * Copy the data from an {@link InputStream} to an {@link OutputStream}, using the specified byte[] as a temporary buffer.
      * The stream is not closed.
+     * <p>
+     * 使用指定的 byte[] 作为临时缓冲区,将数据从 {@link InputStream} 复制到 {@link OutputStream}。不关闭流。
      */
     public static void copy(InputStream input, OutputStream output, byte[] buffer) throws IOException{
         int bytesRead;
@@ -43,7 +52,9 @@ public final class Streams{
      * Copy the data from an {@link InputStream} to an {@link OutputStream}, using the specified byte[] as a temporary buffer.
      * The stream is not closed.
      * Provides progress as a 0-1 value through the specified listener.
-     * @param totalLength the total byte length of the input.
+     * <p>
+     * 使用指定的 byte[] 作为临时缓冲区,将数据从 {@link InputStream} 复制到 {@link OutputStream}。不关闭流。通过指定的监听器以 0-1 的值提供进度。
+     * @param totalLength the total byte length of the input. 输入的总字节长度。
      */
     public static void copyProgress(InputStream input, OutputStream output, long totalLength, int bufferSize, Floatc progress) throws IOException{
         byte[] buffer = new byte[bufferSize];
@@ -59,6 +70,8 @@ public final class Streams{
     /**
      * Allocates a {@value #defaultBufferSize} byte[] for use as a temporary buffer and calls
      * {@link #copy(InputStream, OutputStream, byte[])}.
+     * <p>
+     * 分配 {@value #defaultBufferSize} 大小的 byte[] 作为临时缓冲区,并调用 {@link #copy(InputStream, OutputStream, byte[])}。
      */
     public static void copy(InputStream input, ByteBuffer output) throws IOException{
         copy(input, output, new byte[defaultBufferSize]);
@@ -67,6 +80,8 @@ public final class Streams{
     /**
      * Allocates a byte[] of the specified size for use as a temporary buffer and calls
      * {@link #copy(InputStream, ByteBuffer, byte[])}.
+     * <p>
+     * 分配指定大小的 byte[] 作为临时缓冲区,并调用 {@link #copy(InputStream, ByteBuffer, byte[])}。
      */
     public static void copy(InputStream input, ByteBuffer output, int bufferSize) throws IOException{
         copy(input, output, new byte[bufferSize]);
@@ -75,9 +90,11 @@ public final class Streams{
     /**
      * Copy the data from an {@link InputStream} to a {@link ByteBuffer}, using the specified byte[] as a temporary buffer. The
      * buffer's limit is increased by the number of bytes copied, the position is left unchanged. The stream is not closed.
-     * @param output Must be a direct Buffer with native byte order and the buffer MUST be large enough to hold all the bytes in
+     * <p>
+     * 使用指定的 byte[] 作为临时缓冲区,将数据从 {@link InputStream} 复制到 {@link ByteBuffer}。缓冲区的 limit 增加所复制的字节数,position 保持不变。不关闭流。
+     * @param output Must be a direct Buffer with native byte order and the buffer MUST be large enough to hold all the bytes in 必须是具有本机字节序的直接 Buffer,且缓冲区必须足够大以容纳其中的全部字节
      * the stream. No error checking is performed.
-     * @return the number of bytes copied.
+     * @return the number of bytes copied. 复制的字节数。
      */
     public static int copy(InputStream input, ByteBuffer output, byte[] buffer) throws IOException{
         int startPosition = output.position(), total = 0, bytesRead;
@@ -90,14 +107,19 @@ public final class Streams{
         return total;
     }
 
-    /** Copy the data from an {@link InputStream} to a byte array. The stream is not closed. */
+    /**
+     * Copy the data from an {@link InputStream} to a byte array. The stream is not closed.
+     * 将数据从 {@link InputStream} 复制到 byte 数组。不关闭流。
+     */
     public static byte[] copyBytes(InputStream input) throws IOException{
         return copyBytes(input, input.available());
     }
 
     /**
      * Copy the data from an {@link InputStream} to a byte array. The stream is not closed.
-     * @param estimatedSize Used to allocate the output byte[] to possibly avoid an array copy.
+     * <p>
+     * 将数据从 {@link InputStream} 复制到 byte 数组。不关闭流。
+     * @param estimatedSize Used to allocate the output byte[] to possibly avoid an array copy. 用于分配输出 byte[],以尽量避免数组复制。
      */
     public static byte[] copyBytes(InputStream input, int estimatedSize) throws IOException{
         ByteArrayOutputStream baos = new OptimizedByteArrayOutputStream(Math.max(0, estimatedSize));
@@ -108,20 +130,27 @@ public final class Streams{
     /**
      * Calls {@link #copyString(InputStream, int, String)} using the input's {@link InputStream#available() available} size
      * and the platform's default charset.
+     * <p>
+     * 使用输入的 {@link InputStream#available() available} 大小和平台默认字符集调用 {@link #copyString(InputStream, int, String)}。
      */
     public static String copyString(InputStream input) throws IOException{
         return copyString(input, input.available(), null);
     }
 
-    /** Calls {@link #copyString(InputStream, int, String)} using the platform's default charset. */
+    /**
+     * Calls {@link #copyString(InputStream, int, String)} using the platform's default charset.
+     * 使用平台默认字符集调用 {@link #copyString(InputStream, int, String)}。
+     */
     public static String copyString(InputStream input, int estimatedSize) throws IOException{
         return copyString(input, estimatedSize, null);
     }
 
     /**
      * Copy the data from an {@link InputStream} to a string using the specified charset.
-     * @param estimatedSize Used to allocate the output buffer to possibly avoid an array copy.
-     * @param charset May be null to use the platform's default charset.
+     * <p>
+     * 使用指定字符集将数据从 {@link InputStream} 复制为字符串。
+     * @param estimatedSize Used to allocate the output buffer to possibly avoid an array copy. 用于分配输出缓冲区,以尽量避免数组复制。
+     * @param charset May be null to use the platform's default charset. 可为 null,表示使用平台默认字符集。
      */
     public static String copyString(InputStream input, int estimatedSize, String charset) throws IOException{
         InputStreamReader reader = new InputStreamReader(input, charset == null ? "UTF-8" : charset);
@@ -134,7 +163,10 @@ public final class Streams{
         return writer.toString();
     }
 
-    /** Close and ignore all errors. */
+    /**
+     * Close and ignore all errors.
+     * 关闭并忽略所有错误。
+     */
     public static void close(Closeable c){
         if(c != null){
             try{
@@ -144,7 +176,10 @@ public final class Streams{
         }
     }
 
-    /** @return sha256 hash of provided byte array */
+    /**
+     * @return sha256 hash of provided byte array
+     * 所提供 byte 数组的 sha256 哈希值
+     */
     public static byte[] sha256(byte[] bytes){
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -155,7 +190,10 @@ public final class Streams{
         }
     }
 
-    /** A ByteArrayOutputStream which avoids copying of the byte array if possible. */
+    /**
+     * A ByteArrayOutputStream which avoids copying of the byte array if possible.
+     * 一个 ByteArrayOutputStream,尽可能避免复制字节数组。
+     */
     public static class OptimizedByteArrayOutputStream extends ByteArrayOutputStream{
         public OptimizedByteArrayOutputStream(int initialSize){
             super(initialSize);

@@ -2,6 +2,8 @@ package arc.util;
 
 /**
  * Provides bit flag constants for alignment.
+ * <p>
+ * 提供用于对齐的位标志常量。
  * @author Nathan Sweet
  */
 public class Align{

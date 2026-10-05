@@ -7,6 +7,8 @@ import java.io.*;
 
 /**
  * Builder style API for emitting UBJSON.
+ * <p>
+ * 用于输出 UBJSON 的构建器风格 API。
  * @author Justin Shapcott
  */
 public class UBJsonWriter implements JsonWriter{
@@ -28,7 +30,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Begins a new object container. To finish the object call {@link #pop()}.
-     * @return This writer, for chaining
+     * <p>
+     * 开始一个新的对象容器。要结束该对象请调用 {@link #pop()}。
+     * @return This writer, for chaining 此写入器,用于链式调用
      */
     @Override
     public UBJsonWriter object(){
@@ -48,7 +52,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Begins a new named object container, having the given name. To finish the object call {@link #pop()}.
-     * @return This writer, for chaining
+     * <p>
+     * 开始一个新的具名对象容器,使用给定名称。要结束该对象请调用 {@link #pop()}。
+     * @return This writer, for chaining 此写入器,用于链式调用
      */
     @Override
     public UBJsonWriter object(String name){
@@ -58,7 +64,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Begins a new array container. To finish the array call {@link #pop()}.
-     * @return this writer, for chaining.
+     * <p>
+     * 开始一个新的数组容器。要结束该数组请调用 {@link #pop()}。
+     * @return this writer, for chaining. 此写入器,用于链式调用。
      */
     @Override
     public UBJsonWriter array(){
@@ -78,7 +86,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Begins a new named array container, having the given name. To finish the array call {@link #pop()}.
-     * @return this writer, for chaining.
+     * <p>
+     * 开始一个新的具名数组容器,使用给定名称。要结束该数组请调用 {@link #pop()}。
+     * @return this writer, for chaining. 此写入器,用于链式调用。
      */
     @Override
     public UBJsonWriter array(String name){
@@ -88,7 +98,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Appends a name for the next object, array, or value.
-     * @return this writer, for chaining
+     * <p>
+     * 为下一个对象、数组或值追加名称。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     @Override
     public UBJsonWriter name(String name){
@@ -115,7 +127,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Appends a {@code byte} value to the stream. This corresponds to the {@code int8} value type in the UBJSON specification.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加 {@code byte} 值。对应 UBJSON 规范中的 {@code int8} 值类型。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(byte value){
         try{
@@ -130,7 +144,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Appends a {@code short} value to the stream. This corresponds to the {@code int16} value type in the UBJSON specification.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加 {@code short} 值。对应 UBJSON 规范中的 {@code int16} 值类型。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(short value){
         try{
@@ -145,7 +161,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Appends an {@code int} value to the stream. This corresponds to the {@code int32} value type in the UBJSON specification.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加 {@code int} 值。对应 UBJSON 规范中的 {@code int32} 值类型。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(int value){
         try{
@@ -160,7 +178,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Appends a {@code long} value to the stream. This corresponds to the {@code int64} value type in the UBJSON specification.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加 {@code long} 值。对应 UBJSON 规范中的 {@code int64} 值类型。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(long value){
         try{
@@ -175,7 +195,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Appends a {@code float} value to the stream. This corresponds to the {@code float32} value type in the UBJSON specification.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加 {@code float} 值。对应 UBJSON 规范中的 {@code float32} 值类型。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(float value){
         try{
@@ -191,7 +213,9 @@ public class UBJsonWriter implements JsonWriter{
     /**
      * Appends a {@code double} value to the stream. This corresponds to the {@code float64} value type in the UBJSON
      * specification.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加 {@code double} 值。对应 UBJSON 规范中的 {@code float64} 值类型。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(double value){
         try{
@@ -207,7 +231,9 @@ public class UBJsonWriter implements JsonWriter{
     /**
      * Appends a {@code boolean} value to the stream. This corresponds to the {@code boolean} value type in the UBJSON
      * specification.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加 {@code boolean} 值。对应 UBJSON 规范中的 {@code boolean} 值类型。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(boolean value){
         try{
@@ -222,7 +248,9 @@ public class UBJsonWriter implements JsonWriter{
     /**
      * Appends a {@code char} value to the stream. Because, in Java, a {@code char} is 16 bytes, this corresponds to the
      * {@code int16} value type in the UBJSON specification.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加 {@code char} 值。由于 Java 中 {@code char} 为 16 位,这对应 UBJSON 规范中的 {@code int16} 值类型。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(char value){
         try{
@@ -237,7 +265,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Appends a {@code String} value to the stream. This corresponds to the {@code string} value type in the UBJSON specification.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加 {@code String} 值。对应 UBJSON 规范中的 {@code string} 值类型。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(String value){
         try{
@@ -264,7 +294,9 @@ public class UBJsonWriter implements JsonWriter{
     /**
      * Appends an optimized {@code byte array} value to the stream. As an optimized array, the {@code int8} value type marker and
      * element count are encoded once at the array marker instead of repeating the type marker for each element.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加优化过的 {@code byte array} 值。作为优化数组,{@code int8} 值类型标记和元素个数只在数组标记处编码一次,而不必为每个元素重复类型标记。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(byte[] values){
         try{
@@ -286,7 +318,9 @@ public class UBJsonWriter implements JsonWriter{
     /**
      * Appends an optimized {@code short array} value to the stream. As an optimized array, the {@code int16} value type marker and
      * element count are encoded once at the array marker instead of repeating the type marker for each element.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加优化过的 {@code short array} 值。作为优化数组,{@code int16} 值类型标记和元素个数只在数组标记处编码一次,而不必为每个元素重复类型标记。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(short[] values){
         try{
@@ -308,7 +342,9 @@ public class UBJsonWriter implements JsonWriter{
     /**
      * Appends an optimized {@code int array} value to the stream. As an optimized array, the {@code int32} value type marker and
      * element count are encoded once at the array marker instead of repeating the type marker for each element.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加优化过的 {@code int array} 值。作为优化数组,{@code int32} 值类型标记和元素个数只在数组标记处编码一次,而不必为每个元素重复类型标记。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(int[] values){
         try{
@@ -330,7 +366,9 @@ public class UBJsonWriter implements JsonWriter{
     /**
      * Appends an optimized {@code long array} value to the stream. As an optimized array, the {@code int64} value type marker and
      * element count are encoded once at the array marker instead of repeating the type marker for each element.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加优化过的 {@code long array} 值。作为优化数组,{@code int64} 值类型标记和元素个数只在数组标记处编码一次,而不必为每个元素重复类型标记。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(long[] values){
         try{
@@ -352,7 +390,9 @@ public class UBJsonWriter implements JsonWriter{
     /**
      * Appends an optimized {@code float array} value to the stream. As an optimized array, the {@code float32} value type marker
      * and element count are encoded once at the array marker instead of repeating the type marker for each element.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加优化过的 {@code float array} 值。作为优化数组,{@code float32} 值类型标记和元素个数只在数组标记处编码一次,而不必为每个元素重复类型标记。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(float[] values){
         try{
@@ -375,7 +415,9 @@ public class UBJsonWriter implements JsonWriter{
      * Appends an optimized {@code double array} value to the stream. As an optimized array, the {@code float64} value type marker
      * and element count are encoded once at the array marker instead of repeating the type marker for each element. element count
      * are encoded once at the array marker instead of for each element.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加优化过的 {@code double array} 值。作为优化数组,{@code float64} 值类型标记和元素个数只在数组标记处编码一次,而不必为每个元素重复类型标记。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(double[] values){
         try{
@@ -396,7 +438,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Appends a {@code boolean array} value to the stream.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加 {@code boolean array} 值。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(boolean[] values){
         try{
@@ -414,7 +458,9 @@ public class UBJsonWriter implements JsonWriter{
     /**
      * Appends an optimized {@code char array} value to the stream. As an optimized array, the {@code int16} value type marker and
      * element count are encoded once at the array marker instead of repeating the type marker for each element.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加优化过的 {@code char array} 值。作为优化数组,{@code int16} 值类型标记和元素个数只在数组标记处编码一次,而不必为每个元素重复类型标记。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(char[] values){
         try{
@@ -436,7 +482,9 @@ public class UBJsonWriter implements JsonWriter{
     /**
      * Appends an optimized {@code String array} value to the stream. As an optimized array, the {@code String} value type marker
      * and element count are encoded once at the array marker instead of repeating the type marker for each element.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加优化过的 {@code String array} 值。作为优化数组,{@code String} 值类型标记和元素个数只在数组标记处编码一次,而不必为每个元素重复类型标记。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(String[] values){
         try{
@@ -469,7 +517,9 @@ public class UBJsonWriter implements JsonWriter{
     /**
      * Appends the object to the stream, if it is a known value type. This is a convenience method that calls through to the
      * appropriate value method.
-     * @return this writer, for chaining
+     * <p>
+     * 若对象是已知值类型,则将其追加到流中。这是一个便捷方法,内部调用相应的值方法。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     @Override
     public UBJsonWriter value(Object object){
@@ -497,7 +547,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Appends a {@code null} value to the stream.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加 {@code null} 值。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     public UBJsonWriter value(){
         try{
@@ -511,7 +563,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Appends a named value to the stream.
-     * @return this writer, for chaining
+     * <p>
+     * 向流中追加一个具名值。
+     * @return this writer, for chaining 此写入器,用于链式调用
      */
     @Override
     public UBJsonWriter set(String name, Object value){
@@ -529,7 +583,9 @@ public class UBJsonWriter implements JsonWriter{
 
     /**
      * Ends the current object or array and pops it off of the element stack.
-     * @return This writer, for chaining
+     * <p>
+     * 结束当前对象或数组,并将其弹出元素栈。
+     * @return This writer, for chaining 此写入器,用于链式调用
      */
     @Override
     public UBJsonWriter pop(){
@@ -550,7 +606,10 @@ public class UBJsonWriter implements JsonWriter{
         }
     }
 
-    /** Flushes the underlying stream. This forces any buffered output bytes to be written out to the stream. */
+    /**
+     * Flushes the underlying stream. This forces any buffered output bytes to be written out to the stream.
+     * 刷新底层流。这会强制将所有缓冲的输出字节写出到底层流。
+     */
     public void flush(){
         try{
             out.flush();
@@ -559,7 +618,10 @@ public class UBJsonWriter implements JsonWriter{
         }
     }
 
-    /** Closes the underlying output stream and releases any system resources associated with the stream. */
+    /**
+     * Closes the underlying output stream and releases any system resources associated with the stream.
+     * 关闭底层输出流,并释放与该流关联的所有系统资源。
+     */
     @Override
     public void close(){
         try{

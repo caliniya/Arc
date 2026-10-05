@@ -2,10 +2,16 @@ package arc.util.io;
 
 import java.io.ByteArrayInputStream;
 
-/** A {@link ByteArrayInputStream} that can have its content bytes reset. */
+/**
+ * A {@link ByteArrayInputStream} that can have its content bytes reset.
+ * 一个 {@link ByteArrayInputStream},其内容字节可被重置。
+ */
 public class ReusableByteInStream extends ByteArrayInputStream{
 
-    /** {@link #setBytes} must be called before this stream can be used. */
+    /**
+     * {@link #setBytes} must be called before this stream can be used.
+     * 必须先调用 {@link #setBytes},该流才能使用。
+     */
     public ReusableByteInStream(){
         super(new byte[0]);
     }

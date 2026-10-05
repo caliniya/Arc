@@ -4,7 +4,10 @@ import arc.util.*;
 
 import java.io.*;
 
-/** A wrapper for DataInput with more concise method names and no IOExceptions. */
+/**
+ * A wrapper for DataInput with more concise method names and no IOExceptions.
+ * DataInput 的封装,方法名更简洁且不抛出 IOException。
+ */
 public class Reads implements Closeable{
     private @Nullable byte[] bytearr;
     private @Nullable char[] chararr;
@@ -15,7 +18,10 @@ public class Reads implements Closeable{
         this.input = input;
     }
 
-    /** @return -1 if EOF or unsupported, or the next byte. */
+    /**
+     * @return -1 if EOF or unsupported, or the next byte.
+     * 若到达 EOF 或不支持则返回 -1,否则返回下一个字节。
+     */
     public int checkEOF(){
         try{
             if(input instanceof InputStream){
@@ -27,7 +33,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read long */
+    /**
+     * read long
+     * 读取 long
+     */
     public long l(){
         try{
             return input.readLong();
@@ -36,7 +45,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read int */
+    /**
+     * read int
+     * 读取 int
+     */
     public int i(){
         try{
             return input.readInt();
@@ -45,7 +57,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read short */
+    /**
+     * read short
+     * 读取 short
+     */
     public short s(){
         try{
             return input.readShort();
@@ -54,7 +69,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read unsigned short */
+    /**
+     * read unsigned short
+     * 读取无符号 short
+     */
     public int us(){
         try{
             return input.readUnsignedShort();
@@ -63,7 +81,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read byte */
+    /**
+     * read byte
+     * 读取 byte
+     */
     public byte b(){
         try{
             return input.readByte();
@@ -72,7 +93,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** allocate & read byte array */
+    /**
+     * allocate & read byte array
+     * 分配并读取 byte 数组
+     */
     public byte[] b(int length){
         try{
             byte[] array = new byte[length];
@@ -83,7 +107,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read byte array */
+    /**
+     * read byte array
+     * 读取 byte 数组
+     */
     public byte[] b(byte[] array){
         try{
             input.readFully(array);
@@ -93,7 +120,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read byte array w/ offset */
+    /**
+     * read byte array w/ offset
+     * 读取 byte 数组(带偏移)
+     */
     public byte[] b(byte[] array, int offset, int length){
         try{
             input.readFully(array, offset, length);
@@ -103,7 +133,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read unsigned byte */
+    /**
+     * read unsigned byte
+     * 读取无符号 byte
+     */
     public int ub(){
         try{
             return input.readUnsignedByte();
@@ -112,7 +145,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read boolean */
+    /**
+     * read boolean
+     * 读取 boolean
+     */
     public boolean bool(){
         try{
             return input.readBoolean();
@@ -121,7 +157,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read float */
+    /**
+     * read float
+     * 读取 float
+     */
     public float f(){
         try{
             return input.readFloat();
@@ -130,7 +169,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read double */
+    /**
+     * read double
+     * 读取 double
+     */
     public double d(){
         try{
             return input.readDouble();
@@ -139,7 +181,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read string (UTF) */
+    /**
+     * read string (UTF)
+     * 读取字符串(UTF)
+     */
     public String str(){
         try{
             return input.readUTF();
@@ -148,7 +193,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** skip bytes */
+    /**
+     * skip bytes
+     * 跳过若干字节
+     */
     public void skip(int amount){
         try{
             input.skipBytes(amount);
@@ -157,7 +205,10 @@ public class Reads implements Closeable{
         }
     }
 
-    /** read string (UTF), with an optional max length */
+    /**
+     * read string (UTF), with an optional max length
+     * 读取字符串(UTF),可指定最大长度
+     */
     public String str(int maxLen){
         try{
             DataInput in = input;

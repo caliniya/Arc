@@ -5,7 +5,10 @@ import arc.util.serialization.Jval.*;
 
 import java.io.*;
 
-/** Builder-style JSON writer: writes directly to a stream instead of building an in-memory tree (unlike {@link Jval}). */
+/**
+ * Builder-style JSON writer: writes directly to a stream instead of building an in-memory tree (unlike {@link Jval}).
+ * 构建器风格的 JSON 写入器:直接写入流,而不是像 {@link Jval} 那样构建内存中的树。
+ */
 public class StringJsonWriter extends Writer implements JsonWriter{
     final Writer writer;
     private final Ar<JsonObject> stack = new Ar<>();

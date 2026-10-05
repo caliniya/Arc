@@ -13,6 +13,11 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
+ * 根据一份或多份贡献者许可协议,将本作品授权给 Apache 软件基金会(ASF)。有关版权归属的附加信息,请参阅随本作品一同分发的 NOTICE 文件。ASF 依据 Apache 许可证 2.0 版(“许可证”)将本文件授权给你;除非遵守许可证,否则你不得使用本文件。你可以通过以下地址获取许可证副本:
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * 除非适用法律要求或另有书面约定,依照许可证分发的软件均按“原样”分发,不附带任何明示或暗示的担保或条件。有关许可证项下的权限和限制的具体语言,请参阅许可证文本。
  */
 
 package arc.util.io;
@@ -30,6 +35,8 @@ import java.util.Date;
 /**
  * {@code PropertiesUtils} is a helper class that allows you to load and store key/value pairs of an
  * {@code ObjectMap<String,String>} with the same line-oriented syntax supported by {@code java.util.Properties}.
+ * <p>
+ * {@code PropertiesUtils} 是一个辅助类,支持以与 {@code java.util.Properties} 相同的面向行语法加载和存储 {@code ObjectMap<String,String>} 中的键/值对。
  */
 public final class PropertiesUtils{
     private static final int NONE = 0, SLASH = 1, UNICODE = 2, CONTINUE = 3, KEY_DONE = 4, IGNORE = 5;
@@ -43,10 +50,12 @@ public final class PropertiesUtils{
      * compatible with <code>java.util.Properties</code>.
      * <p>
      * The input stream remains open after this method returns.
-     * @param properties the map to be filled.
-     * @param reader the input character stream reader.
-     * @throws IOException if an error occurred when reading from the input stream.
-     * @throws IllegalArgumentException if a malformed Unicode escape appears in the input.
+     * <p>
+     * 以与 <code>java.util.Properties</code> 兼容的简单行格式,将从 {@code Reader} 读取的键/值对加入指定的 {@code ObjectMap}。 <p> 此方法返回后输入流仍保持打开。
+     * @param properties the map to be filled. 要填充的映射表。
+     * @param reader the input character stream reader. 输入字符流读取器。
+     * @throws IOException if an error occurred when reading from the input stream. 从输入流读取时发生错误。
+     * @throws IllegalArgumentException if a malformed Unicode escape appears in the input. 输入中出现格式错误的 Unicode 转义。
      */
     public static void load(ObjectMap<String, String> properties, Reader reader){
         if(properties == null) throw new NullPointerException("ObjectMap cannot be null");
@@ -94,9 +103,11 @@ public final class PropertiesUtils{
                     switch(nextChar){
                         case '\r':
                             mode = CONTINUE; // Look for a following \n
+                            // 查找后续的 \n
                             continue;
                         case '\n':
                             mode = IGNORE; // Ignore whitespace on the next line
+                            // 忽略下一行的空白字符
                             continue;
                         case 'b':
                             nextChar = '\b';
@@ -138,10 +149,13 @@ public final class PropertiesUtils{
                             break;
                         case '\n':
                             if(mode == CONTINUE){ // Part of a \r\n sequence
+                            // \r\n 序列的一部分
                                 mode = IGNORE; // Ignore whitespace on the next line
+                                // 忽略下一行的空白字符
                                 continue;
                             }
                             // fall into the next case
+                            // 落入下一个分支
                         case '\r':
                             mode = NONE;
                             firstChar = true;
@@ -164,6 +178,7 @@ public final class PropertiesUtils{
                         case ':':
                         case '=':
                             if(keyLength == -1){ // if parsing the key
+                            // 若正在解析键
                                 mode = NONE;
                                 keyLength = offset;
                                 continue;
@@ -176,10 +191,12 @@ public final class PropertiesUtils{
                             mode = IGNORE;
                         }
                         // if key length == 0 or value length == 0
+                        // 若键长度 == 0 或值长度 == 0
                         if(offset == 0 || offset == keyLength || mode == IGNORE){
                             continue;
                         }
                         if(keyLength == -1){ // if parsing the key
+                        // 若正在解析键
                             mode = KEY_DONE;
                             continue;
                         }
@@ -226,11 +243,13 @@ public final class PropertiesUtils{
      * <code>=</code>, and <code>:</code> are written with a preceding backslash to ensure that they are properly loaded.
      * <p>
      * After the entries have been written, the output stream is flushed. The output stream remains open after this method returns.
-     * @param properties the {@code ObjectMap}.
-     * @param writer an output character stream writer.
-     * @param comment an optional comment to be written, or null.
-     * @throws IOException if writing this property list to the specified output stream throws an <tt>IOException</tt>.
-     * @throws NullPointerException if <code>writer</code> is null.
+     * <p>
+     * 以与 <code>java.util.Properties</code> 兼容的简单行格式,将指定 <code>ObjectMap</code> 的键/值对写入输出字符流。 <p> <code>ObjectMap</code> 中的每个条目都会写出,每行一个。对每个条目,先写键字符串,然后写一个 ASCII <code>=</code>,再写对应的元素字符串。对于键,所有空格字符都会以一个前导 <code>\</code> 字符写出。对于元素,前导空格字符(但不包括内嵌或末尾的空格字符)会以一个前导 <code>\</code> 字符写出。键和元素中的字符 <code>#</code>、<code>!</code>、<code>=</code> 和 <code>:</code> 都会以反斜杠前导写出,以确保它们能被正确加载。 <p> 条目写完后,输出流会被刷新。此方法返回后输出流仍保持打开。
+     * @param properties the {@code ObjectMap}. {@code ObjectMap} 对象。
+     * @param writer an output character stream writer. 输出字符流写入器。
+     * @param comment an optional comment to be written, or null. 可选的要写入的注释,或为 null。
+     * @throws IOException if writing this property list to the specified output stream throws an <tt>IOException</tt>. 将此属性列表写入指定输出流时抛出 <tt>IOException</tt>。
+     * @throws NullPointerException if <code>writer</code> is null. <code>writer</code> 为 null 时抛出。
      */
     public static void store(ObjectMap<String, String> properties, Writer writer, String comment, boolean date) throws IOException{
         storeImpl(properties, writer, comment, false, date);
@@ -267,6 +286,7 @@ public final class PropertiesUtils{
         for(int i = 0; i < len; i++){
             char ch = string.charAt(i);
             // Handle common case first
+            // 先处理常见情形
             if((ch > 61) && (ch < 127)){
                 outBuffer.append(ch == '\\' ? "\\\\" : ch);
                 continue;
@@ -292,8 +312,11 @@ public final class PropertiesUtils{
                     outBuffer.append("\\f");
                     break;
                 case '=': // Fall through
+                // 直接落入下一个分支
                 case ':': // Fall through
+                // 直接落入下一个分支
                 case '#': // Fall through
+                // 直接落入下一个分支
                 case '!':
                     outBuffer.append('\\').append(ch);
                     break;

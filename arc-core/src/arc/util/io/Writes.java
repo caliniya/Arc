@@ -2,7 +2,10 @@ package arc.util.io;
 
 import java.io.*;
 
-/** A wrapper for DataOutput with more concise method names and no IOExceptions. */
+/**
+ * A wrapper for DataOutput with more concise method names and no IOExceptions.
+ * DataOutput 的封装,方法名更简洁且不抛出 IOException。
+ */
 public class Writes implements Closeable{
     public DataOutput output;
 
@@ -10,7 +13,10 @@ public class Writes implements Closeable{
         this.output = output;
     }
 
-    /** write long */
+    /**
+     * write long
+     * 写出 long
+     */
     public void l(long i){
         try{
             output.writeLong(i);
@@ -19,7 +25,10 @@ public class Writes implements Closeable{
         }
     }
 
-    /** write int */
+    /**
+     * write int
+     * 写出 int
+     */
     public void i(int i){
         try{
             output.writeInt(i);
@@ -28,7 +37,10 @@ public class Writes implements Closeable{
         }
     }
 
-    /** write byte */
+    /**
+     * write byte
+     * 写出 byte
+     */
     public void b(int i){
         try{
             output.writeByte(i);
@@ -37,7 +49,10 @@ public class Writes implements Closeable{
         }
     }
 
-    /** write bytes */
+    /**
+     * write bytes
+     * 写出 byte 数组
+     */
     public void b(byte[] array, int offset, int length){
         try{
             output.write(array, offset, length);
@@ -46,17 +61,26 @@ public class Writes implements Closeable{
         }
     }
 
-    /** write bytes */
+    /**
+     * write bytes
+     * 写出 byte 数组
+     */
     public void b(byte[] array){
         b(array, 0, array.length);
     }
 
-    /** write boolean (writes a byte internally) */
+    /**
+     * write boolean (writes a byte internally)
+     * 写出 boolean(内部写一个 byte)
+     */
     public void bool(boolean b){
         b(b ? 1 : 0);
     }
 
-    /** write short */
+    /**
+     * write short
+     * 写出 short
+     */
     public void s(int i){
         try{
             output.writeShort(i);
@@ -65,7 +89,10 @@ public class Writes implements Closeable{
         }
     }
 
-    /** write float */
+    /**
+     * write float
+     * 写出 float
+     */
     public void f(float f){
         try{
             output.writeFloat(f);
@@ -74,7 +101,10 @@ public class Writes implements Closeable{
         }
     }
 
-    /** write double */
+    /**
+     * write double
+     * 写出 double
+     */
     public void d(double d){
         try{
             output.writeDouble(d);
@@ -83,7 +113,10 @@ public class Writes implements Closeable{
         }
     }
 
-    /** writes a string (UTF) */
+    /**
+     * writes a string (UTF)
+     * 写出字符串(UTF)
+     */
     public void str(String str){
         try{
             output.writeUTF(str);

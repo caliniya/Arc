@@ -4,22 +4,34 @@ import arc.math.*;
 
 public class Pack{
 
-    /** Packs [0-1] texture coordinates or positions into a single float. For use in VertexAttribute.packedTexCoords/packedPosition. */
+    /**
+     * Packs [0-1] texture coordinates or positions into a single float. For use in VertexAttribute.packedTexCoords/packedPosition.
+     * 将 [0-1] 的纹理坐标或位置打包到一个 float 中。用于 VertexAttribute.packedTexCoords/packedPosition。
+     */
     public static float packUv(float x, float y){
         return Float.intBitsToFloat(((int)(Mathf.clamp(x) * 65535)) | (((int)(Mathf.clamp(y) * 65535)) << 16));
     }
 
-    /** byte -> unsigned byte */
+    /**
+     * byte -> unsigned byte
+     * byte -> 无符号 byte
+     */
     public static int u(byte b){
         return b & 0xff;
     }
 
-    /** short -> unsigned short */
+    /**
+     * short -> unsigned short
+     * short -> 无符号 short
+     */
     public static int u(short b){
         return b & 0xffff;
     }
 
-    /** int -> unsigned int */
+    /**
+     * int -> unsigned int
+     * int -> 无符号 int
+     */
     public static long u(int b){
         return b & 0x00000000ffffffffL;
     }
@@ -36,7 +48,10 @@ public class Pack{
         return (((long)x) << 32) | (y & 0xffffffffL);
     }
 
-    /** Packs two bytes with values 0-15 into one byte. */
+    /**
+     * Packs two bytes with values 0-15 into one byte.
+     * 将两个取值 0-15 的字节打包为一个字节。
+     */
     public static byte byteByte(byte left, byte right){
         return (byte)((left << 4) | right);
     }
@@ -77,7 +92,10 @@ public class Pack{
         return (short)((left << 8) | (right & 0xFF));
     }
 
-    /** The same array instance is returned each call. */
+    /**
+     * The same array instance is returned each call.
+     * 每次调用返回同一个数组实例。
+     */
     public static byte[] bytes(int i, byte[] result){
         result[0] = (byte)(i >> 24);
         result[1] = (byte)(i >> 16);
@@ -87,7 +105,10 @@ public class Pack{
         return result;
     }
 
-    /** The same array instance is returned each call. */
+    /**
+     * The same array instance is returned each call.
+     * 每次调用返回同一个数组实例。
+     */
     public static short[] shorts(long i, short[] resultShort){
         resultShort[0] = (short)(i >> 48);
         resultShort[1] = (short)(i >> 32);
@@ -105,7 +126,10 @@ public class Pack{
         return ((0xFF & b1) << 24) | ((0xFF & b2) << 16) | ((0xFF & b3) << 8) | (0xFF & b4);
     }
 
-    /** Packs 4 bytes into an int. */
+    /**
+     * Packs 4 bytes into an int.
+     * 将 4 个字节打包为一个 int。
+     */
     public static int intBytes(byte[] array){
         return ((0xFF & array[0]) << 24) | ((0xFF & array[1]) << 16) | ((0xFF & array[2]) << 8) | (0xFF & array[3]);
     }

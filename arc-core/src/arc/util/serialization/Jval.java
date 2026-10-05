@@ -7,6 +7,8 @@ import arc.util.*;
 import java.io.*;
 
 /** An hsjon parser. Can be used as a standard json value.
+ * <p>
+ * 一个 hjson 解析器。可用作标准 JSON 值,输出可转换为标准 JSON。该类大量基于 Hjson 的 Java 实现。
  * Output can be converted to standard JSON. This class is heavily based upon the Hjson Java implementation.*/
 public interface Jval{
     Jval
@@ -29,8 +31,10 @@ public interface Jval{
      * an additional <code>BufferedReader</code> does <strong>not</strong> improve reading
      * performance.
      * </p>
-     * @param reader the reader to read the Hjson value from
-     * @return the Hjson value that has been read
+     * <p>
+     * 从给定的读取器读取一个 Hjson 值。 <p> 字符按块读取并在内部缓冲,因此将现有读取器再包一层 <code>BufferedReader</code> <strong>不会</strong>提升读取性能。 </p>
+     * @param reader the reader to read the Hjson value from 从中读取 Hjson 值的读取器
+     * @return the Hjson value that has been read 已读取的 Hjson 值
      */
     static Jval read(Reader reader){
         try{
@@ -50,8 +54,10 @@ public interface Jval{
 
     /**
      * Reads a Hjson value from the given string.
-     * @param text the string that contains the Hjson value
-     * @return the Hjson value that has been read
+     * <p>
+     * 从给定字符串读取一个 Hjson 值。
+     * @param text the string that contains the Hjson value 包含 Hjson 值的字符串
+     * @return the Hjson value that has been read 已读取的 Hjson 值
      */
     static Jval read(String text){
         return new JvalReader(text).parse();
@@ -67,7 +73,10 @@ public interface Jval{
     static Jval valueOf(double value){ return new JsonDouble(value); }
     static Jval valueOf(String string){ return string == null ? nullValue : new JsonString(string); }
     static Jval valueOf(boolean value){ return value ? trueValue : falseValue; }
-    /** Buckets any Number into a long or double value, depending on its kind. */
+    /**
+     * Buckets any Number into a long or double value, depending on its kind.
+     * 将任意 Number 按其种类归入 long 或 double 值。
+     */
     static Jval valueOf(Number value){ return value instanceof Float || value instanceof Double ? valueOf(value.doubleValue()) : valueOf(value.longValue()); }
 
     Jtype getType();
@@ -275,8 +284,10 @@ public interface Jval{
      * <p>
      * Writing performance can be improved by using a {@link java.io.BufferedWriter BufferedWriter}.
      * </p>
-     * @param writer the writer to write this value to
-     * @throws IOException if an I/O error occurs in the writer
+     * <p>
+     * 以最简形式将此值的 JSON 表示写入给定写入器,不含任何多余空白。 <p> 使用 {@link java.io.BufferedWriter BufferedWriter} 可以提升写入性能。 </p>
+     * @param writer the writer to write this value to 要写入该值的写入器
+     * @throws IOException if an I/O error occurs in the writer 写入器中发生 I/O 错误时抛出
      */
     default void writeTo(Writer writer) throws IOException{
         writeTo(writer, Jformat.plain);
@@ -287,9 +298,11 @@ public interface Jval{
      * <p>
      * Writing performance can be improved by using a {@link java.io.BufferedWriter BufferedWriter}.
      * </p>
-     * @param writer the writer to write this value to
-     * @param format controls the formatting
-     * @throws IOException if an I/O error occurs in the writer
+     * <p>
+     * 使用给定格式将此值的 JSON/Hjson 表示写入给定写入器。 <p> 使用 {@link java.io.BufferedWriter BufferedWriter} 可以提升写入性能。 </p>
+     * @param writer the writer to write this value to 要写入该值的写入器
+     * @param format controls the formatting 控制格式化方式
+     * @throws IOException if an I/O error occurs in the writer 写入器中发生 I/O 错误时抛出
      */
     default void writeTo(Writer writer, Jformat format) throws IOException{
         WritingBuffer buffer = new WritingBuffer(writer, 128);
@@ -312,8 +325,10 @@ public interface Jval{
 
     /**
      * Returns the JSON/Hjson string for this value using the given formatting.
-     * @param format controls the formatting
-     * @return a JSON/Hjson string that represents this value
+     * <p>
+     * 使用给定的格式返回此值的 JSON/Hjson 字符串。
+     * @param format controls the formatting 控制格式化方式
+     * @return a JSON/Hjson string that represents this value 表示此值的 JSON/Hjson 字符串
      */
     default String toString(Jformat format){
         StringWriter writer = new StringWriter();
@@ -321,12 +336,16 @@ public interface Jval{
             writeTo(writer, format);
         }catch(IOException exception){
             // StringWriter does not throw IOExceptions
+            // StringWriter 不会抛出 IOException
             throw new RuntimeException(exception);
         }
         return writer.toString();
     }
 
-    /** Holds a true/false value; true and false are the shared singleton instances. */
+    /**
+     * Holds a true/false value; true and false are the shared singleton instances.
+     * 保存 true/false 值;true 和 false 是共享的单例实例。
+     */
     class JsonBool implements Jval{
         private final boolean value;
 
@@ -339,7 +358,10 @@ public interface Jval{
         @Override public int hashCode(){ return Boolean.hashCode(value); }
     }
 
-    /** Holds an integral number as a raw, unboxed long. */
+    /**
+     * Holds an integral number as a raw, unboxed long.
+     * 以原始未装箱的 long 保存整数。
+     */
     class JsonLong implements Jval{
         private final long value;
 
@@ -358,7 +380,10 @@ public interface Jval{
         @Override public int hashCode(){ return Long.hashCode(value); }
     }
 
-    /** Holds a floating-point number as a raw, unboxed double. */
+    /**
+     * Holds a floating-point number as a raw, unboxed double.
+     * 以原始未装箱的 double 保存浮点数。
+     */
     class JsonDouble implements Jval{
         private final double value;
 
@@ -384,7 +409,10 @@ public interface Jval{
         @Override public int hashCode(){ return Double.hashCode(value); }
     }
 
-    /** Holds a string value. */
+    /**
+     * Holds a string value.
+     * 保存一个字符串值。
+     */
     class JsonString implements Jval{
         private final String value;
 
@@ -404,7 +432,10 @@ public interface Jval{
         @Override public int hashCode(){ return value.hashCode(); }
     }
 
-    /** Holds no value at all; represents JSON null. */
+    /**
+     * Holds no value at all; represents JSON null.
+     * 不保存任何值;表示 JSON null。
+     */
     class JsonNull implements Jval{
         JsonNull(){}
 
@@ -415,11 +446,15 @@ public interface Jval{
         @Override public int hashCode(){ return 0; }
     }
 
-    /** Alias class of whatever is used to store json maps (objects). */
+    /**
+     * Alias class of whatever is used to store json maps (objects).
+     * 用于存储 JSON 映射(对象)的类型的别名类。
+     */
     class JsonMap extends ArrayMap<String, Jval> implements Jval{
 
         public JsonMap(){
             //maps have no capacity until actually used; this calls resize() after the first put(), but that's fine, there is no initial allocation with 0 capacity
+            // 映射在实际使用前没有容量;这会在第一次 put() 之后调用 resize(),不过没关系,不会以 0 容量做初始分配
             super(0);
         }
 
@@ -445,7 +480,10 @@ public interface Jval{
             put(name, val == null ? nullValue : val);
         }
 
-        /** Puts a value without checking if it's in the map first. This is unsafe, but prevents O(n) put. */
+        /**
+         * Puts a value without checking if it's in the map first. This is unsafe, but prevents O(n) put.
+         * 不做存在性检查直接放入值。这并不安全,但可避免 O(n) 的 put 操作。
+         */
         public void putAdd(String key, Jval value){
             if(size == ((Object[])keys).length) resize(Math.max(8, (int)(size * 1.75f)));
             int index = size++;
@@ -454,7 +492,10 @@ public interface Jval{
         }
     }
 
-    /** Alias class of json arrays. */
+    /**
+     * Alias class of json arrays.
+     * JSON 数组的别名类。
+     */
     class JsonArray extends Ar<Jval> implements Jval{
 
         public JsonArray(){
@@ -478,19 +519,37 @@ public interface Jval{
         @Override public String toString(){ return toString(Jformat.minimal); }
     }
 
-    /** The toString format. */
+    /**
+     * The toString format.
+     * toString 所用的格式。
+     */
     enum Jformat{
-        /** JSON (no whitespace). */
+        /**
+         * JSON (no whitespace).
+         * JSON(无空白)。
+         */
         plain,
-        /** Minimal quote-less JSON. Equivalent to libGDX's minimal output type. */
+        /**
+         * Minimal quote-less JSON. Equivalent to libGDX's minimal output type.
+         * 最简无引号 JSON。等价于 libGDX 的 minimal 输出类型。
+         */
         minimal,
-        /** Formatted JSON. */
+        /**
+         * Formatted JSON.
+         * 格式化的 JSON。
+         */
         formatted,
-        /** Formatted HJSON. */
+        /**
+         * Formatted HJSON.
+         * 格式化的 HJSON。
+         */
         hjson,
     }
 
-    /** Defines the known json types. */
+    /**
+     * Defines the known json types.
+     * 定义已知的 JSON 类型。
+     */
     enum Jtype{
         string, number, object, array, bool, nil,
     }

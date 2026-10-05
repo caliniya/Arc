@@ -24,7 +24,7 @@ public class Strings{
         unsafeFilenamePattern = Pattern.compile("[\0/\"'<>|:*!?\\\\]"),
         reservedFilenamePattern = Pattern.compile("(CON|AUX|PRN|NUL|(COM[0-9])|(LPT[0-9]))((\\..*$)|$)", Pattern.CASE_INSENSITIVE);
 
-    /** @return sha256 hash of the given string */
+    /** @return sha256 hash of the given string 给定字符串的 sha256 哈希 */
     public static byte[] sha256(String str){
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -73,7 +73,7 @@ public class Strings{
         return dotIndex == -1 ? name : name.substring(0, dotIndex);
     }
 
-    /** @return whether the name matches the query; case-insensitive. Always returns true if query is empty. */
+    /** @return whether the name matches the query; case-insensitive. Always returns true if query is empty. 名称是否匹配查询;不区分大小写。查询为空时始终返回 true。 */
     public static boolean matches(String query, String name){
         return query == null || query.isEmpty() || (name != null && name.toLowerCase().contains(query.toLowerCase()));
     }
@@ -160,12 +160,12 @@ public class Strings{
         return sw.toString();
     }
 
-    /** @return a neat error message of a throwable, with stack trace. */
+    /** @return a neat error message of a throwable, with stack trace. 返回 throwable 的整洁错误消息,包含堆栈跟踪。 */
     public static String neatError(Throwable e){
         return neatError(e, true);
     }
 
-    /** @return a neat error message of a throwable, with stack trace. */
+    /** @return a neat error message of a throwable, with stack trace. 返回 throwable 的整洁错误消息,包含堆栈跟踪。 */
     public static String neatError(Throwable e, boolean stacktrace){
         StringBuilder build = new StringBuilder();
 
@@ -208,6 +208,7 @@ public class Strings{
             char c = str.charAt(i);
 
             // Possible color tag.
+            // 可能是颜色标签。
             if(c == '['){
                 int length = parseColorMarkup(str, i + 1, str.length());
                 if(length >= 0){
@@ -215,6 +216,7 @@ public class Strings{
                 }else{
                     out.append(c);
                     //escaped string
+                    // 转义后的字符串
                     i++;
                 }
             }else{
@@ -240,36 +242,47 @@ public class Strings{
 
     private static int parseColorMarkup(CharSequence str, int start, int end){
         if(start >= end) return -1; // String ended with "[".
+        // 字符串以 "[" 结尾。
         switch(str.charAt(start)){
             case '#':
                 // Parse hex color RRGGBBAA where AA is optional and defaults to 0xFF if less than 6 chars are used.
+                // 解析十六进制颜色 RRGGBBAA,其中 AA 可选,若使用的字符少于 6 个则默认为 0xFF。
                 for(int i = start + 1; i < end; i++){
                     char ch = str.charAt(i);
                     if(ch == ']'){
                         if(i < start + 2 || i > start + 9) break; // Illegal number of hex digits.
+                        // 十六进制位数非法。
                         return i - start;
                     }
                     if(!(ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F')){
                         break; // Unexpected character in hex color.
+                        // 十六进制颜色中出现意外字符。
                     }
                 }
                 return -1;
             case '[': // "[[" is an escaped left square bracket.
+            // "[[" 是转义的左方括号。
                 return -2;
             case ']': // "[]" is a "pop" color tag.
+            // "[]" 是 "pop" 颜色标签。
                 //pop the color stack here if needed
+                // 如有需要,在此弹出颜色栈
                 return 0;
         }
         // Parse named color.
+        // 解析命名颜色。
         for(int i = start + 1; i < end; i++){
             char ch = str.charAt(i);
             if(ch != ']') continue;
             Color namedColor = Colors.get(str.subSequence(start, i).toString());
             if(namedColor == null) return -1; // Unknown color name.
+            // 未知的颜色名称。
             //namedColor is the result color here
+            // 此处 namedColor 即结果颜色
             return i - start;
         }
         return -1; // Unclosed color tag.
+        // 未闭合的颜色标签。
     }
 
     public static int count(String str, String substring){
@@ -288,7 +301,10 @@ public class Strings{
         return count;
     }
 
-    /** Replaces non-safe filename characters with '_'. Handles reserved window file names. */
+    /**
+     * Replaces non-safe filename characters with '_'. Handles reserved window file names.
+     * 将文件名中的不安全字符替换为 '_'。会处理 Windows 保留文件名。
+     */
     public static String sanitizeFilename(String str){
         if(str.equals(".")){
             return "_";
@@ -296,6 +312,7 @@ public class Strings{
             return "__";
         }else if(reservedFilenamePattern.matcher(str).matches()){
             //turn things like con.msch -> _con.msch, which is no longer reserved
+            // 把 con.msch 之类的名称变成 _con.msch,从而不再是保留名
             str = "_" + str;
         }
         return filenamePattern.matcher(str).replaceAll("_");
@@ -310,6 +327,7 @@ public class Strings{
             return URLEncoder.encode(str, "UTF-8");
         }catch(UnsupportedEncodingException why){
             //why the HECK does this even throw an exception
+            // 这到底为什么会抛异常
             throw new RuntimeException(why);
         }
     }
@@ -366,7 +384,10 @@ public class Strings{
         return builder.toString();
     }
 
-    /** Returns the levenshtein distance between two strings. */
+    /**
+     * Returns the levenshtein distance between two strings.
+     * 返回两个字符串之间的 Levenshtein 距离。
+     */
     public static int levenshtein(String x, String y){
         int[][] dp = new int[x.length() + 1][y.length() + 1];
 
@@ -387,7 +408,10 @@ public class Strings{
         return dp[x.length()][y.length()];
     }
 
-    /** Returns the case-independent biased levenshtein distance between two strings. */
+    /**
+     * Returns the case-independent biased levenshtein distance between two strings.
+     * 返回两个字符串之间不区分大小写的带偏 Levenshtein 距离。
+     */
     public static float biasedLevenshtein(String x, String y){
         x = x.toLowerCase(Locale.ROOT);
         y = y.toLowerCase(Locale.ROOT);
@@ -454,6 +478,9 @@ public class Strings{
     }
 
     /**Converts a snake_case or kebab-case string to Upper Case.
+     * <p>
+     * 将 snake_case 或 kebab-case 字符串转换为首字母大写形式。
+     * 例如:"test_string" -> "Test String"
      * For example: "test_string" -> "Test String"*/
     public static String capitalize(String s){
         StringBuilder result = new StringBuilder(s.length());
@@ -472,7 +499,10 @@ public class Strings{
         return result.toString();
     }
 
-    /** Adds spaces to a camel/pascal case string. */
+    /**
+     * Adds spaces to a camel/pascal case string.
+     * 在 camel/pascal 命名风格的字符串中添加空格。
+     */
     public static String insertSpaces(String s){
         StringBuilder result = new StringBuilder(s.length() + 1);
 
@@ -490,6 +520,9 @@ public class Strings{
     }
 
     /**Converts a Space Separated string to camelCase.
+     * <p>
+     * 将空格分隔的字符串转换为 camelCase。
+     * 例如:"Camel Case" -> "camelCase"
      * For example: "Camel Case" -> "camelCase"*/
     public static String camelize(String s){
         StringBuilder result = new StringBuilder(s.length());
@@ -622,7 +655,10 @@ public class Strings{
         }
     }
 
-    /** Faster double parser that doesn't throw exceptions. */
+    /**
+     * Faster double parser that doesn't throw exceptions.
+     * 不抛出异常的更快 double 解析器。
+     */
     public static double parseDouble(String value, double defaultValue){
         int len = value.length();
         if(len == 0) return defaultValue;
@@ -663,6 +699,7 @@ public class Strings{
 
         if(dot != -1 && dot < end){
             //negation as first character
+            // 首字符为负号
             long whole = start == dot ? 0 : parseLong(value, 10, start, dot, Long.MIN_VALUE);
             if(whole == Long.MIN_VALUE || whole < 0) return defaultValue;
 
@@ -672,11 +709,13 @@ public class Strings{
             }
 
             //a long holds 18 decimal digits safely, and a double can't represent more precision than that anyway
+            // long 可以安全地保存 18 位十进制数字,而 double 无论如何也无法表示比这更高的精度
             int used = Math.min(decDigits, 18);
             long dec = parseLong(value, 10, dot + 1, dot + 1 + used, Long.MIN_VALUE);
             if(dec < 0) return defaultValue;
 
             //truncated digits still have to be valid digits
+            // 被截断的数字仍必须是有效数字
             for(int i = dot + 1 + used; i < mantissaEnd; i++){
                 char c = value.charAt(i);
                 if(c < '0' || c > '9') return defaultValue;
@@ -687,6 +726,7 @@ public class Strings{
             double mantissa;
             if(whole <= (Long.MAX_VALUE - dec) / p){
                 //fits in a long, keeps the original (more accurate) path
+                // 能放进 long,走原来的(更精确)路径
                 mantissa = (whole * p + dec) / pow;
             }else{
                 mantissa = whole + dec / pow;
@@ -695,6 +735,7 @@ public class Strings{
         }
 
         //check scientific notation
+        // 检查科学计数法
         if(e != -1){
             long whole = parseLong(value, 10, start, e, Long.MIN_VALUE);
             if(whole == Long.MIN_VALUE) return defaultValue;
@@ -702,11 +743,15 @@ public class Strings{
         }
 
         //parse as standard integer
+        // 按标准整数解析
         long out = parseLong(value, 10, start, end, Long.MIN_VALUE);
         return out == Long.MIN_VALUE ? defaultValue : out*sign;
     }
 
-    /** Returns Integer.MIN_VALUE if parsing failed. */
+    /**
+     * Returns Integer.MIN_VALUE if parsing failed.
+     * 解析失败时返回 Integer.MIN_VALUE。
+     */
     public static int parseInt(String s){
         return parseInt(s, Integer.MIN_VALUE);
     }
@@ -719,17 +764,26 @@ public class Strings{
         return parseFloat(s) >= 0f;
     }
 
-    /** Returns Float.NEGATIVE_INFINITY if parsing failed. */
+    /**
+     * Returns Float.NEGATIVE_INFINITY if parsing failed.
+     * 解析失败时返回 Float.NEGATIVE_INFINITY。
+     */
     public static float parseFloat(String s){
         return parseFloat(s, Float.NEGATIVE_INFINITY);
     }
 
-    /** Faster float parser that doesn't throw exceptions. */
+    /**
+     * Faster float parser that doesn't throw exceptions.
+     * 不抛出异常的更快 float 解析器。
+     */
     public static float parseFloat(String value, float defaultValue){
         return (float)parseDouble(value, defaultValue);
     }
 
-    /** Returns a new, blank color if parsing failed. */
+    /**
+     * Returns a new, blank color if parsing failed.
+     * 解析失败时返回一个新的空白颜色。
+     */
     public static Color parseColor(String s){
         return parseColor(s, new Color());
     }
@@ -773,6 +827,7 @@ public class Strings{
     public static String autoFixed(float value, int max){
 
         //truncate extra digits past the max
+        // 截断超出上限的多余数字
         value = (float)Mathf.floor(value * Mathf.pow(10, max) + 0.001f) / Mathf.pow(10, max);
 
         int precision =
@@ -809,12 +864,14 @@ public class Strings{
             return dec;
         }else if(decimalPosition > 0){
             // Insert a dot in the right place
+            // 在正确的位置插入小数点
             result.append(dec, 0, decimalPosition);
             result.append(".");
             result.append(dec, decimalPosition, dec.length());
         }else{
             result.append("0.");
             // Insert leading zeroes into the decimal part
+            // 在小数部分插入前导零
             while(decimalPosition++ < 0){
                 result.append("0");
             }
@@ -848,7 +905,10 @@ public class Strings{
         tgt.append(val);
     }
 
-    /** Replaces all instances of {@code find} with {@code replace}. */
+    /**
+     * Replaces all instances of {@code find} with {@code replace}.
+     * 将所有 {@code find} 替换为 {@code replace}。
+     */
     public static StringBuilder replace(StringBuilder builder, String find, String replace){
         int findLength = find.length(), replaceLength = replace.length();
         int index = 0;
@@ -861,7 +921,10 @@ public class Strings{
         return builder;
     }
 
-    /** Replaces all instances of {@code find} with {@code replace}. */
+    /**
+     * Replaces all instances of {@code find} with {@code replace}.
+     * 将所有 {@code find} 替换为 {@code replace}。
+     */
     public static StringBuilder replace(StringBuilder builder, char find, String replace) {
         int replaceLength = replace.length();
         int index = 0;
@@ -888,7 +951,9 @@ public class Strings{
     /**
      * Strips leading/trailing non-numeric, non-dot characters, normalizes a loose version string (e.g. "v1", "2.0", "alpha 2.0.0 release") into an array.
      * This can handle semver, but is adapted for a maximum of 4 components, since people do that for some reason.
-     * @return the parsed {major, minor, patch, build} array, or null upon failure.
+     * <p>
+     * 去除开头和结尾的非数字、非点字符,将宽松的版本字符串(如 "v1"、"2.0"、"alpha 2.0.0 release")规范化为数组。可以处理 semver,但最多适配 4 个组成部分,因为总有人这么用。
+     * @return the parsed {major, minor, patch, build} array, or null upon failure. 解析出的 {major, minor, patch, build} 数组,失败时为 null。
      */
     public static @Nullable int[] sanitizeVersion(String raw){
         if(raw == null){
@@ -896,17 +961,20 @@ public class Strings{
         }
         String trimmed = raw.trim();
         //strip leading chars until first digit
+        // 去除开头字符直到第一个数字
         int start = 0;
         while(start < trimmed.length() && !Character.isDigit(trimmed.charAt(start))){
             start++;
         }
         //strip trailing chars after last digit
+        // 去除最后一个数字之后的结尾字符
         int end = trimmed.length() - 1;
         while(end >= 0 && !Character.isDigit(trimmed.charAt(end))){
             end--;
         }
         if(start > end){
             return null; //no digits at all
+            // 完全没有数字
         }
         String core = trimmed.substring(start, end + 1);
         String[] parts = core.split("\\.", -1);
@@ -914,6 +982,7 @@ public class Strings{
             return null;
         }
         int[] nums = new int[4]; //major, minor, patch, build
+        // major、minor、patch、build
         for(int i = 0; i < 4; i++){
             if(i < parts.length){
                 String part = parts[i];
@@ -927,7 +996,7 @@ public class Strings{
         return nums;
     }
 
-    /** @return true if semver {@param version} > {@param target}. If either parameter is not a valid (or sanitizable) semver string, just returns (version != target). */
+    /** @return true if semver {@param version} > {@param target}. If either parameter is not a valid (or sanitizable) semver string, just returns (version != target). 若 semver {@param version} > {@param target} 则返回 true。若任一参数不是有效(或可规范化)的 semver 字符串,则直接返回 (version != target)。 */
     public static boolean checkNewerSemver(String version, String target){
         if(version == null || target == null) return false;
 

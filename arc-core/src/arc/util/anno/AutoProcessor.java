@@ -17,6 +17,10 @@ import java.util.*;
  * <p>
  * This processor registers itself through a hand-written service file in the same
  * resources folder (the one bootstrap step that can't be automated).
+ * <p>
+ * 为标注了 {@link AnnoProc} 的注解处理器提供引导:生成 META-INF/services/javax.annotation.processing.Processor 文件,列出当前编译中所有标注了 {@link AnnoProc} 的类,使处理器无需手动进行 SPI 注册。
+ * <p>
+ * 此处理器自身通过同一资源文件夹中手写的服务文件注册(这是唯一无法自动化的引导步骤)。
  */
 @SupportedAnnotationTypes("arc.util.anno.AnnoProc")
 public class AutoProcessor extends AbstractProcessor{

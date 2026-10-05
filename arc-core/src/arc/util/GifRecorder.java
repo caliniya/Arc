@@ -15,7 +15,10 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 
-/** Records and saves GIFs. */
+/**
+ * Records and saves GIFs.
+ * 录制并保存 GIF。
+ */
 public class GifRecorder{
     private static final float defaultSize = 300;
     private static GifRecorder instance;
@@ -50,11 +53,15 @@ public class GifRecorder{
         instance.update();
     }
 
-    /** Updates the recorder and draws the GUI */
+    /**
+     * Updates the recorder and draws the GUI
+     * 更新录制器并绘制 GUI
+     */
     public void update(){
         float wx = Core.graphics.getWidth() / 2f, wy = Core.graphics.getHeight() / 2f;
 
         //save each frame when recording
+        // 录制时保存每一帧
         if(recording){
             frametime += Core.graphics.getDeltaTime() * 60.5f / speedMultiplier;
             if(frametime >= (60f / recordfps)){
@@ -68,6 +75,7 @@ public class GifRecorder{
         }
 
         //update input
+        // 更新输入
         if(Core.scene == null || !Core.scene.hasField()){
             if(Core.input.keyTap(openKey) && !saving){
                 if(recording){
@@ -129,6 +137,7 @@ public class GifRecorder{
                                 String outputFile = exportDirectory.absolutePath()  + "/" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault()).format(new Date()) + (outputMp4 ? ".mp4" : ".gif");
 
                                 //pix_fmt yuv420p -profile:v baseline -level 3.0 -vcodec libx264 -crf 18 -
+                                // ffmpeg 参数:pix_fmt yuv420p -profile:v baseline -level 3.0 -vcodec libx264 -crf 18 -
                                 String args = Strings.format(
                                 "@ -r @ -s @x@ -f rawvideo -pix_fmt rgba -i - -frames:v @ -filter:v vflip@ @@",
                                 OS.isLinux ? "/usr/bin/ffmpeg" : "ffmpeg",
@@ -164,6 +173,7 @@ public class GifRecorder{
         }
 
         //draw UI
+        // 绘制 UI
         if(open){
             Tmp.m1.set(Draw.proj());
             Draw.proj(0, 0, Core.graphics.getWidth(), Core.graphics.getHeight());
@@ -187,6 +197,7 @@ public class GifRecorder{
             }
 
             //attempt fetching font from several sources
+            // 尝试从多个来源获取字体
             Font font = null;
 
             if(Core.assets != null && Core.assets.contains("outline", Font.class)){

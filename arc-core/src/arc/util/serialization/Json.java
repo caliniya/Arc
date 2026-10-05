@@ -16,6 +16,8 @@ import java.util.*;
 
 /**
  * Reads/writes Java objects to/from JSON, automatically.
+ * <p>
+ * 自动地将 Java 对象与 JSON 相互读写。
  * @author Nathan Sweet
  */
 @SuppressWarnings("unchecked")
@@ -32,35 +34,61 @@ public class Json{
     private final ObjectMap<Class, ObjectMap<String, Enum>> classToEnumConstants = new ObjectMap();
     private final Object[] equals1 = {null}, equals2 = {null};
 
-    /** Sets the serializer to use when the type being deserialized is not known (null). */
+    /**
+     * Sets the serializer to use when the type being deserialized is not known (null).
+     * 设置当被反序列化的类型未知(null)时使用的序列化器。
+     */
     public @Nullable JsonSerializer<?> defaultSerializer;
     /**
      * Sets the name of the JSON field to store the Java class name or class tag when required to avoid ambiguity during
      * deserialization. Set to null to never output this information, but be warned that deserialization may fail. Default is
      * "class".
+     * <p>
+     * 设置用于存储 Java 类名或类标签的 JSON 字段名,在反序列化需要消除歧义时使用。设为 null 则从不输出该信息,但要注意反序列化可能因此失败。默认值为 “class”。
      */
     public String typeName = "class";
-    /** When true, field values that are identical to a newly constructed instance are not written. Default is true. */
+    /**
+     * When true, field values that are identical to a newly constructed instance are not written. Default is true.
+     * 为 true 时,与新构造实例相同的字段值不会被写出。默认值为 true。
+     */
     public boolean skipDefaultValues = true;
-    /** When true, fields in the JSON that are not found on the class will not throw a {@link SerializationException}. Default is true. */
+    /**
+     * When true, fields in the JSON that are not found on the class will not throw a {@link SerializationException}. Default is true.
+     * 为 true 时,JSON 中类上找不到的字段不会抛出 {@link SerializationException}。默认值为 true。
+     */
     public boolean ignoreUnknownFields = true;
-    /** When true, {@link Enum#name()} is used to write enum values. When false, {@link Enum#toString()} is used which may not be unique. Default is true. */
+    /**
+     * When true, {@link Enum#name()} is used to write enum values. When false, {@link Enum#toString()} is used which may not be unique. Default is true.
+     * 为 true 时,使用 {@link Enum#name()} 写出枚举值。为 false 时使用 {@link Enum#toString()},后者可能不唯一。默认值为 true。
+     */
     public boolean enumNames = true;
-    /** When true, classes not implementing Serializable are allowed. This is very unsafe! */
+    /**
+     * When true, classes not implementing Serializable are allowed. This is very unsafe!
+     * 为 true 时,允许未实现 Serializable 的类。这非常不安全!
+     */
     public boolean allowNonSerializableClasses = false;
 
-    /** Sets a tag to use instead of the fully qualifier class name. This can make the JSON easier to read. */
+    /**
+     * Sets a tag to use instead of the fully qualifier class name. This can make the JSON easier to read.
+     * 设置一个标签用于替代完全限定类名。这可以让 JSON 更易读。
+     */
     public void addClassTag(String tag, Class type){
         tagToClass.put(tag, type);
         classToTag.put(type, tag);
     }
 
-    /** Returns the class for the specified tag, or null. */
+    /**
+     * Returns the class for the specified tag, or null.
+     * 返回指定标签对应的类,或 null。
+     */
     public Class getClass(String tag){
         return tagToClass.get(tag);
     }
 
-    /** Returns the tag for the specified class, or null. */
+    /**
+     * Returns the tag for the specified class, or null.
+     * 返回指定类对应的标签,或 null。
+     */
     public String getTag(Class type){
         return classToTag.get(type);
     }
@@ -68,6 +96,8 @@ public class Json{
     /**
      * Registers a serializer to use for the specified type instead of the default behavior of serializing all of an objects
      * fields.
+     * <p>
+     * 为指定类型注册序列化器,取代序列化对象所有字段的默认行为。
      */
     public <T> void setSerializer(Class<T> type, JsonSerializer<T> serializer){
         classToSerializer.put(type, serializer);
@@ -80,6 +110,8 @@ public class Json{
     /**
      * Sets the type of elements in a struct. When the element type is known, the class for each element in the struct
      * does not need to be written unless different from the element type.
+     * <p>
+     * 设置 struct 中元素的类型。当元素类型已知时,struct 中每个元素无需写出其类名,除非与元素类型不同。
      */
     public void setElementType(Class type, String fieldName, Class elementType){
         ObjectMap<String, FieldMetadata> fields = getFields(type);
@@ -112,6 +144,7 @@ public class Json{
             if(field.isSynthetic() || type.isEnum() || Reflect.isWrapper(type)) continue;
 
             //this is deprecated, but I know what I'm doing
+            // 这已被弃用,但我知道自己在做什么
             if(!field.isAccessible()){
                 try{
                     field.setAccessible(true);
@@ -146,8 +179,8 @@ public class Json{
     }
 
     /**
-     * @param knownType May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
+     * @param knownType May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
      */
     public String toJson(Object object, Class knownType, Class elementType){
         StringWriter buffer = new StringWriter();
@@ -159,14 +192,17 @@ public class Json{
         toJson(object, object == null ? null : object.getClass(), null, file);
     }
 
-    /** @param knownType May be null if the type is unknown. */
+    /**
+     * @param knownType May be null if the type is unknown.
+     * 类型未知时可为 null。
+     */
     public void toJson(Object object, Class knownType, Fi file){
         toJson(object, knownType, null, file);
     }
 
     /**
-     * @param knownType May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
+     * @param knownType May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
      */
     public void toJson(Object object, Class knownType, Class elementType, Fi file){
         Writer writer = null;
@@ -184,14 +220,17 @@ public class Json{
         toJson(object, object == null ? null : object.getClass(), null, writer);
     }
 
-    /** @param knownType May be null if the type is unknown. */
+    /**
+     * @param knownType May be null if the type is unknown.
+     * 类型未知时可为 null。
+     */
     public void toJson(Object object, Class knownType, Writer writer){
         toJson(object, knownType, null, writer);
     }
 
     /**
-     * @param knownType May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
+     * @param knownType May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
      */
     public void toJson(Object object, Class knownType, Class elementType, Writer writer){
         JsonWriter jsonWriter = new StringJsonWriter(writer, Jformat.minimal);
@@ -202,7 +241,10 @@ public class Json{
         }
     }
 
-    /** Writes all fields of the specified object to the current JSON object. */
+    /**
+     * Writes all fields of the specified object to the current JSON object.
+     * 将指定对象的所有字段写入当前 JSON 对象。
+     */
     public void writeFields(JsonWriter writer, Object object){
         Class type = object.getClass();
 
@@ -286,7 +328,7 @@ public class Json{
     }
 
     /**
-     * @param elementType May be null if the type is unknown.
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
      * @see #writeField(JsonWriter, Object, String, String, Class)
      */
     public void writeField(JsonWriter writer, Object object, String name, Class elementType){
@@ -300,7 +342,9 @@ public class Json{
 
     /**
      * Writes the specified field to the current JSON object.
-     * @param elementType May be null if the type is unknown.
+     * <p>
+     * 将指定字段写入当前 JSON 对象。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
      */
     public void writeField(JsonWriter writer, Object object, String fieldName, String jsonName, Class elementType){
         Class type = object.getClass();
@@ -327,7 +371,9 @@ public class Json{
 
     /**
      * Writes the value as a field on the current JSON object, without writing the actual class.
-     * @param value May be null.
+     * <p>
+     * 将值作为字段写入当前 JSON 对象,但不写出实际类。
+     * @param value May be null. 可为 null。
      * @see #writeValue(JsonWriter, String, Object, Class, Class)
      */
     public void writeValue(JsonWriter writer, String name, Object value){
@@ -341,8 +387,10 @@ public class Json{
     /**
      * Writes the value as a field on the current JSON object, writing the class of the object if it differs from the specified
      * known type.
-     * @param value May be null.
-     * @param knownType May be null if the type is unknown.
+     * <p>
+     * 将值作为字段写入当前 JSON 对象,若对象类与指定的已知类型不同则写出其类。
+     * @param value May be null. 可为 null。
+     * @param knownType May be null if the type is unknown. 类型未知时可为 null。
      * @see #writeValue(JsonWriter, String, Object, Class, Class)
      */
     public void writeValue(JsonWriter writer, String name, Object value, Class knownType){
@@ -353,9 +401,11 @@ public class Json{
     /**
      * Writes the value as a field on the current JSON object, writing the class of the object if it differs from the specified
      * known type. The specified element type is used as the default type for collections.
-     * @param value May be null.
-     * @param knownType May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
+     * <p>
+     * 将值作为字段写入当前 JSON 对象,若对象类与指定的已知类型不同则写出其类。指定的元素类型用作集合的默认类型。
+     * @param value May be null. 可为 null。
+     * @param knownType May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
      */
     public void writeValue(JsonWriter writer, String name, Object value, Class knownType, Class elementType){
         writer.name(name);
@@ -364,7 +414,9 @@ public class Json{
 
     /**
      * Writes the value, without writing the class of the object.
-     * @param value May be null.
+     * <p>
+     * 写出该值,不写出对象的类。
+     * @param value May be null. 可为 null。
      */
     public void writeValue(JsonWriter writer, Object value){
         if(value == null)
@@ -375,8 +427,10 @@ public class Json{
 
     /**
      * Writes the value, writing the class of the object if it differs from the specified known type.
-     * @param value May be null.
-     * @param knownType May be null if the type is unknown.
+     * <p>
+     * 写出该值,若对象类与指定的已知类型不同则写出其类。
+     * @param value May be null. 可为 null。
+     * @param knownType May be null if the type is unknown. 类型未知时可为 null。
      */
     public void writeValue(JsonWriter writer, Object value, Class knownType){
         writeValue(writer, value, knownType, null);
@@ -385,9 +439,11 @@ public class Json{
     /**
      * Writes the value, writing the class of the object if it differs from the specified known type. The specified element type
      * is used as the default type for collections.
-     * @param value May be null.
-     * @param knownType May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
+     * <p>
+     * 写出该值,若对象类与指定的已知类型不同则写出其类。指定的元素类型用作集合的默认类型。
+     * @param value May be null. 可为 null。
+     * @param knownType May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
      */
     public void writeValue(JsonWriter writer, Object value, Class knownType, Class elementType){
         if(knownType != null && knownType.isAnonymousClass()){
@@ -427,6 +483,7 @@ public class Json{
         }
 
         // JSON array special cases.
+        // JSON 数组特殊情况。
         if(value instanceof Ar){
             if(knownType != null && actualType != knownType && actualType != Ar.class)
                 throw new SerializationException("Serialization of an Array other than the known type is not supported.\n"
@@ -506,6 +563,7 @@ public class Json{
         }
 
         // JSON object special cases.
+        // JSON 对象特殊情况。
         if(value instanceof ObjectMap){
             if(knownType == null) knownType = ObjectMap.class;
             writeObjectStart(writer, actualType, knownType);
@@ -569,9 +627,11 @@ public class Json{
         }
 
         // Enum special case.
+        // 枚举特殊情况。
         if(Enum.class.isAssignableFrom(actualType)){
             if(typeName != null && (knownType == null || knownType != actualType)){
                 // Ensures that enums with specific implementations (abstract logic) serialize correctly.
+                // 确保具有特定实现(抽象逻辑)的枚举能正确序列化。
                 if(actualType.getEnumConstants() == null) actualType = actualType.getSuperclass();
 
                 writeObjectStart(writer, actualType, null);
@@ -589,7 +649,10 @@ public class Json{
         writeObjectEnd(writer);
     }
 
-    /** @param knownType May be null if the type is unknown. */
+    /**
+     * @param knownType May be null if the type is unknown.
+     * 类型未知时可为 null。
+     */
     public void writeObjectStart(JsonWriter writer, String name, Class actualType, Class knownType){
         writer.name(name);
         writeObjectStart(writer, actualType, knownType);
@@ -597,7 +660,9 @@ public class Json{
 
     /**
      * Starts writing an object, writing the actualType to a field if needed.
-     * @param knownType May be null if the type is unknown.
+     * <p>
+     * 开始写入一个对象,必要时将 actualType 写入字段。
+     * @param knownType May be null if the type is unknown. 类型未知时可为 null。
      */
     public void writeObjectStart(JsonWriter writer, Class actualType, Class knownType){
         writer.writeObjectStart();
@@ -616,42 +681,42 @@ public class Json{
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T fromJson(Class<T> type, Reader reader){
         return readValue(type, null, Jval.read(reader));
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T fromJson(Class<T> type, Class elementType, Reader reader){
         return readValue(type, elementType, Jval.read(reader));
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T fromJson(Class<T> type, InputStream input){
         return readValue(type, null, Jval.read(new InputStreamReader(input)));
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T fromJson(Class<T> type, Class elementType, InputStream input){
         return readValue(type, elementType, Jval.read(new InputStreamReader(input)));
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T fromJson(Class<T> type, Fi file){
         try{
@@ -662,9 +727,9 @@ public class Json{
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T fromJson(Class<T> type, Class elementType, Fi file){
         try{
@@ -675,33 +740,33 @@ public class Json{
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T fromJson(Class<T> type, char[] data, int offset, int length){
         return readValue(type, null, Jval.read(new String(data, offset, length)));
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T fromJson(Class<T> type, Class elementType, char[] data, int offset, int length){
         return readValue(type, elementType, Jval.read(new String(data, offset, length)));
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T fromJson(Class<T> type, String json){
         return readValue(type, null, Jval.read(json));
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T fromJson(Class<T> type, Class elementType, String json){
         return readValue(type, elementType, Jval.read(json));
@@ -719,7 +784,10 @@ public class Json{
         readField(object, fieldName, jsonName, null, jsonData);
     }
 
-    /** @param elementType May be null if the type is unknown. */
+    /**
+     * @param elementType May be null if the type is unknown.
+     * 类型未知时可为 null。
+     */
     public void readField(Object object, String fieldName, String jsonName, Class elementType, Jval jsonMap){
         Class type = object.getClass();
         ObjectMap<String, FieldMetadata> fields = getFields(type);
@@ -732,8 +800,8 @@ public class Json{
     }
 
     /**
-     * @param object May be null if the field is static.
-     * @param elementType May be null if the type is unknown.
+     * @param object May be null if the field is static. 字段为静态时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
      */
     public void readField(Object object, Field field, String jsonName, Class elementType, Jval jsonMap){
         Jval jsonValue = jsonMap.get(jsonName);
@@ -791,9 +859,11 @@ public class Json{
     /**
      * Called for each unknown field name encountered by {@link #readFields(Object, Jval)} when {@link #ignoreUnknownFields}
      * is false to determine whether the unknown field name should be ignored.
-     * @param type The object type being read.
-     * @param fieldName A field name encountered in the JSON for which there is no matching class field.
-     * @return true if the field name should be ignored and an exception won't be thrown by
+     * <p>
+     * 当 {@link #ignoreUnknownFields} 为 false 时,对 {@link #readFields(Object, Jval)} 遇到的每个未知字段名调用此方法,以决定是否应忽略该未知字段名。
+     * @param type The object type being read. 正在读取的对象类型。
+     * @param fieldName A field name encountered in the JSON for which there is no matching class field. 在 JSON 中遇到的字段名,类中没有与之匹配的字段。
+     * @return true if the field name should be ignored and an exception won't be thrown by 如果应忽略该字段名且不会抛出异常,则为 true
      * {@link #readFields(Object, Jval)}.
      */
     protected boolean ignoreUnknownField(Class type, String fieldName){
@@ -801,16 +871,16 @@ public class Json{
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T readValue(String name, Class<T> type, Jval jsonMap){
         return readValue(type, null, jsonMap.get(name));
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T readValue(String name, Class<T> type, T defaultValue, Jval jsonMap){
         Jval jsonValue = jsonMap.get(name);
@@ -819,18 +889,18 @@ public class Json{
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T readValue(String name, Class<T> type, Class elementType, Jval jsonMap){
         return readValue(type, elementType, jsonMap.get(name));
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T readValue(String name, Class<T> type, Class elementType, T defaultValue, Jval jsonMap){
         Jval jsonValue = jsonMap.get(name);
@@ -838,9 +908,9 @@ public class Json{
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T readValue(Class<T> type, Class elementType, T defaultValue, Jval jsonData){
         if(jsonData == null) return defaultValue;
@@ -848,8 +918,8 @@ public class Json{
     }
 
     /**
-     * @param type May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T readValue(Class<T> type, Jval jsonData){
         return readValue(type, null, jsonData);
@@ -859,9 +929,9 @@ public class Json{
         return readValue(type, elementType, jsonData, null);
     }
     /**
-     * @param type May be null if the type is unknown.
-     * @param elementType May be null if the type is unknown.
-     * @return May be null.
+     * @param type May be null if the type is unknown. 类型未知时可为 null。
+     * @param elementType May be null if the type is unknown. 类型未知时可为 null。
+     * @return May be null. 可为 null。
      */
     public <T> T readValue(Class<T> type, Class elementType, Jval jsonData, Class keytype){
         if(jsonData == null) return null;
@@ -879,6 +949,7 @@ public class Json{
 
             if(typeName != null && Collection.class.isAssignableFrom(type)){
                 // JSON object wrapper to specify type.
+                // 用于指定类型的 JSON 对象包装器。
                 jsonData = jsonData.get("items");
                 if(jsonData == null) throw new SerializationException(
                 "Unable to convert object to struct: " + jsonData + " (" + type.getName() + ")");
@@ -898,6 +969,7 @@ public class Json{
                 }
 
                 // JSON object special cases.
+                // JSON 对象特殊情况。
                 if(object instanceof ObjectMap){
                     ObjectMap result = (ObjectMap)object;
                     for(ObjectMap.Entry<String, Jval> entry : jsonData.asObject()){
@@ -979,6 +1051,7 @@ public class Json{
 
             if(JsonSerializable.class.isAssignableFrom(type)){
                 // A Serializable may be read as an array, string, etc, even though it will be written as an object.
+                // Serializable 也可以按数组、字符串等形式读取,尽管它会被写为对象。
                 Object object = newInstance(type);
                 ((JsonSerializable)object).read(this, jsonData);
                 return (T)object;
@@ -987,6 +1060,7 @@ public class Json{
 
         if(jsonData.isArray()){
             // JSON array special cases.
+            // JSON 数组特殊情况。
             if(type == null || type == Object.class) type = (Class<T>)Ar.class;
             if(Ar.class.isAssignableFrom(type)){
                 Ar result = type == Ar.class ? new Ar() : (Ar)newInstance(type);
@@ -1094,6 +1168,8 @@ public class Json{
      * Each field on the <code>to</code> object is set to the value for the field with the same name on the <code>from</code>
      * object. The <code>to</code> object must have at least all the fields of the <code>from</code> object with the same name and
      * type.
+     * <p>
+     * <code>to</code> 对象的每个字段都被设置为 <code>from</code> 对象上同名同类型字段的值。<code>to</code> 对象必须至少包含 <code>from</code> 对象的所有同名同类型字段。
      */
     public void copyFields(Object from, Object to){
         copyFields(from, to, false);
@@ -1164,6 +1240,7 @@ public class Json{
         }catch(Exception ex){
             try{
                 // Try a private constructor.
+                // 尝试私有构造函数。
                 Constructor constructor = type.getDeclaredConstructor();
                 constructor.setAccessible(true);
                 Object result = constructor.newInstance();

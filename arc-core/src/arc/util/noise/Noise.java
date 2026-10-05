@@ -1,7 +1,11 @@
 package arc.util.noise;
 
 //TODO why dos this class still exist
-/** Perlin noise implementation. */
+// TODO 为什么这个类还存在
+/**
+ * Perlin noise implementation.
+ * Perlin 噪声实现。
+ */
 public final class Noise{
     private static int seed = 100;
 

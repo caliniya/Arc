@@ -8,6 +8,9 @@ import arc.math.geom.*;
 /**
  * Temporary stuff.
  * DO NOT USE IN ANY MULTITHREADED CODE!
+ * <p>
+ * 临时对象。
+ * 切勿在任何多线程代码中使用!
  */
 public class Tmp{
     public static final Vec2 v1 = new Vec2();

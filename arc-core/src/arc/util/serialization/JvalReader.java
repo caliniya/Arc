@@ -5,9 +5,15 @@ import arc.util.serialization.Jval.*;
 import java.io.*;
 import java.util.*;
 
-/** Used internally by Jval. Don't use directly. */
+/**
+ * Used internally by Jval. Don't use directly.
+ * 由 Jval 内部使用。不要直接使用。
+ */
 class JvalReader{
-    /** current == ',': peeks ahead (skipping comments) for ':'/'}'/']', or a bare trailing comma before EOL, to confirm a real separator; cap that to prevent ridiculously long lookahead */
+    /**
+     * current == ',': peeks ahead (skipping comments) for ':'/'}'/']', or a bare trailing comma before EOL, to confirm a real separator; cap that to prevent ridiculously long lookahead
+     * current == ',':向前查看(跳过注释)是否有 ':'/'}'/']',或行尾前的孤立尾逗号,以确认是真正的分隔符;对该前瞻距离设置上限,以防过长的向前查看
+     */
     private static final int commaLookaheadLimit = 256;
 
     private final char[] buffer;
@@ -19,7 +25,10 @@ class JvalReader{
     private int captureStart;
     private int rawStart;
     private boolean escaped;
-    /** True while reading an array element, where ',' always acts as a terminator/separator. */
+    /**
+     * True while reading an array element, where ',' always acts as a terminator/separator.
+     * 读取数组元素期间为 true,此时 ',' 始终充当终止符/分隔符。
+     */
     private boolean inArray;
 
     JvalReader(String string){
@@ -54,6 +63,7 @@ class JvalReader{
 
     Jval parse(){
         //braces for the root object are optional
+        // 根对象的大括号是可选的
 
         read();
         skipWhiteSpace();
@@ -65,9 +75,11 @@ class JvalReader{
             default:
                 try{
                     // assume we have a root object without braces
+                    // 假定存在一个没有大括号的根对象
                     return checkTrailing(readObject(true));
                 }catch(Exception exception){
                     // test if we are dealing with a single JSON value instead (true/false/null/num/"")
+                    // 测试我们处理的其实是不是单个 JSON 值(true/false/null/数字/"")
                     reset();
                     read();
                     skipWhiteSpace();
@@ -76,6 +88,7 @@ class JvalReader{
                     }catch(Exception ignored){
                     }
                     throw exception; // throw original error
+                    // 抛出原始错误
                 }
         }
     }
@@ -110,10 +123,12 @@ class JvalReader{
             read();
             boolean isComment = current == '#' || (current == '/' && (peek() == '/' || peek() == '*'));
             // in objects, only treat ',' as a separator if it looks like it precedes another 'key:'
+            // 在对象中,仅当 ',' 看起来后随另一个 'key:' 时才将 ',' 视为分隔符
             boolean commaStop = current == ',' && (inArray || commaEndsValue());
             boolean isEol = current < 0 || current == '\r' || current == '\n' || commaStop || current == ']' || current == '}' || isComment;
             if(isEol){
                 int stop = current < 0 ? index : index - 1; // position of the stopping char, not yet part of the value
+                // 终止字符的位置,尚未成为值的一部分
 
                 switch(first){
                     case 'f':
@@ -137,8 +152,10 @@ class JvalReader{
                 if(isEol){
                     int end = stop;
                     //remove trailing comma
+                    // 移除末尾逗号
                     if(end > start && buffer[end - 1] == ',') end--;
                     //trim like String.trim() (<= 0x20), matching original .trim() behavior
+                    // 像 String.trim() 一样去除空白(<= 0x20),与原先的 .trim() 行为保持一致
                     int s = start, e = end;
                     while(s < e && isTrimChar(buffer[s])) s++;
                     while(e > s && isTrimChar(buffer[e - 1])) e--;
@@ -176,6 +193,7 @@ class JvalReader{
             i++;
         }
         return false; // no resolution within the bound -> treat as literal, not a separator
+        // 在界限内未找到解析结果 -> 视为字面值,而非分隔符
     }
 
     static Jval tryParseNumber(char[] buf, int from, int to, boolean stopAtNext){
@@ -188,10 +206,12 @@ class JvalReader{
 
         if(first == '0' && idx < len && isDigit(buf[idx]))
             return null; // leading zero is not allowed
+            // 不允许前导零
 
         while(idx < len && isDigit(buf[idx])) idx++;
 
         // frac
+        // 小数部分
         if(idx < len && buf[idx] == '.'){
             idx++;
             if(idx >= len || !isDigit(buf[idx++])) return null;
@@ -199,6 +219,7 @@ class JvalReader{
         }
 
         // exp
+        // 指数部分
         if(idx < len && Character.toLowerCase(buf[idx]) == 'e'){
             idx++;
             if(idx < len && (buf[idx] == '+' || buf[idx] == '-')) idx++;
@@ -245,7 +266,10 @@ class JvalReader{
         return true;
     }
 
-    /** Matches String.trim()'s definition (chars <= 0x20), used where the original relied on .trim(). */
+    /**
+     * Matches String.trim()'s definition (chars <= 0x20), used where the original relied on .trim().
+     * 与 String.trim() 的定义一致(字符 <= 0x20),用于原先依赖 .trim() 的地方。
+     */
     private static boolean isTrimChar(char c){
         return c <= ' ';
     }
@@ -265,6 +289,7 @@ class JvalReader{
             array.add(readValue());
             skipWhiteSpace();
             if(readIf(',')) skipWhiteSpace(); // , is optional
+            // , 是可选的
             if(readIf(']')) break;
             else if(isEndOfText()) throw error("End of input while parsing an array (did you forget a closing ']'?)");
         }
@@ -275,6 +300,7 @@ class JvalReader{
     private Jval readObject(boolean objectWithoutBraces){
         boolean previousInArray = inArray;
         inArray = false; // object values use commaEndsValue() instead, regardless of outer context
+        // 对象值改用 commaEndsValue(),与外层上下文无关
         if(!objectWithoutBraces) read();
         JsonMap object = new JsonMap();
         skipWhiteSpace();
@@ -294,6 +320,7 @@ class JvalReader{
             object.putAdd(name, readValue());
             skipWhiteSpace();
             if(readIf(',')) skipWhiteSpace(); // , is optional
+            // , 是可选的
         }
         inArray = previousInArray;
         return object;
@@ -326,13 +353,16 @@ class JvalReader{
     private String readMlString(){
 
         // Parse a multiline string value.
+        // 解析多行字符串值。
         StringBuilder sb = new StringBuilder();
         int triple = 0;
 
         // we are at '''
+        // 当前位于 '''
         int indent = index - lineOffset - 4;
 
         // skip white/to (newline)
+        // 跳过空白直到(换行符)
         while(true){
             if(isWhiteSpace(current) && current != '\n') read();
             else break;
@@ -343,6 +373,7 @@ class JvalReader{
         }
 
         // When parsing for string values, we must look for " and \ characters.
+        // 解析字符串值时,必须查找 " 和 \ 字符。
         while(true){
             if(current < 0) throw error("Bad multiline string");
             else if(current == '\''){
@@ -383,6 +414,7 @@ class JvalReader{
 
     private String readStringInternal(boolean allowML){
         // callees make sure that (current=='"' || current=='\'')
+        // 调用方确保 (current=='"' || current=='\'')
         int exitCh = current;
         read();
         startCapture();
@@ -395,6 +427,7 @@ class JvalReader{
 
         if(allowML && exitCh == '\'' && current == '\'' && string.length() == 0){
             // ''' indicates a multiline string
+            // ''' 表示多行字符串
             read();
             return readMlString();
         }else return string;
@@ -402,18 +435,21 @@ class JvalReader{
 
     private void startCapture(){
         captureStart = index - 1; // current already holds buffer[index-1]
+        // current 中已保存 buffer[index-1]
         rawStart = captureStart;
         escaped = false;
     }
 
     private void readEscape(){
         // flush the raw (unescaped) run seen so far, up to this backslash
+        // 将到目前为止见到的原始(未转义)字符段刷新输出,直到该反斜杠之前
         int backslashPos = index - 1;
         if(captureBuffer == null) captureBuffer = new StringBuilder(32);
         captureBuffer.append(buffer, rawStart, backslashPos - rawStart);
         escaped = true;
 
         read(); // consume '\', current -> escape designator
+        // 消费 '\',current 随后指向转义指示符
         switch(current){
             case '"':
             case '\'':
@@ -452,18 +488,23 @@ class JvalReader{
                 throw expected("valid escape sequence");
         }
         read(); // advance past the escape sequence
+        // 跳过转义序列
         rawStart = index - 1; // next raw run starts here
+        // 下一段原始字符从这里开始
     }
 
     private String endCapture(){
         int end = index - 1; // current is exitCh (or -1 on unterminated input, pre-existing edge case)
+        // current 为 exitCh(输入未终止时为 -1,这是原有的边界情况)
         String result;
         if(escaped){
             captureBuffer.append(buffer, rawStart, end - rawStart);
             result = captureBuffer.toString();
             captureBuffer.setLength(0); // reuse the builder for the next escaped string, if any
+            // 如还有下一个转义字符串,则复用该构建器
         }else{
             result = new String(buffer, captureStart, end - captureStart); // single copy, common case
+            // 单次复制,常见情形
         }
         return result;
     }
@@ -482,10 +523,12 @@ class JvalReader{
 
         if(first == '0' && idx < len && isDigit(value.charAt(idx)))
             return null; // leading zero is not allowed
+            // 不允许前导零
 
         while(idx < len && isDigit(value.charAt(idx))) idx++;
 
         // frac
+        // 小数部分
         if(idx < len && value.charAt(idx) == '.'){
             idx++;
             if(idx >= len || !isDigit(value.charAt(idx++))) return null;
@@ -493,6 +536,7 @@ class JvalReader{
         }
 
         // exp
+        // 指数部分
         if(idx < len && Character.toLowerCase(value.charAt(idx)) == 'e'){
             idx++;
             if(idx < len && (value.charAt(idx) == '+' || value.charAt(idx) == '-')) idx++;

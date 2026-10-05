@@ -3,16 +3,25 @@ package arc.util.io;
 import java.io.*;
 import java.nio.*;
 
-/** DataInput wrapper of ByteBuffer. */
+/**
+ * DataInput wrapper of ByteBuffer.
+ * ByteBuffer 的 DataInput 包装器。
+ */
 public class ByteBufferInput implements DataInput{
     public ByteBuffer buffer;
 
-    /** Wraps the specified ByteBuffer. */
+    /**
+     * Wraps the specified ByteBuffer.
+     * 包装指定的 ByteBuffer。
+     */
     public ByteBufferInput(ByteBuffer buffer){
         this.buffer = buffer;
     }
 
-    /** {@link #setBuffer} must be called before this object can be used. */
+    /**
+     * {@link #setBuffer} must be called before this object can be used.
+     * 必须先调用 {@link #setBuffer},此对象才能使用。
+     */
     public ByteBufferInput(){
     }
 

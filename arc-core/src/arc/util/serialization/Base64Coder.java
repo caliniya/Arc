@@ -5,17 +5,21 @@ import arc.util.*;
 public class Base64Coder{
     public static final CharMap regularMap = new CharMap('+', '/'), urlsafeMap = new CharMap('-', '_');
     // The line separator string of the operating system.
+    // 操作系统的行分隔符字符串。
     private static final String systemLineSeparator = "\n";
 
     // Dummy constructor.
+    // 空构造函数。
     private Base64Coder(){
     }
 
     /**
      * Encodes a string into Base64 format. No blanks or line breaks are inserted.
      *
-     * @param s A String to be encoded.
-     * @return A String containing the Base64 encoded data.
+     * <p>
+     * 将字符串编码为 Base64 格式。不插入空格或换行。
+     * @param s A String to be encoded. 待编码的字符串。
+     * @return A String containing the Base64 encoded data. 包含 Base64 编码数据的字符串。
      */
     public static String encodeString(String s){
         return encodeString(s, false);
@@ -29,8 +33,10 @@ public class Base64Coder{
      * Encodes a byte array into Base64 format and breaks the output into lines of 76 characters. This method is compatible with
      * <code>sun.misc.BASE64Encoder.encodeBuffer(byte[])</code>.
      *
-     * @param in An array containing the data bytes to be encoded.
-     * @return A String containing the Base64 encoded data, broken into lines.
+     * <p>
+     * 将字节数组编码为 Base64 格式,并将输出按 76 个字符一行折行。该方法与 <code>sun.misc.BASE64Encoder.encodeBuffer(byte[])</code> 兼容。
+     * @param in An array containing the data bytes to be encoded. 包含待编码数据字节的数组。
+     * @return A String containing the Base64 encoded data, broken into lines. 包含 Base64 编码数据的字符串,按行分隔。
      */
     public static String encodeLines(byte[] in){
         return encodeLines(in, 0, in.length, 76, systemLineSeparator, regularMap.encodingMap);
@@ -43,13 +49,15 @@ public class Base64Coder{
     /**
      * Encodes a byte array into Base64 format and breaks the output into lines.
      *
-     * @param in An array containing the data bytes to be encoded.
-     * @param iOff Offset of the first byte in <code>in</code> to be processed.
-     * @param iLen Number of bytes to be processed in <code>in</code>, starting at <code>iOff</code>.
-     * @param lineLen Line length for the output data. Should be a multiple of 4.
-     * @param lineSeparator The line separator to be used to separate the output lines.
-     * @param charMap char map to use
-     * @return A String containing the Base64 encoded data, broken into lines.
+     * <p>
+     * 将字节数组编码为 Base64 格式,并将输出折行。
+     * @param in An array containing the data bytes to be encoded. 包含待编码数据字节的数组。
+     * @param iOff Offset of the first byte in <code>in</code> to be processed. <code>in</code> 中要处理的第一个字节的偏移量。
+     * @param iLen Number of bytes to be processed in <code>in</code>, starting at <code>iOff</code>. 从 <code>iOff</code> 开始在 <code>in</code> 中要处理的字节数。
+     * @param lineLen Line length for the output data. Should be a multiple of 4. 输出数据的行长度。应为 4 的倍数。
+     * @param lineSeparator The line separator to be used to separate the output lines. 用于分隔输出行的行分隔符。
+     * @param charMap char map to use 要使用的字符映射表
+     * @return A String containing the Base64 encoded data, broken into lines. 包含 Base64 编码数据的字符串,按行分隔。
      */
     public static String encodeLines(byte[] in, int iOff, int iLen, int lineLen, String lineSeparator, char[] charMap){
         int blockLen = (lineLen * 3) / 4;
@@ -72,8 +80,10 @@ public class Base64Coder{
     /**
      * Encodes a byte array into Base64 format. No blanks or line breaks are inserted in the output.
      *
-     * @param in An array containing the data bytes to be encoded.
-     * @return A character array containing the Base64 encoded data.
+     * <p>
+     * 将字节数组编码为 Base64 格式。输出中不插入空格或换行。
+     * @param in An array containing the data bytes to be encoded. 包含待编码数据字节的数组。
+     * @return A character array containing the Base64 encoded data. 包含 Base64 编码数据的字符数组。
      */
     public static char[] encode(byte[] in){
         return encode(in, regularMap.encodingMap);
@@ -94,9 +104,11 @@ public class Base64Coder{
     /**
      * Encodes a byte array into Base64 format. No blanks or line breaks are inserted in the output.
      *
-     * @param in An array containing the data bytes to be encoded.
-     * @param iLen Number of bytes to process in <code>in</code>.
-     * @return A character array containing the Base64 encoded data.
+     * <p>
+     * 将字节数组编码为 Base64 格式。输出中不插入空格或换行。
+     * @param in An array containing the data bytes to be encoded. 包含待编码数据字节的数组。
+     * @param iLen Number of bytes to process in <code>in</code>. 在 <code>in</code> 中要处理的字节数。
+     * @return A character array containing the Base64 encoded data. 包含 Base64 编码数据的字符数组。
      */
     public static char[] encode(byte[] in, int iLen){
         return encode(in, 0, iLen, regularMap.encodingMap);
@@ -109,15 +121,19 @@ public class Base64Coder{
     /**
      * Encodes a byte array into Base64 format. No blanks or line breaks are inserted in the output.
      *
-     * @param in An array containing the data bytes to be encoded.
-     * @param iOff Offset of the first byte in <code>in</code> to be processed.
-     * @param iLen Number of bytes to process in <code>in</code>, starting at <code>iOff</code>.
-     * @param charMap char map to use
-     * @return A character array containing the Base64 encoded data.
+     * <p>
+     * 将字节数组编码为 Base64 格式。输出中不插入空格或换行。
+     * @param in An array containing the data bytes to be encoded. 包含待编码数据字节的数组。
+     * @param iOff Offset of the first byte in <code>in</code> to be processed. <code>in</code> 中要处理的第一个字节的偏移量。
+     * @param iLen Number of bytes to process in <code>in</code>, starting at <code>iOff</code>. 从 <code>iOff</code> 开始在 <code>in</code> 中要处理的字节数。
+     * @param charMap char map to use 要使用的字符映射表
+     * @return A character array containing the Base64 encoded data. 包含 Base64 编码数据的字符数组。
      */
     public static char[] encode(byte[] in, int iOff, int iLen, char[] charMap){
         int oDataLen = (iLen * 4 + 2) / 3; // output length without padding
+        // 不含填充的输出长度
         int oLen = ((iLen + 2) / 3) * 4; // output length including padding
+        // 含填充的输出长度
         char[] out = new char[oLen];
         int ip = iOff;
         int iEnd = iOff + iLen;
@@ -143,9 +159,11 @@ public class Base64Coder{
     /**
      * Decodes a string from Base64 format. No blanks or line breaks are allowed within the Base64 encoded input data.
      *
-     * @param s A Base64 String to be decoded.
-     * @return A String containing the decoded data.
-     * @throws IllegalArgumentException If the input is not valid Base64 encoded data.
+     * <p>
+     * 从 Base64 格式解码出字符串。Base64 编码的输入数据中不允许有空格或换行。
+     * @param s A Base64 String to be decoded. 待解码的 Base64 字符串。
+     * @return A String containing the decoded data. 包含解码后数据的字符串。
+     * @throws IllegalArgumentException If the input is not valid Base64 encoded data. 输入不是有效的 Base64 编码数据。
      */
     public static String decodeString(String s){
         return decodeString(s, false);
@@ -167,10 +185,12 @@ public class Base64Coder{
      * Decodes a byte array from Base64 format and ignores line separators, tabs and blanks. CR, LF, Tab and Space characters are
      * ignored in the input data. This method is compatible with <code>sun.misc.BASE64Decoder.decodeBuffer(String)</code>.
      *
-     * @param s A Base64 String to be decoded.
+     * <p>
+     * 从 Base64 格式解码出字节数组,并忽略行分隔符、制表符和空格。输入数据中的 CR、LF、Tab 和空格字符均被忽略。该方法与 <code>sun.misc.BASE64Decoder.decodeBuffer(String)</code> 兼容。
+     * @param s A Base64 String to be decoded. 待解码的 Base64 字符串。
      * @param inverseCharMap
-     * @return An array containing the decoded data bytes.
-     * @throws IllegalArgumentException If the input is not valid Base64 encoded data.
+     * @return An array containing the decoded data bytes. 包含解码后数据字节的数组。
+     * @throws IllegalArgumentException If the input is not valid Base64 encoded data. 输入不是有效的 Base64 编码数据。
      */
     public static byte[] decodeLines(String s, byte[] inverseCharMap){
         char[] buf = new char[s.length()];
@@ -187,9 +207,11 @@ public class Base64Coder{
     /**
      * Decodes a byte array from Base64 format. No blanks or line breaks are allowed within the Base64 encoded input data.
      *
-     * @param s A Base64 String to be decoded.
-     * @return An array containing the decoded data bytes.
-     * @throws IllegalArgumentException If the input is not valid Base64 encoded data.
+     * <p>
+     * 从 Base64 格式解码出字节数组。Base64 编码的输入数据中不允许有空格或换行。
+     * @param s A Base64 String to be decoded. 待解码的 Base64 字符串。
+     * @return An array containing the decoded data bytes. 包含解码后数据字节的数组。
+     * @throws IllegalArgumentException If the input is not valid Base64 encoded data. 输入不是有效的 Base64 编码数据。
      */
     public static byte[] decode(String s){
         return decode(s.toCharArray());
@@ -198,10 +220,12 @@ public class Base64Coder{
     /**
      * Decodes a byte array from Base64 format. No blanks or line breaks are allowed within the Base64 encoded input data.
      *
-     * @param s A Base64 String to be decoded.
+     * <p>
+     * 从 Base64 格式解码出字节数组。Base64 编码的输入数据中不允许有空格或换行。
+     * @param s A Base64 String to be decoded. 待解码的 Base64 字符串。
      * @param inverseCharMap
-     * @return An array containing the decoded data bytes.
-     * @throws IllegalArgumentException If the input is not valid Base64 encoded data.
+     * @return An array containing the decoded data bytes. 包含解码后数据字节的数组。
+     * @throws IllegalArgumentException If the input is not valid Base64 encoded data. 输入不是有效的 Base64 编码数据。
      */
     public static byte[] decode(String s, CharMap inverseCharMap){
         return decode(s.toCharArray(), inverseCharMap);
@@ -218,9 +242,11 @@ public class Base64Coder{
     /**
      * Decodes a byte array from Base64 format. No blanks or line breaks are allowed within the Base64 encoded input data.
      *
-     * @param in A character array containing the Base64 encoded data.
-     * @return An array containing the decoded data bytes.
-     * @throws IllegalArgumentException If the input is not valid Base64 encoded data.
+     * <p>
+     * 从 Base64 格式解码出字节数组。Base64 编码的输入数据中不允许有空格或换行。
+     * @param in A character array containing the Base64 encoded data. 包含 Base64 编码数据的字符数组。
+     * @return An array containing the decoded data bytes. 包含解码后数据字节的数组。
+     * @throws IllegalArgumentException If the input is not valid Base64 encoded data. 输入不是有效的 Base64 编码数据。
      */
     public static byte[] decode(char[] in){
         return decode(in, 0, in.length, regularMap.decodingMap);
@@ -233,12 +259,14 @@ public class Base64Coder{
     /**
      * Decodes a byte array from Base64 format. No blanks or line breaks are allowed within the Base64 encoded input data.
      *
-     * @param in A character array containing the Base64 encoded data.
-     * @param iOff Offset of the first character in <code>in</code> to be processed.
-     * @param iLen Number of characters to process in <code>in</code>, starting at <code>iOff</code>.
-     * @param inverseCharMap charMap to use
-     * @return An array containing the decoded data bytes.
-     * @throws IllegalArgumentException If the input is not valid Base64 encoded data.
+     * <p>
+     * 从 Base64 格式解码出字节数组。Base64 编码的输入数据中不允许有空格或换行。
+     * @param in A character array containing the Base64 encoded data. 包含 Base64 编码数据的字符数组。
+     * @param iOff Offset of the first character in <code>in</code> to be processed. <code>in</code> 中要处理的第一个字符的偏移量。
+     * @param iLen Number of characters to process in <code>in</code>, starting at <code>iOff</code>. 从 <code>iOff</code> 开始在 <code>in</code> 中要处理的字符数。
+     * @param inverseCharMap charMap to use 要使用的字符映射表
+     * @return An array containing the decoded data bytes. 包含解码后数据字节的数组。
+     * @throws IllegalArgumentException If the input is not valid Base64 encoded data. 输入不是有效的 Base64 编码数据。
      */
     public static byte[] decode(char[] in, int iOff, int iLen, byte[] inverseCharMap){
         if(iLen % 4 != 0){

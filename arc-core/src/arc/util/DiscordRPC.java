@@ -15,6 +15,10 @@ import java.util.concurrent.*;
  * Simple class for handling Discord Rich Presence.
  * Implementation based on https://github.com/jagrosh/DiscordIPC
  * This the only know implementation that is pure Java; on Linux/Mac, this uses Java 16's new Unix sockets.
+ * <p>
+ * 处理 Discord Rich Presence 的简单类。
+ * 实现基于 https://github.com/jagrosh/DiscordIPC。
+ * 这是唯一已知的纯 Java 实现;在 Linux/Mac 上使用 Java 16 新增的 Unix 套接字。
  * */
 public final class DiscordRPC{
     private static int pid;
@@ -28,7 +32,10 @@ public final class DiscordRPC{
     public static Cons<Throwable> onDisconnected = error -> {};
     public static Cons<Jval> onClose = json -> {};
 
-    /** Call before sending any presence updates. */
+    /**
+     * Call before sending any presence updates.
+     * 在发送任何 presence 更新之前调用。
+     */
     public static void connect(long clientId) throws Exception{
         DiscordRPC.clientId = clientId;
         String version = OS.javaVersion;
@@ -38,12 +45,15 @@ public final class DiscordRPC{
             Strings.parseInt(version);
 
         //on unix, this is supported on java >= 16 (unix sockets)
+        // 在 unix 上,java >= 16 支持此功能(unix 套接字)
         //on windows, this is supported on java >= 9 (ProcessHandle#pid())
+        // 在 windows 上,java >= 9 支持此功能(ProcessHandle#pid())
         if(!(major >= 16 || (OS.isWindows && major >= 9))){
             throw new Exception("Discord RPC is not supported on < Java " + (OS.isWindows ? "9" : "16") + ". Your version: " + version);
         }
 
         //use reflection to call Java 9 API
+        // 使用反射调用 Java 9 API
         Class<?> c = Class.forName("java.lang.ProcessHandle");
         Object current = c.getMethod("current").invoke(null);
         pid = ((Long)c.getMethod("pid").invoke(current)).intValue();
@@ -60,6 +70,7 @@ public final class DiscordRPC{
         onReady.run();
 
         //start reading incoming events
+        // 开始读取传入的事件
         Thread t = new Thread(() -> {
             try{
                 Packet p;
@@ -99,7 +110,10 @@ public final class DiscordRPC{
         t.start();
     }
 
-    /** Updates the displayed rich presence. */
+    /**
+     * Updates the displayed rich presence.
+     * 更新显示的 rich presence。
+     */
     public static void send(RichPresence presence){
         checkConnected(true);
         pipe.send(PacketOp.frame,
@@ -110,7 +124,10 @@ public final class DiscordRPC{
         .put("activity", presence == null ? null : presence.toJson())));
     }
 
-    /** Subscribes to all activity events. */
+    /**
+     * Subscribes to all activity events.
+     * 订阅所有活动事件。
+     */
     public static void subscribe(){
         checkConnected(true);
 
@@ -126,7 +143,10 @@ public final class DiscordRPC{
         return pipe == null ? PipeStatus.uninitialized : pipe.status;
     }
 
-    /** Attempts to close an open connection to Discord. Does nothing if not connected. */
+    /**
+     * Attempts to close an open connection to Discord. Does nothing if not connected.
+     * 尝试关闭与 Discord 的已建立连接。若未连接则不做任何事。
+     */
     public static void close(){
         if(getStatus() != PipeStatus.connected) return;
 
@@ -139,8 +159,10 @@ public final class DiscordRPC{
     /**
      * Makes sure that the client is connected (or not) depending on if it should
      * for the current state.
+     * <p>
+     * 根据当前状态的需要,确保客户端处于已连接(或未连接)状态。
      * @param connected Whether to check in the context of the IPCClient being
-     * connected or not.
+     * connected or not. 是否在 IPCClient 已连接的上下文中进行检查。
      */
     private static void checkConnected(boolean connected){
         if(connected && getStatus() != PipeStatus.connected)
@@ -260,6 +282,7 @@ public final class DiscordRPC{
     abstract static class Pipe{
         private static final int version = 1;
         // a list of system property keys to get IPC file from different unix systems.
+        // 一组系统属性键,用于从不同的 unix 系统获取 IPC 文件。
         private final static String[] unixPaths = {"XDG_RUNTIME_DIR", "TMPDIR", "TMP", "TEMP"};
 
         public PipeStatus status = PipeStatus.connecting;
@@ -281,6 +304,7 @@ public final class DiscordRPC{
                     pipe.status = PipeStatus.connected;
 
                     //discard read packet
+                    // 丢弃已读取的数据包
                     pipe.read();
 
                     return pipe;
@@ -325,6 +349,7 @@ public final class DiscordRPC{
 
         UnixPipe(String location) throws Exception{
             //this is java 16+ API, so needs reflection
+            // 这是 java 16+ 的 API,因此需要反射
             Method method = SocketChannel.class.getMethod("open", SocketAddress.class);
             Class<?> addressc = Class.forName("java.net.UnixDomainSocketAddress");
             Method construct = addressc.getMethod("of", String.class);

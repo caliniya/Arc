@@ -1,6 +1,9 @@
 package arc.util.noise;
 
-/** Ridged perlin noise implementation. */
+/**
+ * Ridged perlin noise implementation.
+ * Ridged(脊状)Perlin 噪声实现。
+ */
 public class Ridged{
     static final int X_NOISE_GEN = 1619;
     static final int Y_NOISE_GEN = 31337;
@@ -37,35 +40,47 @@ public class Ridged{
             double ny = range(y1);
 
             // Get the coherent-noise value.
+            // 获取相干噪声值。
             // Create a unit-length cube aligned along an integer boundary. This cube surrounds the input point.
+            // 创建一个沿整数边界对齐的单位长度立方体。该立方体包围输入点。
             int x0 = (nx > 0.0 ? (int)nx : (int)nx - 1);
             int x11 = x0 + 1;
             int y0 = (ny > 0.0 ? (int)ny : (int)ny - 1);
             int y11 = y0 + 1;
 
             // Map the difference between the coordinates of the input value and the
+            // 将输入值坐标与
             // coordinates of the cube's outer-lower-left vertex onto an S-curve.
+            // 立方体左下外侧顶点坐标之差映射到 S 曲线上。
             double xs = 0, ys = 0;
             switch(quality){
                 case 0: // fast
+                // 快速
                     xs = (nx - (double)x0);
                     ys = (ny - (double)y0);
                     break;
                 case 1: // STD
+                // 标准
                     xs = scurve3(nx - (double)x0);
                     ys = scurve3(ny - (double)y0);
                     break;
                 case 2: // best
+                // 最佳
                     xs = scurve5(nx - (double)x0);
                     ys = scurve5(ny - (double)y0);
                     break;
             }
 
             // Now calculate the noise values at each vertex of the cube. To
+            // 现在计算立方体每个顶点处的噪声值。为了
             // generate
+            // 生成
             // the coherent-noise value at the input point, interpolate these eight
+            // 输入点处的相干噪声值,需要对这八个
             // noise values using the S-curve value as the interpolant (trilinear
+            // 噪声值以 S 曲线值作为插值因子进行插值(三线性
             // interpolation.)
+            // 插值)。
             double n0, n1, ix0, ix1, iy0;
             n0 = gradientNoise(nx, ny, x0, y0, (seed + curOctave) & 0x7fffffff);
             n1 = gradientNoise(nx, ny, x11, y0, (seed + curOctave) & 0x7fffffff);
@@ -78,17 +93,22 @@ public class Ridged{
             signal = iy0;
 
             // Make the ridges.
+            // 生成脊线。
             signal = Math.abs(signal);
             signal = offset - signal;
 
             // Square the signal to increase the sharpness of the ridges.
+            // 对信号取平方以增强脊线的锐度。
             signal *= signal;
 
             // The weighting from the previous octave is applied to the signal.
+            // 上一个倍频的权重会施加到信号上。
             // Larger values have higher weights, producing sharp points along the ridges.
+            // 值越大权重越高,从而在脊线上形成尖锐的峰。
             signal *= weight;
 
             // Weight successive contributions by the previous signal.
+            // 用上一个信号为后续贡献加权。
             weight = signal * gain;
             if(weight > 1.0){
                 weight = 1.0;
@@ -98,11 +118,13 @@ public class Ridged{
             }
 
             // Add the signal to the output value.
+            // 将信号加到输出值上。
             value += (signal * sweight);
 
             sweight *= persistence;
 
             // Go to the next octave.
+            // 进入下一个倍频。
             x1 *= 2;
             y1 *= 2;
         }
@@ -136,7 +158,9 @@ public class Ridged{
             nz = range(z1);
 
             // Get the coherent-noise value.
+            // 获取相干噪声值。
             // Create a unit-length cube aligned along an integer boundary. This cube surrounds the input point.
+            // 创建一个沿整数边界对齐的单位长度立方体。该立方体包围输入点。
             int x0 = (nx > 0.0 ? (int)nx : (int)nx - 1);
             int x11 = x0 + 1;
             int y0 = (ny > 0.0 ? (int)ny : (int)ny - 1);
@@ -145,20 +169,25 @@ public class Ridged{
             int z11 = z0 + 1;
 
             // Map the difference between the coordinates of the input value and the
+            // 将输入值坐标与
             // coordinates of the cube's outer-lower-left vertex onto an S-curve.
+            // 立方体左下外侧顶点坐标之差映射到 S 曲线上。
             double xs = 0, ys = 0, zs = 0;
             switch(quality){
                 case 0: // fast
+                // 快速
                     xs = (nx - (double)x0);
                     ys = (ny - (double)y0);
                     zs = (nz - (double)z0);
                     break;
                 case 1: // STD
+                // 标准
                     xs = scurve3(nx - (double)x0);
                     ys = scurve3(ny - (double)y0);
                     zs = scurve3(nz - (double)z0);
                     break;
                 case 2: // best
+                // 最佳
                     xs = scurve5(nx - (double)x0);
                     ys = scurve5(ny - (double)y0);
                     zs = scurve5(nz - (double)z0);
@@ -166,10 +195,15 @@ public class Ridged{
             }
 
             // Now calculate the noise values at each vertex of the cube. To
+            // 现在计算立方体每个顶点处的噪声值。为了
             // generate
+            // 生成
             // the coherent-noise value at the input point, interpolate these eight
+            // 输入点处的相干噪声值,需要对这八个
             // noise values using the S-curve value as the interpolant (trilinear
+            // 噪声值以 S 曲线值作为插值因子进行插值(三线性
             // interpolation.)
+            // 插值)。
             double n0, n1, ix0, ix1, iy0, iy1;
             n0 = gradientNoise3D(nx, ny, nz, x0, y0, z0, (seed + curOctave) & 0x7fffffff);
             n1 = gradientNoise3D(nx, ny, nz, x11, y0, z0, (seed + curOctave) & 0x7fffffff);
@@ -189,17 +223,22 @@ public class Ridged{
             signal = lerp(iy0, iy1, zs);
 
             // Make the ridges.
+            // 生成脊线。
             signal = Math.abs(signal);
             signal = offset - signal;
 
             // Square the signal to increase the sharpness of the ridges.
+            // 对信号取平方以增强脊线的锐度。
             signal *= signal;
 
             // The weighting from the previous octave is applied to the signal.
+            // 上一个倍频的权重会施加到信号上。
             // Larger values have higher weights, producing sharp points along the ridges.
+            // 值越大权重越高,从而在脊线上形成尖锐的峰。
             signal *= weight;
 
             // Weight successive contributions by the previous signal.
+            // 用上一个信号为后续贡献加权。
             weight = signal * gain;
             if(weight > 1.0){
                 weight = 1.0;
@@ -209,11 +248,13 @@ public class Ridged{
             }
 
             // Add the signal to the output value.
+            // 将信号加到输出值上。
             value += (signal * sweight);
 
             sweight *= scaling;
 
             // Go to the next octave.
+            // 进入下一个倍频。
             x1 *= 2;
             y1 *= 2;
             z1 *= 2;
@@ -245,15 +286,21 @@ public class Ridged{
 
 
         // Set up us another vector equal to the distance between the two
+        // 再创建一个向量,使其等于
         // vectors
+        // 传给本函数的那两个向量
         // passed to this function.
+        // 之间的距离。
         double xvPoint = (fx - (double)ix);
         double yvPoint = (fy - (double)iy);
         double zvPoint = (fz - (double)iz);
 
         // Now compute the dot product of the gradient vector with the distance
+        // 现在计算梯度向量与距离
         // vector. The resulting value is gradient noise. Apply a scaling value
+        // 向量的点积。所得结果即为梯度噪声。再乘以一个缩放值,
         // so that this noise value ranges from -1.0 to 1.0.
+        // 使该噪声值的范围落在 -1.0 到 1.0 之间。
         return ((xvGradient * xvPoint) + (yvGradient * yvPoint) + (zvGradient * zvPoint)) * 2.12;
     }
 
@@ -269,14 +316,20 @@ public class Ridged{
         double yvGradient = VectorTable.randomVectors[vectorIndex + 1];
 
         // Set up us another vector equal to the distance between the two
+        // 再创建一个向量,使其等于
         // vectors
+        // 传给本函数的那两个向量
         // passed to this function.
+        // 之间的距离。
         double xvPoint = (fx - (double)ix);
         double yvPoint = (fy - (double)iy);
 
         // Now compute the dot product of the gradient vector with the distance
+        // 现在计算梯度向量与距离
         // vector. The resulting value is gradient noise. Apply a scaling value
+        // 向量的点积。所得结果即为梯度噪声。再乘以一个缩放值,
         // so that this noise value ranges from -1.0 to 1.0.
+        // 使该噪声值的范围落在 -1.0 到 1.0 之间。
         return ((xvGradient * xvPoint) + (yvGradient * yvPoint)) * 2.12;
     }
 
