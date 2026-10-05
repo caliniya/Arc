@@ -30,11 +30,19 @@ import java.util.*;
  * <p>
  * A selection made by the user calls the listener and fires a {@link ChangeEvent}; {@link #setSelected} does neither.
  * The button is as wide as the widest item, so it doesn't resize when the selection changes.
+ * <p>
+ * 一种按钮,显示当前选中的条目,点击时打开一个包含所有条目的可滚动列表,基于 libGDX 的 SelectBox。列表在按钮下方打开,若上方空间更大则在上方打开;点击列表外部或按 Escape 键关闭。列表打开时,方向键移动高亮,回车键选中高亮的条目。 <p> 用户做出的选择会调用监听器并触发 {@link ChangeEvent};而 {@link #setSelected} 两者都不会。按钮的宽度与最宽的条目相同,因此选择变化时按钮不会改变大小。
  */
 public class Dropdown<T> extends Table implements Disableable{
-    /** Maximum number of items visible at once before the list scrolls. */
+    /**
+     * Maximum number of items visible at once before the list scrolls.
+     * 列表滚动前一次可见的最大条目数。
+     */
     public int maxListCount = 8;
-    /** Height of each item in the list. */
+    /**
+     * Height of each item in the list.
+     * 列表中每个条目的高度。
+     */
     public float itemHeight = 40f;
 
     DropdownStyle style;
@@ -110,12 +118,18 @@ public class Dropdown<T> extends Table implements Disableable{
         measureItems();
     }
 
-    /** Returns the style, which is shared and should not be modified. */
+    /**
+     * Returns the style, which is shared and should not be modified.
+     * 返回样式,该样式是共享的,不应修改。
+     */
     public DropdownStyle getStyle(){
         return style;
     }
 
-    /** Sets the items, keeping the selection if it is still present and selecting the first item otherwise. */
+    /**
+     * Sets the items, keeping the selection if it is still present and selecting the first item otherwise.
+     * 设置条目,若当前选中项仍存在则保留选中,否则选中第一个条目。
+     */
     public void setItems(Ar<T> newItems){
         if(newItems != items){
             items.clear();
@@ -131,19 +145,28 @@ public class Dropdown<T> extends Table implements Disableable{
         setItems(Ar.with(newItems));
     }
 
-    /** Returns the backing item list. Call {@link #setItems(Ar)} with it after modifying it. */
+    /**
+     * Returns the backing item list. Call {@link #setItems(Ar)} with it after modifying it.
+     * 返回底层条目列表。修改后需将它传给 {@link #setItems(Ar)}。
+     */
     public Ar<T> getItems(){
         return items;
     }
 
-    /** Sets how items are converted to the displayed text. Text starting with '@' is looked up in the bundle. */
+    /**
+     * Sets how items are converted to the displayed text. Text starting with '@' is looked up in the bundle.
+     * 设置条目如何转换为显示的文本。以 '@' 开头的文本会在语言包中查找。
+     */
     public void setStringifier(Func<T, String> stringifier){
         this.stringifier = stringifier;
         measureItems();
         updateLabel();
     }
 
-    /** Sets the listener called when the user selects a different item. */
+    /**
+     * Sets the listener called when the user selects a different item.
+     * 设置当用户选择不同条目时调用的监听器。
+     */
     public void setListener(Cons<T> listener){
         this.listener = listener;
     }
@@ -156,13 +179,19 @@ public class Dropdown<T> extends Table implements Disableable{
         return selected == null ? -1 : items.indexOf(selected, false);
     }
 
-    /** Selects the item without notifying listeners. Items that aren't in the list select the first item instead. */
+    /**
+     * Selects the item without notifying listeners. Items that aren't in the list select the first item instead.
+     * 选择该条目但不通知监听器。若条目不在列表中,则改为选择第一个条目。
+     */
     public void setSelected(@Nullable T item){
         selected = item != null && items.contains(item, false) ? item : items.any() ? items.first() : null;
         updateLabel();
     }
 
-    /** Selects the item at the index without notifying listeners, or clears the selection for -1. */
+    /**
+     * Selects the item at the index without notifying listeners, or clears the selection for -1.
+     * 选择指定索引处的条目但不通知监听器,索引为 -1 时清除选择。
+     */
     public void setSelectedIndex(int index){
         selected = index < 0 ? null : items.get(index);
         updateLabel();
@@ -306,6 +335,7 @@ public class Dropdown<T> extends Table implements Disableable{
                 if(target != null && (target.isDescendantOf(DropdownList.this) || target.isDescendantOf(Dropdown.this))) return false;
                 hide();
                 //consume the click so it doesn't reach whatever is below the list
+                // 拦截该点击,避免它传递到列表下方的元素
                 event.stop();
                 return true;
             }
@@ -383,7 +413,10 @@ public class Dropdown<T> extends Table implements Disableable{
             lastScrollFocus = null;
         }
 
-        /** Sizes the list to fit its items and the space next to the dropdown, preferring the space below. */
+        /**
+         * Sizes the list to fit its items and the space next to the dropdown, preferring the space below.
+         * 调整列表大小以容纳其条目,并适配下拉框旁边的空间,优先使用下方空间。
+         */
         void layoutList(){
             Scene scene = getScene();
             float bottom = Dropdown.this.localToStageCoordinates(Tmp.v1.setZero()).y;
@@ -458,20 +491,37 @@ public class Dropdown<T> extends Table implements Disableable{
 
     /**
      * The style for a {@link Dropdown}. The inherited drawables are used for the button, with {@link #checked} shown while the list is open.
+     * <p>
+     * {@link Dropdown} 的样式。继承而来的可绘制对象用于按钮,列表打开时显示 {@link #checked}。
      */
     public static class DropdownStyle extends ButtonStyle{
         public Font font;
         public Color fontColor = Color.white;
-        /** Optional. Used while hovered or open. */
+        /**
+         * Optional. Used while hovered or open.
+         * 可选。在悬停或打开时使用。
+         */
         public @Nullable Color overFontColor, disabledFontColor;
-        /** Optional. The icon at the right of the button. */
+        /**
+         * Optional. The icon at the right of the button.
+         * 可选。按钮右侧的图标。
+         */
         public @Nullable Drawable arrow;
         public float arrowSize = 16f;
-        /** Optional. The background of the opened list. */
+        /**
+         * Optional. The background of the opened list.
+         * 可选。打开后的列表的背景。
+         */
         public @Nullable Drawable listBackground;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public @Nullable ScrollPaneStyle scrollStyle;
-        /** The style of each item in the list; the checked drawable marks the selected item and over marks the highlighted one. */
+        /**
+         * The style of each item in the list; the checked drawable marks the selected item and over marks the highlighted one.
+         * 列表中每个条目的样式;checked 可绘制对象标记被选中的条目,over 标记高亮的条目。
+         */
         public TextButtonStyle itemStyle;
 
         public DropdownStyle(){

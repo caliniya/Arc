@@ -29,6 +29,8 @@ import static arc.Core.*;
  * The preferred height of a text field is the height of the {@link TextFieldStyle#font} and {@link TextFieldStyle#background}.
  * The preferred width of a text field is 150, a relatively arbitrary size.
  * <p>
+ * <p>
+ * 单行文本输入框。 <p> 文本输入框的首选高度是 {@link TextFieldStyle#font} 和 {@link TextFieldStyle#background} 的高度。文本输入框的首选宽度为 150,是相对随意的一个值。 <p>
  * @author mzechner
  * @author Nathan Sweet
  */
@@ -45,7 +47,10 @@ public class TextField extends Element implements Disableable{
     public static float keyRepeatInitialTime = 0.4f;
     public static float keyRepeatTime = 0.1f;
 
-    /** Special field containing implementation-specific data for IME support. */
+    /**
+     * Special field containing implementation-specific data for IME support.
+     * 包含 IME 支持的实现特定数据的特殊字段。
+     */
     public Object imeData;
 
     protected final GlyphLayout layout = new GlyphLayout(true);
@@ -179,6 +184,7 @@ public class TextField extends Element implements Disableable{
 
     public void addInputDialog(){
         //mobile only
+        // 仅限移动端
         if(!app.isMobile() || hasInputDialog) return;
 
         hasInputDialog = true;
@@ -222,6 +228,8 @@ public class TextField extends Element implements Disableable{
      * When false, text set by {@link #setText(String)} may contain characters not in the font, a space will be displayed instead.
      * When true (the default), characters not in the font are stripped by setText. Characters not in the font are always stripped
      * when typed or pasted.
+     * <p>
+     * 为 false 时,通过 {@link #setText(String)} 设置的文本可能包含字体中不存在的字符,这些字符将显示为空格。为 true(默认)时,setText 会剔除字体中不存在的字符。输入或粘贴时,字体中不存在的字符总是会被剔除。
      */
     public void setOnlyFontChars(boolean onlyFontChars){
         this.onlyFontChars = onlyFontChars;
@@ -230,6 +238,8 @@ public class TextField extends Element implements Disableable{
     /**
      * Returns the text field's style. Modifying the returned style may not have an effect until {@link #setStyle(TextFieldStyle)}
      * is called.
+     * <p>
+     * 返回文本输入框的样式。在调用 {@link #setStyle(TextFieldStyle)} 之前,修改返回的样式可能不会生效。
      */
     public TextFieldStyle getStyle(){
         return style;
@@ -251,6 +261,7 @@ public class TextField extends Element implements Disableable{
         float[] glyphPositions = this.glyphPositions.items;
 
         // Check if the cursor has gone out the left or right side of the visible area and adjust renderOffset.
+        // 检查光标是否移出了可视区域的左侧或右侧,并调整 renderOffset。
         cursor = Mathf.clamp(cursor, 0, glyphPositions.length - 1);
         float distance = glyphPositions[Math.max(0, cursor - 1)] + renderOffset;
         if(distance <= 0)
@@ -262,6 +273,7 @@ public class TextField extends Element implements Disableable{
         }
 
         // Prevent renderOffset from starting too close to the end, eg after text was deleted.
+        // 防止 renderOffset 起始位置过于接近末尾,例如在文本被删除之后。
         float maxOffset = 0;
         float width = glyphPositions[Mathf.clamp(glyphCount - 1, 0, glyphPositions.length - 1)];
         for(int i = glyphCount - 2; i >= 0; i--){
@@ -272,6 +284,7 @@ public class TextField extends Element implements Disableable{
         if(-renderOffset > maxOffset) renderOffset = -maxOffset;
 
         // calculate first visible char based on render offset
+        // 根据渲染偏移计算第一个可见字符
         visibleTextStart = 0;
         float startX = 0;
         for(int i = 0; i < glyphCount; i++){
@@ -283,6 +296,7 @@ public class TextField extends Element implements Disableable{
         }
 
         // calculate last visible char based on visible width and render offset
+        // 根据可视宽度和渲染偏移计算最后一个可见字符
         int length = Math.min(displayText.length(), glyphPositions.length - 1);
         visibleTextEnd = Math.min(length, cursor + 1);
         for(; visibleTextEnd <= length; visibleTextEnd++)
@@ -296,6 +310,7 @@ public class TextField extends Element implements Disableable{
             textOffset = startX + renderOffset;
 
         // calculate selection x position and width
+        // 计算选区的 x 位置和宽度
         if(hasSelection){
             int minIndex = Math.min(cursor, selectionStart);
             int maxIndex = Math.max(cursor, selectionStart);
@@ -397,7 +412,10 @@ public class TextField extends Element implements Disableable{
         return textY;
     }
 
-    /** Draws selection rectangle **/
+    /**
+     * Draws selection rectangle
+     * 绘制选区矩形
+     */
     protected void drawSelection(Drawable selection, Font font, float x, float y){
         selection.draw(x + textOffset + selectionX + fontOffset, y - textHeight - font.getDescent(), selectionWidth, textHeight);
     }
@@ -474,7 +492,10 @@ public class TextField extends Element implements Disableable{
         }
     }
 
-    /** Copies the contents of this TextField to the lipboard implementation set on this TextField. */
+    /**
+     * Copies the contents of this TextField to the lipboard implementation set on this TextField.
+     * 将此 TextField 的内容复制到此 TextField 上设置的剪贴板实现。
+     */
     public void copy(){
         if(hasSelection && !passwordMode){
             Core.app.setClipboardText(text.substring(Math.min(cursor, selectionStart), Math.max(cursor, selectionStart)));
@@ -484,6 +505,8 @@ public class TextField extends Element implements Disableable{
     /**
      * Copies the selected contents of this TextField to the Clipboard implementation set on this TextField, then removes
      * it.
+     * <p>
+     * 将此 TextField 中选中的内容复制到此 TextField 上设置的 Clipboard 实现,然后将其删除。
      */
     public void cut(){
         cut(programmaticChangeEvents);
@@ -547,7 +570,9 @@ public class TextField extends Element implements Disableable{
 
     /**
      * Focuses the next TextField. If none is found, the keyboard is hidden. Does nothing if the text field is not in a stage.
-     * @param up If true, the TextField with the same or next smallest y coordinate is found, else the next highest.
+     * <p>
+     * 聚焦下一个 TextField。若未找到,则隐藏键盘。若文本输入框不在舞台中则不做任何操作。
+     * @param up If true, the TextField with the same or next smallest y coordinate is found, else the next highest. 为 true 时,查找 y 坐标相同或次小的 TextField,否则查找下一个更大的。
      */
     public void next(boolean up){
         Scene stage = getScene();
@@ -557,6 +582,7 @@ public class TextField extends Element implements Disableable{
             current.parent.localToStageCoordinates(tmp1.set(x, y));
             TextField textField = current.findNextTextField(stage.getElements(), null, tmp2, tmp1, up);
             if(textField == null){ // Try to wrap around.
+            // 尝试循环查找。
                 if(up)
                     tmp1.set(Float.MIN_VALUE, Float.MIN_VALUE);
                 else
@@ -597,7 +623,7 @@ public class TextField extends Element implements Disableable{
         return inputListener;
     }
 
-    /** @param listener May be null. */
+    /** @param listener May be null. 可以为 null。 */
     public void setTextFieldListener(TextFieldListener listener){
         this.listener = listener;
     }
@@ -618,7 +644,7 @@ public class TextField extends Element implements Disableable{
         return filter;
     }
 
-    /** @param filter May be null. */
+    /** @param filter May be null. 可以为 null。 */
     public void setFilter(TextFieldFilter filter){
         this.filter = filter;
     }
@@ -631,19 +657,24 @@ public class TextField extends Element implements Disableable{
         return validator;
     }
 
-    /** If true (the default), tab/shift+tab will move to the next text field. */
+    /**
+     * If true (the default), tab/shift+tab will move to the next text field.
+     * 为 true(默认)时,tab/shift+tab 会移动到下一个文本输入框。
+     */
     public void setFocusTraversal(boolean focusTraversal){
         this.focusTraversal = focusTraversal;
     }
 
-    /** @return May be null. */
+    /** @return May be null. 可以为 null。 */
     public String getMessageText(){
         return messageText;
     }
 
     /**
      * Sets the text that will be drawn in the text field if no text has been entered.
-     * @param messageText may be null.
+     * <p>
+     * 设置在未输入任何文本时绘制在文本输入框中的文本。
+     * @param messageText may be null. 可为 null。
      */
     public void setMessageText(String messageText){
         if(messageText != null && (messageText.startsWith("$") || messageText.startsWith("@")) && bundle != null && bundle.has(messageText.substring(1))){
@@ -653,7 +684,7 @@ public class TextField extends Element implements Disableable{
         }
     }
 
-    /** @param str If null, "" is used. */
+    /** @param str If null, "" is used. 若为 null,则使用 ""。 */
     public void appendText(String str){
         if(str == null) str = "";
 
@@ -662,12 +693,12 @@ public class TextField extends Element implements Disableable{
         paste(str, programmaticChangeEvents);
     }
 
-    /** @return Never null, might be an empty string. */
+    /** @return Never null, might be an empty string. 永不为 null,可能是空字符串。 */
     public String getText(){
         return text;
     }
 
-    /** @param str If null, "" is used. */
+    /** @param str If null, "" is used. 若为 null,则使用 ""。 */
     public void setText(String str){
         if(str == null) str = "";
         if(str.equals(text)) return;
@@ -681,8 +712,8 @@ public class TextField extends Element implements Disableable{
     }
 
     /**
-     * @param oldText May be null.
-     * @return True if the text was changed.
+     * @param oldText May be null. 可以为 null。
+     * @return True if the text was changed. 若文本被更改则返回 true。
      */
     boolean changeText(String oldText, String newText){
         if(newText.equals(oldText)) return false;
@@ -701,6 +732,8 @@ public class TextField extends Element implements Disableable{
     /**
      * If false, methods that change the text will not fire {@link ChangeEvent}, the event will be fired only when user changes
      * the text.
+     * <p>
+     * 为 false 时,修改文本的方法不会触发 {@link ChangeEvent},只有用户更改文本时才会触发该事件。
      */
     public void setProgrammaticChangeEvents(boolean programmaticChangeEvents){
         this.programmaticChangeEvents = programmaticChangeEvents;
@@ -714,7 +747,10 @@ public class TextField extends Element implements Disableable{
         return hasSelection ? text.substring(Math.min(selectionStart, cursor), Math.max(selectionStart, cursor)) : "";
     }
 
-    /** Sets the selected text. */
+    /**
+     * Sets the selected text.
+     * 设置选中的文本。
+     */
     public void setSelection(int selectionStart, int selectionEnd){
         if(selectionStart < 0) throw new IllegalArgumentException("selectionStart must be >= 0");
         if(selectionEnd < 0) throw new IllegalArgumentException("selectionEnd must be >= 0");
@@ -747,7 +783,10 @@ public class TextField extends Element implements Disableable{
         return cursor;
     }
 
-    /** Sets the cursor position and clears any selection. */
+    /**
+     * Sets the cursor position and clears any selection.
+     * 设置光标位置并清除所有选区。
+     */
     public void setCursorPosition(int cursorPosition){
         if(cursorPosition < 0) throw new IllegalArgumentException("cursorPosition must be >= 0");
         clearSelection();
@@ -781,6 +820,8 @@ public class TextField extends Element implements Disableable{
 
     /**
      * Sets text horizontal alignment (left, center or right).
+     * <p>
+     * 设置文本的水平对齐方式(左、中或右)。
      * @see Align
      */
     public void setAlignment(int alignment){
@@ -793,6 +834,8 @@ public class TextField extends Element implements Disableable{
 
     /**
      * If true, the text in this text field will be shown as bullet characters.
+     * <p>
+     * 为 true 时,此文本输入框中的文本将以圆点字符显示。
      * @see #setPasswordCharacter(char)
      */
     public void setPasswordMode(boolean passwordMode){
@@ -803,6 +846,8 @@ public class TextField extends Element implements Disableable{
     /**
      * Sets the password character for the text field. The character must be present in the {@link Font}. Default is 149
      * (bullet).
+     * <p>
+     * 设置文本输入框的密码字符。该字符必须存在于 {@link Font} 中。默认为 149(圆点)。
      */
     public void setPasswordCharacter(char passwordCharacter){
         this.passwordCharacter = passwordCharacter;
@@ -838,6 +883,8 @@ public class TextField extends Element implements Disableable{
 
     /**
      * Interface for listening to typed characters.
+     * <p>
+     * 用于监听输入字符的接口。
      * @author mzechner
      */
     public interface TextFieldListener{
@@ -846,6 +893,8 @@ public class TextField extends Element implements Disableable{
 
     /**
      * Interface for filtering characters entered into the text field.
+     * <p>
+     * 用于过滤输入到文本输入框中字符的接口。
      * @author mzechner
      */
     public interface TextFieldFilter{
@@ -861,19 +910,33 @@ public class TextField extends Element implements Disableable{
 
     /**
      * The style for a text field, see {@link TextField}.
+     * <p>
+     * 文本输入框的样式,见 {@link TextField}。
      * @author mzechner
      * @author Nathan Sweet
      */
     public static class TextFieldStyle extends Style{
         public Font font;
         public Color fontColor;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Color focusedFontColor, disabledFontColor;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Drawable background, focusedBackground, disabledBackground, invalidBackground, cursor, selection;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Font messageFont;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Color messageFontColor;
 
         public TextFieldStyle(){
@@ -903,7 +966,10 @@ public class TextField extends Element implements Disableable{
         }
     }
 
-    /** Basic input listener for the text field */
+    /**
+     * Basic input listener for the text field
+     * 文本输入框的基础输入监听器
+     */
     public class TextFieldClickListener extends ClickListener{
         @Override
         public void clicked(InputEvent event, float x, float y){
@@ -1035,6 +1101,7 @@ public class TextField extends Element implements Disableable{
                 }
             }else{
                 // Cursor movement or other keys (kills selection).
+                // 光标移动或其他按键(取消选区)。
                 if(keycode == KeyCode.left){
                     moveCursor(false, jump);
                     clearSelection();
@@ -1087,6 +1154,7 @@ public class TextField extends Element implements Disableable{
             if(disabled) return false;
 
             // Disallow "typing" most ASCII control characters, which would show up as a space when onlyFontChars is true.
+            // 禁止"输入"大多数 ASCII 控制字符,在 onlyFontChars 为 true 时它们会显示为空格。
             switch(character){
                 case DELETE:
                 case BACKSPACE:
@@ -1128,6 +1196,7 @@ public class TextField extends Element implements Disableable{
                     }
                     if(add && !remove){
                         // Character may be added to the text.
+                        // 允许将该字符添加到文本中。
                         if(filter != null && !filter.acceptChar(TextField.this, character)) return true;
                         if(!withinMaxLength(text.length())) return true;
                         String insertion = enter ? "\n" : String.valueOf(character);

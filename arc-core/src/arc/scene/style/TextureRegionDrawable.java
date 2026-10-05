@@ -8,6 +8,8 @@ import arc.util.Tmp;
 
 /**
  * Drawable for a {@link TextureRegion}.
+ * <p>
+ * {@link TextureRegion} 的可绘制对象。
  * @author Nathan Sweet
  */
 public class TextureRegionDrawable extends BaseDrawable implements TransformDrawable{
@@ -15,7 +17,10 @@ public class TextureRegionDrawable extends BaseDrawable implements TransformDraw
     protected Color tint = new Color(1f, 1f, 1f);
     protected float scale = 1f;
 
-    /** Creates an uninitialized TextureRegionDrawable. The texture region must be set before use. */
+    /**
+     * Creates an uninitialized TextureRegionDrawable. The texture region must be set before use.
+     * 创建未初始化的 TextureRegionDrawable。使用前必须先设置纹理区域。
+     */
     public TextureRegionDrawable(){
     }
 
@@ -65,12 +70,18 @@ public class TextureRegionDrawable extends BaseDrawable implements TransformDraw
         setMinHeight(Scl.scl(scale * region.height));
     }
 
-    /** Creates a new drawable that renders the same as this drawable tinted the specified color. */
+    /**
+     * Creates a new drawable that renders the same as this drawable tinted the specified color.
+     * 创建一个新可绘制对象,渲染效果与本可绘制对象相同,但以指定颜色着色。
+     */
     public Drawable tint(float r, float g, float b, float a){
         return tint(Tmp.c1.set(r, g, b, a));
     }
 
-    /** Creates a new drawable that renders the same as this drawable tinted the specified color. */
+    /**
+     * Creates a new drawable that renders the same as this drawable tinted the specified color.
+     * 创建一个新可绘制对象,渲染效果与本可绘制对象相同,但以指定颜色着色。
+     */
     public Drawable tint(Color tint){
         TextureRegionDrawable drawable = new TextureRegionDrawable(region);
         drawable.tint.set(tint);

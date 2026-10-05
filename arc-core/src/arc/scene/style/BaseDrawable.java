@@ -2,6 +2,8 @@ package arc.scene.style;
 
 /**
  * Drawable that stores the size information but doesn't draw anything.
+ * <p>
+ * 存储尺寸信息但不绘制任何内容的 Drawable。
  * @author Nathan Sweet
  */
 public class BaseDrawable implements Drawable{
@@ -11,7 +13,10 @@ public class BaseDrawable implements Drawable{
     public BaseDrawable(){
     }
 
-    /** Creates a new empty drawable with the same sizing information as the specified drawable. */
+    /**
+     * Creates a new empty drawable with the same sizing information as the specified drawable.
+     * 创建一个新的空 drawable,其尺寸信息与指定的 drawable 相同。
+     */
     public BaseDrawable(Drawable drawable){
         if(drawable instanceof BaseDrawable) name = ((BaseDrawable)drawable).getName();
         leftWidth = drawable.getLeftWidth();

@@ -9,6 +9,8 @@ import arc.scene.Element;
 /**
  * Detects tap, long press, fling, pan, zoom, and pinch gestures on an actor. If there is only a need to detect tap, use
  * {@link ClickListener}.
+ * <p>
+ * 检测元素上的点按、长按、快速滑动(fling)、平移(pan)、缩放(zoom)和双指捏合(pinch)手势。如果只需检测点按,请使用 {@link ClickListener}。
  * @author Nathan Sweet
  * @see GestureDetector
  */
@@ -126,6 +128,8 @@ public class ElementGestureListener implements EventListener{
     /**
      * If true is returned, additional gestures will not be triggered. No event is provided because this event is triggered by time
      * passing, not by an InputEvent.
+     * <p>
+     * 如果返回 true,将不会再触发其他手势。不提供事件参数,因为此事件由时间流逝触发,而非由 InputEvent 触发。
      */
     public boolean longPress(Element actor, float x, float y){
         return false;
@@ -134,7 +138,10 @@ public class ElementGestureListener implements EventListener{
     public void fling(InputEvent event, float velocityX, float velocityY, KeyCode button){
     }
 
-    /** The delta is the difference in stage coordinates since the last pan. */
+    /**
+     * The delta is the difference in stage coordinates since the last pan.
+     * 增量(delta)是自上次平移以来舞台坐标的差值。
+     */
     public void pan(InputEvent event, float x, float y, float deltaX, float deltaY){
     }
 

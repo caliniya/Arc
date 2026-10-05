@@ -4,13 +4,19 @@ import arc.scene.flabel.*;
 import arc.math.*;
 import arc.util.*;
 
-/** Makes the text jumps and falls as if there was gravity. */
+/**
+ * Makes the text jumps and falls as if there was gravity.
+ * 让文本像受重力作用一样跳跃和下落。
+ */
 public class JumpEffect extends FEffect{
     private static final float defaultFrequency = 50f, defaultDistance = 1.33f, defaultIntensity = 1f;
 
     public float distance = 1; // How much of their height they should move
+    // 移动距离相对于自身高度的比例
     public float frequency = 1; // How frequently the wave pattern repeats
+    // 波形图案的重复频率
     public float intensity = 1; // How fast the glyphs should move
+    // 字形移动的快慢
 
     @Override
     public void applyParams(String[] params){
@@ -22,12 +28,14 @@ public class JumpEffect extends FEffect{
     @Override
     protected void onApply(FLabel label, FGlyph glyph, int localIndex, float delta){
         // Calculate progress
+        // 计算进度
         float progressModifier = (1f / intensity) * defaultIntensity;
         float normalFrequency = (1f / frequency) * defaultFrequency;
         float progressOffset = localIndex / normalFrequency;
         float progress = calculateProgress(progressModifier, -progressOffset, false);
 
         // Calculate offset
+        // 计算偏移
         float interpolation = 0;
         float split = 0.2f;
         if(progress < split){
@@ -38,10 +46,12 @@ public class JumpEffect extends FEffect{
         float y = getLineHeight(label) * distance * interpolation * defaultDistance;
 
         // Calculate fadeout
+        // 计算淡出
         float fadeout = calculateFadeout();
         y *= fadeout;
 
         // Apply changes
+        // 应用更改
         glyph.yoffset += y;
     }
 

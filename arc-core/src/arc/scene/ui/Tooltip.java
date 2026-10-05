@@ -16,6 +16,8 @@ import static arc.scene.actions.Actions.*;
 
 /**
  * A listener that shows a tooltip element when another element is hovered over with the mouse.
+ * <p>
+ * 一种监听器,当鼠标悬停在另一个元素上时显示提示框元素。
  * @author Nathan Sweet
  */
 public class Tooltip extends InputListener{
@@ -49,6 +51,7 @@ public class Tooltip extends InputListener{
         };
         contents.get(container);
         //make scale/alpha small for fade in
+        // 为淡入将缩放/透明度设为较小值
         container.color.a = 0.2f;
         container.setScale(0.05f);
         container.touchable = Touchable.disabled;
@@ -62,12 +65,18 @@ public class Tooltip extends InputListener{
         return container;
     }
 
-    /** If true, this tooltip is shown without delay when hovered. */
+    /**
+     * If true, this tooltip is shown without delay when hovered.
+     * 为 true 时,悬停时此提示框立即显示,无延迟。
+     */
     public void setInstant(boolean instant){
         this.instant = instant;
     }
 
-    /** If true, this tooltip is shown even when tooltips are not {@link Tooltips#enabled}. */
+    /**
+     * If true, this tooltip is shown even when tooltips are not {@link Tooltips#enabled}.
+     * 为 true 时,即使提示框未 {@link Tooltips#enabled},此提示框也会显示。
+     */
     public void setAlways(boolean always){
         this.always = always;
     }
@@ -89,6 +98,7 @@ public class Tooltip extends InputListener{
     @Override
     public void touchUp(InputEvent event, float x, float y, int pointer, KeyCode button){
         //hide tooltip on touch up on mobile, since
+        // 在移动端触摸抬起时隐藏提示框,因为
         if(Core.app.isMobile() && allowMobile){
             hide();
         }
@@ -135,6 +145,7 @@ public class Tooltip extends InputListener{
     @Override
     public void exit(InputEvent event, float x, float y, int pointer, Element toActor){
         //on mobile, tooltips only hide once you stop holding.
+        // 在移动端,提示框只有在松手后才会隐藏。
         if(allowMobile && Core.app.isMobile()) return;
         if(toActor != null && toActor.isDescendantOf(event.listenerActor)) return;
         hide();
@@ -154,30 +165,54 @@ public class Tooltip extends InputListener{
 
     /**
      * Keeps track of an application's tooltips.
+     * <p>
+     * 管理应用程序的提示框。
      * @author Nathan Sweet
      */
     public static class Tooltips{
         private static Tooltips instance;
 
-        /** Default text tooltip provider. */
+        /**
+         * Default text tooltip provider.
+         * 默认的文本提示框提供者。
+         */
         public Func<String, Tooltip> textProvider = text -> new Tooltip(t -> t.add(text));
         /**
          * Seconds from when an element is hovered to when the tooltip is shown. Default is 2.
+         * <p>
+         * 从元素被悬停到提示框显示的秒数。默认为 2。
          */
         public float initialTime = 2;
-        /** Once a tooltip is shown, this is used instead of {@link #initialTime}. Default is 0. */
+        /**
+         * Once a tooltip is shown, this is used instead of {@link #initialTime}. Default is 0.
+         * 提示框显示过一次后,将使用此值代替 {@link #initialTime}。默认为 0。
+         */
         public float subsequentTime = 0;
-        /** Seconds to use {@link #subsequentTime}. Default is 1.5. */
+        /**
+         * Seconds to use {@link #subsequentTime}. Default is 1.5.
+         * 使用 {@link #subsequentTime} 的秒数。默认为 1.5。
+         */
         public float resetTime = 1.5f;
-        /** If false, tooltips will not be shown. Default is true. */
+        /**
+         * If false, tooltips will not be shown. Default is true.
+         * 为 false 时,将不显示提示框。默认为 true。
+         */
         public boolean enabled = true;
-        /** If false, tooltips will be shown without animations. Default is true. */
+        /**
+         * If false, tooltips will be shown without animations. Default is true.
+         * 为 false 时,提示框将以无动画方式显示。默认为 true。
+         */
         public boolean animations = false;
-        /** The distance from the mouse position to offset the tooltip element. Default is 15,19. */
+        /**
+         * The distance from the mouse position to offset the tooltip element. Default is 15,19.
+         * 提示框元素相对鼠标位置的偏移距离。默认为 15,19。
+         */
         public float offsetX = 15, offsetY = 19;
         /**
          * The distance from the tooltip element position to the edge of the screen where the element will be shown on the other side of
          * the mouse cursor. Default is 7.
+         * <p>
+         * 提示框元素位置与屏幕边缘的距离,当达到该距离时元素将显示在鼠标光标的另一侧。默认为 7。
          */
         public float edgeDistance = 7;
 
@@ -258,7 +293,10 @@ public class Tooltip extends InputListener{
             }
         }
 
-        /** Called when tooltip is shown. Default implementation sets actions to animate showing. */
+        /**
+         * Called when tooltip is shown. Default implementation sets actions to animate showing.
+         * 提示框显示时调用。默认实现设置动画显示的动作。
+         */
         protected void showAction(Tooltip tooltip){
             float actionTime = animations ? (time > 0 ? 0.5f : 0.15f) : 0.1f;
             tooltip.container.setTransform(true);
@@ -268,13 +306,18 @@ public class Tooltip extends InputListener{
         /**
          * Called when tooltip is hidden. Default implementation sets actions to animate hiding and to remove the element from the stage
          * when the actions are complete. A subclass must at least remove the element.
+         * <p>
+         * 提示框隐藏时调用。默认实现设置动画隐藏的动作,并在动作完成后将元素从舞台上移除。子类必须至少移除该元素。
          */
         protected void hideAction(Tooltip tooltip){
             tooltip.container
             .addAction(sequence(parallel(alpha(0.2f, 0.2f, fade), scaleTo(0.05f, 0.05f, 0.2f, Interp.fade)), remove()));
         }
 
-        /** Shows all tooltips on hover without a delay for {@link #resetTime} seconds. */
+        /**
+         * Shows all tooltips on hover without a delay for {@link #resetTime} seconds.
+         * 在 {@link #resetTime} 秒内,悬停时无延迟显示所有提示框。
+         */
         public void instant(){
             time = 0;
             showTask.run();

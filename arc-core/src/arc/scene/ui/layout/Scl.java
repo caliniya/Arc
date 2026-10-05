@@ -2,7 +2,10 @@ package arc.scene.ui.layout;
 
 import arc.*;
 
-/** Utilities for UI scale.*/
+/**
+ * Utilities for UI scale.
+ * UI 缩放工具类。
+ */
 public class Scl{
     private static float scl = -1;
     private static float addition = 0f;
@@ -26,10 +29,12 @@ public class Scl{
     public static float scl(float amount){
         if(scl < 0f){
             //calculate scaling value if it hasn't been set yet
+            // 若尚未设置,则计算缩放值
             if(Core.app.isDesktop() || Core.app.isWeb()){
                 scl = product;
             }else{
                 //mobile scaling
+                // 移动端缩放
                 scl = Math.max(Math.round((Core.graphics.getDensity() / 1.5f + addition) / 0.5) * 0.5f, 1f) * product;
             }
         }

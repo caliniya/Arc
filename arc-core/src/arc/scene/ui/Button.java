@@ -25,6 +25,8 @@ import static arc.Core.*;
  * was previously.
  * <p>
  * The preferred size of the button is determined by the background and the button contents.
+ * <p>
+ * 按钮是一个带有选中(checked)状态的 {@link Table},并包含用于按下、未按下和选中状态的额外 {@link ButtonStyle 样式} 字段。按钮每次被点击时,选中状态都会切换。作为表格,按钮可以包含任何其他元素。<br> <br> 当背景改变时,按钮的内边距会被设置为背景可绘制对象的内边距,并覆盖手动设置的内边距。内边距仍可以在按钮的表格单元格上设置。 <p> 按钮被点击时会触发 {@link ChangeEvent}。取消该事件会将按钮的选中状态恢复为之前的状态。 <p> 按钮的首选大小由背景和按钮内容决定。
  * @author Nathan Sweet
  */
 public class Button extends Table implements Disableable{
@@ -41,7 +43,10 @@ public class Button extends Table implements Disableable{
         setSize(getPrefWidth(), getPrefHeight());
     }
 
-    /** Creates a button without setting the style or size. At least a style must be set before using this button. */
+    /**
+     * Creates a button without setting the style or size. At least a style must be set before using this button.
+     * 创建按钮,但不设置样式和大小。使用此按钮前至少必须设置一个样式。
+     */
     public Button(){
         initialize();
         this.style = scene.getStyle(ButtonStyle.class);
@@ -111,6 +116,8 @@ public class Button extends Table implements Disableable{
     /**
      * Toggles the checked state. This method changes the checked state, which fires a {@link ChangeEvent} (if programmatic change
      * events are enabled), so can be used to simulate a button click.
+     * <p>
+     * 切换选中状态。此方法会改变选中状态并触发 {@link ChangeEvent}(若程序化变更事件已启用),因此可用于模拟按钮点击。
      */
     public void toggle(){
         setChecked(!isChecked);
@@ -145,7 +152,10 @@ public class Button extends Table implements Disableable{
         this.disabledProvider = prov;
     }
 
-    /** When true, the button will not toggle {@link #isChecked()} when clicked and will not fire a {@link ChangeEvent}. */
+    /**
+     * When true, the button will not toggle {@link #isChecked()} when clicked and will not fire a {@link ChangeEvent}.
+     * 为 true 时,按钮被点击时不会切换 {@link #isChecked()},也不会触发 {@link ChangeEvent}。
+     */
     @Override
     public void setDisabled(boolean isDisabled){
         this.isDisabled = isDisabled;
@@ -168,6 +178,8 @@ public class Button extends Table implements Disableable{
     /**
      * If false, {@link #setChecked(boolean)} and {@link #toggle()} will not fire {@link ChangeEvent}, event will be fired only
      * when user clicked the button
+     * <p>
+     * 为 false 时,{@link #setChecked(boolean)} 和 {@link #toggle()} 不会触发 {@link ChangeEvent},只有当用户点击按钮时才会触发该事件。
      */
     public void setProgrammaticChangeEvents(boolean programmaticChangeEvents){
         this.programmaticChangeEvents = programmaticChangeEvents;
@@ -176,6 +188,8 @@ public class Button extends Table implements Disableable{
     /**
      * Returns the button's style. Modifying the returned style may not have an effect until {@link #setStyle(ButtonStyle)} is
      * called.
+     * <p>
+     * 返回按钮的样式。在调用 {@link #setStyle(ButtonStyle)} 之前,修改返回的样式可能不会生效。
      */
     public ButtonStyle getStyle(){
         return style;
@@ -201,7 +215,7 @@ public class Button extends Table implements Disableable{
         setBackground(background);
     }
 
-    /** @return May be null. */
+    /** @return May be null. 可以为 null。 */
     public ButtonGroup getButtonGroup(){
         return buttonGroup;
     }
@@ -283,12 +297,20 @@ public class Button extends Table implements Disableable{
 
     /**
      * The style for a button, see {@link Button}.
+     * <p>
+     * 按钮的样式,见 {@link Button}。
      * @author mzechner
      */
     public static class ButtonStyle extends Style{
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Drawable up, down, over, checked, checkedOver, disabled;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public float pressedOffsetX, pressedOffsetY, unpressedOffsetX,
         unpressedOffsetY, checkedOffsetX, checkedOffsetY;
 

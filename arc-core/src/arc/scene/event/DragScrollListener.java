@@ -7,6 +7,8 @@ import arc.util.Timer.Task;
 
 /**
  * Causes a scroll pane to scroll when a drag goes outside the bounds of the scroll pane.
+ * <p>
+ * 当拖动超出滚动面板的边界时,使滚动面板产生滚动。
  * @author Nathan Sweet
  */
 public class DragScrollListener extends DragListener{

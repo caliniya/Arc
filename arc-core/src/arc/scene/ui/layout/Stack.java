@@ -37,6 +37,8 @@ import arc.scene.event.Touchable;
  * <p>
  * The preferred and min size of the stack is the largest preferred and min size of any children. The max size of the stack is the
  * smallest max size of any children.
+ * <p>
+ * 一种容器,将其子元素调整为自身大小,并把它们在 0,0 位置上彼此叠放。 <p> 堆栈的首选大小和最小大小是所有子元素中最大的首选大小和最小大小;堆栈的最大大小是所有子元素中最小的最大大小。
  * @author Nathan Sweet
  */
 public class Stack extends WidgetGroup{

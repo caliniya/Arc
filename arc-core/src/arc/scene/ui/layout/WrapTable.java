@@ -5,7 +5,10 @@ import arc.scene.style.*;
 import arc.struct.*;
 import arc.util.*;
 
-/** A table that autowraps instead of using standard table layout. */
+/**
+ * A table that autowraps instead of using standard table layout.
+ * 一种自动换行而非使用标准表格布局的表格。
+ */
 public class WrapTable extends Table{
     private static FloatAr rowHeights = new FloatAr();
     private static IntAr cellRow = new IntAr();
@@ -113,6 +116,7 @@ public class WrapTable extends Table{
          float maxRowWidth = Math.max(0f, layoutWidth - hpadding);
 
          // Recheck height against the real width, since computeSize may have guessed before width was set.
+         // 根据实际宽度重新检查高度,因为 computeSize 可能在宽度设置前进行了猜测。
          if(Math.abs(maxRowWidth - lastComputeWidth) > 0.001f){
              lastComputeWidth = maxRowWidth;
              float newMinHeight = wrapHeight(maxRowWidth) + vpadding;
@@ -160,12 +164,14 @@ public class WrapTable extends Table{
          if((align & Align.right) != 0)
              x += layoutWidth - tableWidth;
          else if((align & Align.left) == 0) // Center
+         // 居中
              x += (layoutWidth - tableWidth) / 2;
 
          float y = layoutY + padTop;
          if((align & Align.bottom) != 0)
              y += layoutHeight - tableHeight;
          else if((align & Align.top) == 0) // Center
+         // 居中
              y += (layoutHeight - tableHeight) / 2;
 
          currentX = 0;

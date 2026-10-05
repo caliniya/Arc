@@ -20,6 +20,8 @@ import static arc.Core.scene;
  * A text label, with optional word wrapping.
  * <p>
  * The preferred size of the label is determined by the actual text bounds, unless {@link #setWrap(boolean) word wrap} is enabled.
+ * <p>
+ * 文本标签,支持可选的自动换行。 <p> 标签的首选大小由实际文本边界决定,除非启用了 {@link #setWrap(boolean) 自动换行}。
  * @author Nathan Sweet
  */
 public class Label extends Element{
@@ -69,6 +71,8 @@ public class Label extends Element{
     /**
      * Returns the label's style. Modifying the returned style may not have an effect until {@link #setStyle(LabelStyle)} is
      * called.
+     * <p>
+     * 返回标签的样式。在调用 {@link #setStyle(LabelStyle)} 之前,修改返回的样式可能不会生效。
      */
     public LabelStyle getStyle(){
         return style;
@@ -107,7 +111,7 @@ public class Label extends Element{
     }
 
     /**
-     * @param newText May be null, "" will be used.
+     * @param newText May be null, "" will be used. 可以为 null,此时使用 ""。
      * If this text starts with '$' or '@', this label will look in {@link Core#bundle} for matching text.
      */
     public void setText(CharSequence newText){
@@ -180,6 +184,7 @@ public class Label extends Element{
         float textWidth, textHeight;
         if(wrap || text.indexOf("\n") != -1){
             // If the text can span multiple lines, determine the text's actual size so it can be aligned within the label.
+            // 若文本可跨越多行,则计算文本的实际大小,以便在标签内对齐。
             layout.setText(font, text, 0, text.length(), Color.white, width, lineAlign, wrap, ellipsis);
             textWidth = layout.width;
             textHeight = layout.height;
@@ -230,6 +235,7 @@ public class Label extends Element{
     @Override
     public float getMinWidth(){
         //wrapped labels don't use their 'pref' width as their min width, as that would be the incorrect, unwrapped width
+        // 启用换行的标签不会把首选宽度当作最小宽度,因为那是未换行时的错误宽度
         return wrap ? 0 : super.getMinWidth();
     }
 
@@ -271,7 +277,9 @@ public class Label extends Element{
      * When wrap is enabled, the label's preferred height depends on the width of the label. In some cases the parent of the label
      * will need to layout twice: once to set the width of the label and a second time to adjust to the label's new preferred
      * height.
-     * @param wrapFit if true, labels will have a prefWidth of 0, and need to have an explicit wrap size set. if false, they will occupy all horizontal space unless an explicit size is set.
+     * <p>
+     * 为 false 时,文本只在包含换行符 (\n) 的地方换行。标签的首选大小为文本边界。为 true 时,文本会根据标签的宽度自动换行,标签的首选宽度将为 0,预期由外部设置标签的宽度。启用省略号时不会发生换行。默认为 false。 <p> 启用换行后,标签的首选高度取决于标签的宽度。某些情况下,标签的父级需要布局两次:第一次设置标签的宽度,第二次根据标签新的首选高度进行调整。
+     * @param wrapFit if true, labels will have a prefWidth of 0, and need to have an explicit wrap size set. if false, they will occupy all horizontal space unless an explicit size is set. 为 true 时,标签的 prefWidth 为 0,需要显式设置换行宽度。为 false 时,除非显式设置大小,否则标签将占据全部水平空间。
      */
     public void setWrap(boolean wrap, boolean wrapFit){
         this.wrap = wrap;
@@ -288,8 +296,8 @@ public class Label extends Element{
     }
 
     /**
-     * @param alignment Aligns all the text within the label (default left center) and each line of text horizontally (default
-     * left).
+     * @param alignment Aligns all the text within the label (default left center) and each line of text horizontally (default 对齐标签内的所有文本(默认左中),并将每行文本水平对齐(默认
+     * left). 左对齐)。
      * @see Align
      */
     public void setAlignment(int alignment){
@@ -297,8 +305,8 @@ public class Label extends Element{
     }
 
     /**
-     * @param labelAlign Aligns all the text within the label (default left center).
-     * @param lineAlign Aligns each line of text horizontally (default left).
+     * @param labelAlign Aligns all the text within the label (default left center). 对齐标签内的所有文本(默认左中)。
+     * @param lineAlign Aligns each line of text horizontally (default left). 水平对齐每一行文本(默认左对齐)。
      * @see Align
      */
     public void setAlignment(int labelAlign, int lineAlign){
@@ -344,6 +352,8 @@ public class Label extends Element{
     /**
      * When non-null the text will be truncated "..." if it does not fit within the width of the label. Wrapping will not occur
      * when ellipsis is enabled. Default is false.
+     * <p>
+     * 非 null 时,若文本无法容纳在标签宽度内,则会被截断为 "..."。启用省略号时不会发生换行。默认为 false。
      */
     public void setEllipsis(String ellipsis){
         this.ellipsis = ellipsis;
@@ -352,6 +362,8 @@ public class Label extends Element{
     /**
      * When true the text will be truncated "..." if it does not fit within the width of the label. Wrapping will not occur when
      * ellipsis is true. Default is false.
+     * <p>
+     * 为 true 时,若文本无法容纳在标签宽度内,则会被截断为 "..."。省略号为 true 时不会发生换行。默认为 false。
      */
     public void setEllipsis(boolean ellipsis){
         if(ellipsis)
@@ -360,7 +372,10 @@ public class Label extends Element{
             this.ellipsis = null;
     }
 
-    /** Allows subclasses to access the cache. */
+    /**
+     * Allows subclasses to access the cache.
+     * 允许子类访问缓存。
+     */
     public FontCache getFontCache(){
         return cache;
     }
@@ -371,13 +386,21 @@ public class Label extends Element{
 
     /**
      * The style for a label, see {@link Label}.
+     * <p>
+     * 标签的样式,见 {@link Label}。
      * @author Nathan Sweet
      */
     public static class LabelStyle extends Style{
         public Font font;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Color fontColor;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Drawable background;
 
         public LabelStyle(){

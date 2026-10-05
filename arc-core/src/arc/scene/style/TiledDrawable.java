@@ -7,6 +7,8 @@ import arc.util.Tmp;
 
 /**
  * Draws a {@link TextureRegion} repeatedly to fill the area, instead of stretching it.
+ * <p>
+ * 重复绘制 {@link TextureRegion} 以填充区域,而不是拉伸它。
  * @author Nathan Sweet
  */
 public class TiledDrawable extends TextureRegionDrawable{
@@ -58,6 +60,7 @@ public class TiledDrawable extends TextureRegionDrawable{
         float v2 = region.v2;
         if(remainingX > 0){
             // Right edge.
+            // 右边缘。
             float u2 = u + remainingX / texture.width;
             float v = region.v;
             y = startY;
@@ -69,6 +72,7 @@ public class TiledDrawable extends TextureRegionDrawable{
                 y += regionHeight;
             }
             // Upper right corner.
+            // 右上角。
             if(remainingY > 0){
                 v = v2 - remainingY / texture.height;
                 Tmp.tr1.set(texture);
@@ -79,6 +83,7 @@ public class TiledDrawable extends TextureRegionDrawable{
         }
         if(remainingY > 0){
             // Top edge.
+            // 顶边。
             float u2 = region.u2;
             float v = v2 - remainingY / texture.height;
             x = startX;

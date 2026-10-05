@@ -12,12 +12,17 @@ import arc.graphics.g2d.NinePatch;
  * <p>
  * The min size is set to the ninepatch total size by default. It could be set to the left+right and top+bottom, excluding the
  * middle size, to allow the drawable to be sized down as small as possible.
+ * <p>
+ * {@link NinePatch} 的可绘制对象。 <p> 设置 ninepatch 时会确定可绘制对象的尺寸,但两者是相互独立的值。例如,可以将 {@link Drawable#getLeftWidth()} 设置为大于 {@link NinePatch#getLeftWidth()} 的值,以便在左侧提供比 ninepatch 中实际存在的更多的空间。 <p> 最小尺寸默认为 ninepatch 的总尺寸。也可以将其设置为左+右、上+下之和(不含中间区域),从而使可绘制对象能缩小到尽可能小的尺寸。
  * @author Nathan Sweet
  */
 public class NinePatchDrawable extends BaseDrawable implements TransformDrawable{
     protected NinePatch patch;
 
-    /** Creates an uninitialized NinePatchDrawable. The ninepatch must be {@link #setPatch(NinePatch) set} before use. */
+    /**
+     * Creates an uninitialized NinePatchDrawable. The ninepatch must be {@link #setPatch(NinePatch) set} before use.
+     * 创建未初始化的 NinePatchDrawable。使用前必须先 {@link #setPatch(NinePatch) 设置} ninepatch。
+     */
     public NinePatchDrawable(){
     }
 
@@ -54,14 +59,20 @@ public class NinePatchDrawable extends BaseDrawable implements TransformDrawable
         setLeftWidth(patch.getPadLeft());
     }
 
-    /** Creates a new drawable that renders the same as this drawable tinted the specified color. */
+    /**
+     * Creates a new drawable that renders the same as this drawable tinted the specified color.
+     * 创建一个新可绘制对象,渲染效果与本可绘制对象相同,但以指定颜色着色。
+     */
     public NinePatchDrawable tint(Color tint){
         NinePatchDrawable drawable = new NinePatchDrawable(this);
         drawable.setPatch(new NinePatch(drawable.getPatch(), tint));
         return drawable;
     }
 
-    /** Creates a new drawable that renders the same as this drawable with a top-to-bottom gradient tint. */
+    /**
+     * Creates a new drawable that renders the same as this drawable with a top-to-bottom gradient tint.
+     * 创建一个新可绘制对象,渲染效果与本可绘制对象相同,但使用自上而下的渐变着色。
+     */
     public NinePatchDrawable tint(Color top, Color bottom){
         NinePatchDrawable drawable = new NinePatchDrawable(this);
         drawable.setPatch(new NinePatch(drawable.getPatch(), top, bottom));

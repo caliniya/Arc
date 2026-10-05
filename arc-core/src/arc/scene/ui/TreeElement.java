@@ -21,6 +21,8 @@ import static arc.Core.*;
  * The preferred size of the tree is determined by the preferred size of the elements for the expanded nodes.
  * <p>
  * {@link ChangeEvent} is fired when the selected node changes.
+ * <p>
+ * 一种树形控件,每个节点都有一个图标、一个元素和若干子节点。 <p> 树的首选大小由已展开节点元素的首选大小决定。 <p> 选中节点变化时会触发 {@link ChangeEvent}。
  * @author Nathan Sweet
  */
 public class TreeElement extends WidgetGroup{
@@ -102,6 +104,7 @@ public class TreeElement extends WidgetGroup{
                 if(node != getNodeAt(getTouchDownY())) return;
                 if(selection.getMultiple() && selection.hasItems() && Core.input.shift()){
                     // Select range (shift).
+                    // 范围选择(shift)。
                     if(rangeStart == null) rangeStart = node;
                     TreeElementNode rangeStart = TreeElement.this.rangeStart;
                     if(!Core.input.ctrl()) selection.clear();
@@ -119,6 +122,7 @@ public class TreeElement extends WidgetGroup{
                 }
                 if(node.hasChildren() && (!selection.getMultiple() || !Core.input.ctrl())){
                     // Toggle expanded.
+                    // 切换展开状态。
                     float rowX = node.element.x;
                     if(node.icon != null) rowX -= iconSpacingRight + node.icon.getMinWidth();
                     if(x < rowX){
@@ -167,7 +171,10 @@ public class TreeElement extends WidgetGroup{
         invalidateHierarchy();
     }
 
-    /** Removes all tree nodes. */
+    /**
+     * Removes all tree nodes.
+     * 移除所有树节点。
+     */
     @Override
     public void clearChildren(){
         super.clearChildren();
@@ -250,9 +257,13 @@ public class TreeElement extends WidgetGroup{
         Draw.color(color.r, color.g, color.b, color.a * parentAlpha);
         draw(rootNodes, leftColumnWidth);
         super.draw(); // Draw elements.
+        // 绘制元素。
     }
 
-    /** Called to draw the background. Default implementation draws the style background drawable. */
+    /**
+     * Called to draw the background. Default implementation draws the style background drawable.
+     * 用于绘制背景。默认实现绘制样式的背景可绘制对象。
+     */
     protected void drawBackground(){
         if(style.background != null){
             Color color = this.color;
@@ -261,7 +272,10 @@ public class TreeElement extends WidgetGroup{
         }
     }
 
-    /** Draws selection, icons, and expand icons. */
+    /**
+     * Draws selection, icons, and expand icons.
+     * 绘制选区、图标和展开图标。
+     */
     private void draw(Ar<TreeElementNode> nodes, float indent){
         Drawable plus = style.plus, minus = style.minus;
         float x = this.x, y = this.y;
@@ -293,7 +307,7 @@ public class TreeElement extends WidgetGroup{
         }
     }
 
-    /** @return May be null. */
+    /** @return May be null. 可以为 null。 */
     public TreeElementNode getNodeAt(float y){
         foundNode = null;
         getNodeAt(rootNodes, y, getHeight());
@@ -305,6 +319,7 @@ public class TreeElement extends WidgetGroup{
             TreeElementNode node = nodes.get(i);
             float height = node.height;
             rowY -= node.getHeight() - height; // Node subclass may increase getHeight.
+            // 节点子类可能会增大 getHeight。
             if(y >= rowY - height - ySpacing && y < rowY){
                 foundNode = node;
                 return -1;
@@ -345,28 +360,34 @@ public class TreeElement extends WidgetGroup{
         return rootNodes;
     }
 
-    /** @return May be null. */
+    /** @return May be null. 可以为 null。 */
     public TreeElementNode getOverNode(){
         return overNode;
     }
 
-    /** @param overNode May be null. */
+    /** @param overNode May be null. 可以为 null。 */
     public void setOverNode(TreeElementNode overNode){
         this.overNode = overNode;
     }
 
-    /** @return May be null. */
+    /** @return May be null. 可以为 null。 */
     public Object getOverObject(){
         if(overNode == null) return null;
         return overNode.getObject();
     }
 
-    /** Sets the amount of horizontal space between the nodes and the left/right edges of the tree. */
+    /**
+     * Sets the amount of horizontal space between the nodes and the left/right edges of the tree.
+     * 设置节点与树左/右边缘之间的水平间距。
+     */
     public void setPadding(float padding){
         this.padding = padding;
     }
 
-    /** Returns the amount of horizontal space for indentation level. */
+    /**
+     * Returns the amount of horizontal space for indentation level.
+     * 返回每个缩进级别的水平间距。
+     */
     public float getIndentSpacing(){
         return indentSpacing;
     }
@@ -375,12 +396,18 @@ public class TreeElement extends WidgetGroup{
         return ySpacing;
     }
 
-    /** Sets the amount of vertical space between nodes. */
+    /**
+     * Sets the amount of vertical space between nodes.
+     * 设置节点之间的垂直间距。
+     */
     public void setYSpacing(float ySpacing){
         this.ySpacing = ySpacing;
     }
 
-    /** Sets the amount of horizontal space between the node elements and icons. */
+    /**
+     * Sets the amount of horizontal space between the node elements and icons.
+     * 设置节点元素与图标之间的水平间距。
+     */
     public void setIconSpacing(float left, float right){
         this.iconSpacingLeft = left;
         this.iconSpacingRight = right;
@@ -412,7 +439,10 @@ public class TreeElement extends WidgetGroup{
         }
     }
 
-    /** Returns the node with the specified object, or null. */
+    /**
+     * Returns the node with the specified object, or null.
+     * 返回具有指定对象的节点,若无则返回 null。
+     */
     public TreeElementNode findNode(Object object){
         if(object == null) throw new IllegalArgumentException("object cannot be null.");
         return findNode(rootNodes, object);
@@ -426,7 +456,10 @@ public class TreeElement extends WidgetGroup{
         expandAll(rootNodes);
     }
 
-    /** Returns the click listener the tree uses for clicking on nodes and the over node. */
+    /**
+     * Returns the click listener the tree uses for clicking on nodes and the over node.
+     * 返回树用于节点点击和悬停节点检测的点击监听器。
+     */
     public ClickListener getClickListener(){
         return clickListener;
     }
@@ -449,7 +482,9 @@ public class TreeElement extends WidgetGroup{
 
         /**
          * Adds a child node provider that only gets called on-demand.
-         * @return this
+         * <p>
+         * 添加仅在需要时才调用的子节点提供者。
+         * @return this 自身
          * */
         public TreeElementNode children(Cons<Cons<TreeElementNode>> provider){
             childProvider = provider;
@@ -465,7 +500,10 @@ public class TreeElement extends WidgetGroup{
             return childProvider != null || children.size > 0;
         }
 
-        /** Called to add the element to the tree when the node's parent is expanded. */
+        /**
+         * Called to add the element to the tree when the node's parent is expanded.
+         * 当节点的父节点展开时,调用此方法将元素添加到树中。
+         */
         protected void addToTree(TreeElement tree){
             tree.addChild(element);
             if(!expanded) return;
@@ -480,7 +518,10 @@ public class TreeElement extends WidgetGroup{
             }
         }
 
-        /** Called to remove the element from the tree when the node's parent is collapsed. */
+        /**
+         * Called to remove the element from the tree when the node's parent is collapsed.
+         * 当节点的父节点折叠时,调用此方法从树中移除元素。
+         */
         protected void removeFromTree(TreeElement tree){
             tree.removeChild(element);
             if(!expanded) return;
@@ -533,7 +574,10 @@ public class TreeElement extends WidgetGroup{
             children.clear();
         }
 
-        /** Returns the tree this node is currently in, or null. */
+        /**
+         * Returns the tree this node is currently in, or null.
+         * 返回此节点当前所在的树,若无则返回 null。
+         */
         public TreeElement getTree(){
             Group parent = element.parent;
             if(!(parent instanceof TreeElement)) return null;
@@ -564,7 +608,10 @@ public class TreeElement extends WidgetGroup{
             tree.invalidateHierarchy();
         }
 
-        /** If the children order is changed, {@link #updateChildren()} must be called. */
+        /**
+         * If the children order is changed, {@link #updateChildren()} must be called.
+         * 若子节点顺序被更改,必须调用 {@link #updateChildren()}。
+         */
         public Ar<TreeElementNode> getChildren(){
             return children;
         }
@@ -577,7 +624,7 @@ public class TreeElement extends WidgetGroup{
                 children.get(i).addToTree(tree);
         }
 
-        /** @return May be null. */
+        /** @return May be null. 可以为 null。 */
         public TreeElementNode getParent(){
             return parent;
         }
@@ -586,7 +633,10 @@ public class TreeElement extends WidgetGroup{
             return object;
         }
 
-        /** Sets an application specific object for this node. */
+        /**
+         * Sets an application specific object for this node.
+         * 为此节点设置一个应用特定的对象。
+         */
         public void setObject(Object object){
             this.object = object;
         }
@@ -595,7 +645,10 @@ public class TreeElement extends WidgetGroup{
             return icon;
         }
 
-        /** Sets an icon that will be drawn to the left of the element. */
+        /**
+         * Sets an icon that will be drawn to the left of the element.
+         * 设置将绘制在元素左侧的图标。
+         */
         public void setIcon(Drawable icon){
             this.icon = icon;
         }
@@ -610,26 +663,38 @@ public class TreeElement extends WidgetGroup{
             return level;
         }
 
-        /** Returns this node or the child node with the specified object, or null. */
+        /**
+         * Returns this node or the child node with the specified object, or null.
+         * 返回此节点或具有指定对象的子节点,若无则返回 null。
+         */
         public TreeElementNode findNode(Object object){
             if(object == null) throw new IllegalArgumentException("object cannot be null.");
             if(object.equals(this.object)) return this;
             return TreeElement.findNode(children, object);
         }
 
-        /** Collapses all nodes under and including this node. */
+        /**
+         * Collapses all nodes under and including this node.
+         * 折叠此节点及其下方的所有节点。
+         */
         public void collapseAll(){
             setExpanded(false);
             TreeElement.collapseAll(children);
         }
 
-        /** Expands all nodes under and including this node. */
+        /**
+         * Expands all nodes under and including this node.
+         * 展开此节点及其下方的所有节点。
+         */
         public void expandAll(){
             setExpanded(true);
             if(children.size > 0) TreeElement.expandAll(children);
         }
 
-        /** Expands all parent nodes of this node. */
+        /**
+         * Expands all parent nodes of this node.
+         * 展开此节点的所有父节点。
+         */
         public void expandTo(){
             TreeElementNode node = parent;
             while(node != null){
@@ -663,6 +728,8 @@ public class TreeElement extends WidgetGroup{
         /**
          * Returns the height of the node as calculated for layout. A subclass may override and increase the returned height to
          * create a blank space in the tree above the node, eg for a separator.
+         * <p>
+         * 返回为布局计算的节点高度。子类可以重写并增大返回的高度,以在树中该节点上方留出空白,例如用作分隔符。
          */
         public float getHeight(){
             return height;
@@ -671,11 +738,16 @@ public class TreeElement extends WidgetGroup{
 
     /**
      * The style for a {@link TreeElement}.
+     * <p>
+     * {@link TreeElement} 的样式。
      * @author Nathan Sweet
      */
     public static class TreeStyle{
         public Drawable plus, minus;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Drawable over, selection, background;
 
         public TreeStyle(){

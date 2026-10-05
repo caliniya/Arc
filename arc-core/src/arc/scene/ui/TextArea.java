@@ -12,20 +12,41 @@ import arc.struct.*;
 import arc.util.*;
 import arc.util.pooling.*;
 
-/** A multiple-line text input field, entirely based on {@link TextField} */
+/**
+ * A multiple-line text input field, entirely based on {@link TextField}
+ * 多行文本输入框,完全基于 {@link TextField}
+ */
 public class TextArea extends TextField{
 
-    /** Array storing starting and ending positions of each line. **/
+    /**
+     * Array storing starting and ending positions of each line.
+     * 存储每行起始和结束位置的数组。
+     */
     protected IntAr linesBreak;
-    /** Current line for the cursor **/
+    /**
+     * Current line for the cursor
+     * 光标当前所在的行
+     */
     protected int cursorLine;
-    /** Index of the first line showed by the text area **/
+    /**
+     * Index of the first line showed by the text area
+     * 文本区域显示的第一行的索引
+     */
     protected int firstLineShowing;
-    /** Variable to maintain the x offset of the cursor when moving up and down. If it's set to -1, the offset is reset **/
+    /**
+     * Variable to maintain the x offset of the cursor when moving up and down. If it's set to -1, the offset is reset
+     * 在上下移动光标时保持光标 x 偏移的变量。若设为 -1,则重置该偏移
+     */
     protected float moveOffset;
-    /** Last text processed. This attribute is used to avoid unnecessary computations while calculating offsets **/
+    /**
+     * Last text processed. This attribute is used to avoid unnecessary computations while calculating offsets
+     * 上次处理的文本。此属性用于在计算偏移时避免不必要的计算
+     */
     protected String lastText;
-    /** Number of lines showed by the text area **/
+    /**
+     * Number of lines showed by the text area
+     * 文本区域显示的行数
+     */
     protected int linesShowing;
     protected float prefRows;
 
@@ -69,7 +90,10 @@ public class TextArea extends TextField{
         }
     }
 
-    /** Sets the preferred number of rows (lines) for this text area. Used to calculate preferred height */
+    /**
+     * Sets the preferred number of rows (lines) for this text area. Used to calculate preferred height
+     * 设置此文本区域的首选行数。用于计算首选高度
+     */
     public void setPrefRows(float prefRows){
         this.prefRows = prefRows;
     }
@@ -88,18 +112,27 @@ public class TextArea extends TextField{
         }
     }
 
-    /** Returns total number of lines that the text occupies **/
+    /**
+     * Returns total number of lines that the text occupies
+     * 返回文本占用的总行数
+     */
     public int getLines(){
         return linesBreak.size / 2 + (newLineAtEnd() ? 1 : 0);
     }
 
-    /** Returns if there's a new line at then end of the text **/
+    /**
+     * Returns if there's a new line at then end of the text
+     * 返回文本末尾是否有换行
+     */
     public boolean newLineAtEnd(){
         return text.length() != 0
         && (text.charAt(text.length() - 1) == '\r' || text.charAt(text.length() - 1) == '\n');
     }
 
-    /** Moves the cursor to the given number line **/
+    /**
+     * Moves the cursor to the given number line
+     * 将光标移动到指定行
+     */
     public void moveCursorLine(int line){
         if(line < 0){
             cursorLine = 0;
@@ -127,12 +160,17 @@ public class TextArea extends TextField{
         }
     }
 
-    /** Updates the current line, checking the cursor position in the text **/
+    /**
+     * Updates the current line, checking the cursor position in the text
+     * 通过检查光标在文本中的位置来更新当前行
+     */
     void updateCurrentLine(){
         int index = calculateCurrentLineIndex(cursor);
         int line = index / 2;
         // Special case when cursor moves to the beginning of the line from the end of another and a word
+        // 特殊情况:光标从另一行的末尾移动到本行开头,且存在一个
         // wider than the box
+        // 比文本框更宽的单词
         if(index % 2 == 0 || index + 1 >= linesBreak.size || cursor != linesBreak.items[index]
         || linesBreak.items[index + 1] != linesBreak.items[index]){
             if(line < linesBreak.size / 2 || text.length() == 0 || text.charAt(text.length() - 1) == '\r'
@@ -142,7 +180,10 @@ public class TextArea extends TextField{
         }
     }
 
-    /** Scroll the text area to show the line of the cursor **/
+    /**
+     * Scroll the text area to show the line of the cursor
+     * 滚动文本区域以显示光标所在行
+     */
     void showCursor(){
         updateCurrentLine();
         if(cursorLine != firstLineShowing){
@@ -153,7 +194,10 @@ public class TextArea extends TextField{
         }
     }
 
-    /** Calculates the text area line for the given cursor position **/
+    /**
+     * Calculates the text area line for the given cursor position
+     * 计算给定光标位置对应的文本区域行号
+     */
     private int calculateCurrentLineIndex(int cursor){
         int index = 0;
         while(index < linesBreak.size && cursor > linesBreak.items[index]){
@@ -163,12 +207,15 @@ public class TextArea extends TextField{
     }
 
     // OVERRIDE from TextField
+    // 从 TextField 重写
 
     @Override
     protected void sizeChanged(){
         lastText = null; // Cause calculateOffsets to recalculate the line breaks.
+        // 使 calculateOffsets 重新计算换行位置。
 
         // The number of lines showed must be updated whenever the height is updated
+        // 每次高度更新时都必须更新显示的行数
         Font font = style.font;
         Drawable background = style.background;
         float availableHeight = getHeight() - (background == null ? 0 : background.getBottomHeight() + background.getTopHeight());
@@ -270,6 +317,7 @@ public class TextArea extends TextField{
             }
             Pools.free(layout);
             // Add last line
+            // 添加最后一行
             if(lineStart < text.length()){
                 linesBreak.add(lineStart);
                 linesBreak.add(text.length());
@@ -335,7 +383,10 @@ public class TextArea extends TextField{
         return -(-font.getDescent() / 2 - (cursorLine - firstLineShowing + 1) * font.getLineHeight());
     }
 
-    /** Input listener for the text area **/
+    /**
+     * Input listener for the text area
+     * 文本区域的输入监听器
+     */
     public class TextAreaListener extends TextFieldClickListener{
 
         @Override

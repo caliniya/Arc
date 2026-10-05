@@ -5,12 +5,17 @@ import arc.scene.flabel.*;
 import arc.struct.*;
 import arc.util.*;
 
-/** Drips the text in a random pattern. */
+/**
+ * Drips the text in a random pattern.
+ * 让文本以随机模式向下滴落。
+ */
 public class SickEffect extends FEffect{
     private static final float defaultFrequency = 50f, defaultDistance = .125f, defaultIntensity = 1f;
 
     public float distance = 1; // How far the glyphs should move
+    // 字形应移动的距离
     public float intensity = 1; // How fast the glyphs should move
+    // 字形移动的快慢
 
     private IntAr indices = new IntAr();
 
@@ -23,6 +28,7 @@ public class SickEffect extends FEffect{
     @Override
     protected void onApply(FLabel label, FGlyph glyph, int localIndex, float delta){
         // Calculate progress
+        // 计算进度
         float progressModifier = (1f / intensity) * defaultIntensity;
         float progressOffset = localIndex / defaultFrequency;
         float progress = calculateProgress(progressModifier, -progressOffset, false);
@@ -40,6 +46,7 @@ public class SickEffect extends FEffect{
             return;
 
         // Calculate offset
+        // 计算偏移
         float interpolation = 0;
         float split = 0.5f;
         if(progress < split){
@@ -55,10 +62,12 @@ public class SickEffect extends FEffect{
             y *= 1.35f;
 
         // Calculate fadeout
+        // 计算淡出
         float fadeout = calculateFadeout();
         y *= fadeout;
 
         // Apply changes
+        // 应用更改
         glyph.yoffset -= y;
     }
 

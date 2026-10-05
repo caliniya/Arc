@@ -1,6 +1,9 @@
 package arc.scene.style;
 
-/** A drawable that draws two drawables stacked on top of each other (first, then second). Size-setting methods are proxied to both drawables. */
+/**
+ * A drawable that draws two drawables stacked on top of each other (first, then second). Size-setting methods are proxied to both drawables.
+ * 将两个可绘制对象叠放在一起(先绘制第一个,再绘制第二个)的可绘制对象。尺寸设置方法会同时代理给两个可绘制对象。
+ */
 public class StackDrawable implements TransformDrawable{
     public Drawable first, second;
 

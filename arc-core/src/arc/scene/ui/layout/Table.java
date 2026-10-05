@@ -25,6 +25,8 @@ import static arc.scene.ui.layout.Cell.*;
  * {@link Touchable#childrenOnly}.
  * <p>
  * The preferred and minimum sizes are that of the children when laid out in columns and rows.
+ * <p>
+ * 一种使用表格约束来设置子元素大小和位置的容器。默认情况下,touchable 为 {@link Touchable#childrenOnly}。 <p> 首选大小和最小大小是子元素按列和行布局后的大小。
  * @author Nathan Sweet
  */
 public class Table extends WidgetGroup{
@@ -80,7 +82,10 @@ public class Table extends WidgetGroup{
         return cell;
     }
 
-    /** Adds and fills a new table within this one. */
+    /**
+     * Adds and fills a new table within this one.
+     * 在此表格内添加并填满一个新表格。
+     */
     public Table fill(){
         Table table = new Table();
         table.setFillParent(true);
@@ -116,6 +121,8 @@ public class Table extends WidgetGroup{
     /**
      * Called to draw the background, before clipping is applied (if enabled). Default implementation draws the background
      * drawable.
+     * <p>
+     * 用于绘制背景,在应用裁剪(若启用)之前调用。默认实现绘制背景可绘制对象。
      */
     protected void drawBackground(float x, float y){
         if(background == null) return;
@@ -134,11 +141,12 @@ public class Table extends WidgetGroup{
         return background;
     }
 
-    /** @param background May be null to clear the background. */
+    /** @param background May be null to clear the background. 可为 null,表示清除背景。 */
     public void setBackground(Drawable background){
         if(this.background == background) return;
         float padTopOld = getMarginTop(), padLeftOld = getMarginLeft(), padBottomOld = getMarginBottom(), padRightOld = getMarginRight();
         this.background = background; // The default margin values use the background's padding.
+        // 默认外边距值使用背景的内边距。
         float padTopNew = getMarginTop(), padLeftNew = getMarginLeft(), padBottomNew = getMarginBottom(), padRightNew = getMarginRight();
         if(padTopOld + padBottomOld != padTopNew + padBottomNew || padLeftOld + padRightOld != padLeftNew + padRightNew)
             invalidateHierarchy();
@@ -162,6 +170,8 @@ public class Table extends WidgetGroup{
     /**
      * Causes the contents to be clipped if they exceed the table element's bounds. Enabling clipping will set
      * {@link #setTransform(boolean)} to true.
+     * <p>
+     * 当内容超出表格元素的边界时对其进行裁剪。启用裁剪会将 {@link #setTransform(boolean)} 设为 true。
      */
     public void setClip(boolean enabled){
         clip = enabled;
@@ -175,12 +185,16 @@ public class Table extends WidgetGroup{
         super.invalidate();
     }
 
-    /** Adds a new cell to the table with the specified element. */
+    /**
+     * Adds a new cell to the table with the specified element.
+     * 将指定元素作为新单元格添加到表格中。
+     */
     public <T extends Element> Cell<T> add(T element){
         Cell<T> cell = obtainCell();
         cell.element = element;
 
         // The row was ended for layout, not by the user, so revert it.
+        // 该行是为布局而结束的,并非用户操作,因此将其回退。
         if(implicitEndRow){
             implicitEndRow = false;
             rows--;
@@ -191,6 +205,7 @@ public class Table extends WidgetGroup{
         int cellCount = cells.size;
         if(cellCount > 0){
             // Set cell column and row.
+            // 设置单元格的列和行。
             Cell lastCell = cells.peek();
             if(!lastCell.endRow){
                 cell.column = lastCell.column + lastCell.colspan;
@@ -200,6 +215,7 @@ public class Table extends WidgetGroup{
                 cell.row = lastCell.row + 1;
             }
             // Set the index of the cell above.
+            // 设置上方单元格的索引。
             if(cell.row > 0){
                 outer:
                 for(int i = cellCount - 1; i >= 0; i--){
@@ -317,19 +333,28 @@ public class Table extends WidgetGroup{
         return pane(scene.getStyle(ScrollPaneStyle.class), element);
     }
 
-    /** Adds a new cell with a label. */
+    /**
+     * Adds a new cell with a label.
+     * 添加一个包含标签的新单元格。
+     */
     public Cell<Label> add(CharSequence text){
         return add(new Label(text));
     }
 
-    /** Adds a new cell with a label. */
+    /**
+     * Adds a new cell with a label.
+     * 添加一个包含标签的新单元格。
+     */
     public Cell<Label> add(CharSequence text, float scl){
         Label l = new Label(text);
         l.setFontScale(scl);
         return add(l);
     }
 
-    /** Adds a new cell with a label. */
+    /**
+     * Adds a new cell with a label.
+     * 添加一个包含标签的新单元格。
+     */
     public Cell<Label> add(CharSequence text, LabelStyle labelStyle, float scl){
         Label l = new Label(text, labelStyle);
         l.setFontScale(scl);
@@ -343,24 +368,35 @@ public class Table extends WidgetGroup{
         return add(l);
     }
 
-    /** Adds a new cell with a label. */
+    /**
+     * Adds a new cell with a label.
+     * 添加一个包含标签的新单元格。
+     */
     public Cell<Label> add(CharSequence text, LabelStyle labelStyle){
         return add(new Label(text, labelStyle));
     }
 
-    /** Adds a new cell with a label. */
+    /**
+     * Adds a new cell with a label.
+     * 添加一个包含标签的新单元格。
+     */
     public Cell<Label> add(CharSequence text, Color color){
         return add(new Label(text, new LabelStyle(scene.getStyle(LabelStyle.class).font, color)));
     }
 
-    /** Adds a cell without an element. */
+    /**
+     * Adds a cell without an element.
+     * 添加一个没有元素的单元格。
+     */
     public Cell add(){
         return add((Element)null);
     }
 
     /**
      * Adds a new cell to the table with the specified elements in a {@link Stack}.
-     * @param elements May be null to add a stack without any elements.
+     * <p>
+     * 将指定元素放入 {@link Stack} 中作为新单元格添加到表格。
+     * @param elements May be null to add a stack without any elements. 可为 null,表示添加一个不含任何元素的堆栈。
      */
     public Cell<Stack> stack(Element... elements){
         Stack stack = new Stack();
@@ -613,7 +649,10 @@ public class Table extends WidgetGroup{
         return true;
     }
 
-    /** Removes all actors and cells from the table. */
+    /**
+     * Removes all actors and cells from the table.
+     * 移除表格中的所有元素和单元格。
+     */
     @Override
     public void clearChildren(){
         Ar<Cell> cells = this.cells;
@@ -636,6 +675,8 @@ public class Table extends WidgetGroup{
     /**
      * Removes all actors and cells from the table (same as {@link #clearChildren()}) and additionally resets all table properties
      * and cell, column, and row defaults.
+     * <p>
+     * 移除表格中的所有元素和单元格(与 {@link #clearChildren()} 相同),并额外重置所有表格属性以及单元格、列和行的默认值。
      */
     public void reset(){
         clearChildren();
@@ -647,7 +688,10 @@ public class Table extends WidgetGroup{
         cellDefaults.reset();
     }
 
-    /** Indicates that subsequent cells should be added to a new row and returns this table.*/
+    /**
+     * Indicates that subsequent cells should be added to a new row and returns this table.
+     * 指示后续单元格应添加到新的一行,并返回此表格。
+     */
     public Table row(){
         if(cells.size > 0){
             if(!implicitEndRow) endRow();
@@ -673,7 +717,10 @@ public class Table extends WidgetGroup{
         cells.peek().endRow = true;
     }
 
-    /** Returns the cell for the specified actor in this table, or null. */
+    /**
+     * Returns the cell for the specified actor in this table, or null.
+     * 返回此表格中指定元素对应的单元格,若无则返回 null。
+     */
     public <T extends Element> Cell getCell(T actor){
         Ar<Cell> cells = this.cells;
         for(int i = 0, n = cells.size; i < n; i++){
@@ -683,7 +730,10 @@ public class Table extends WidgetGroup{
         return null;
     }
 
-    /** Returns the cells for this table. */
+    /**
+     * Returns the cells for this table.
+     * 返回此表格的所有单元格。
+     */
     public Ar<Cell> getCells(){
         return cells;
     }
@@ -716,12 +766,18 @@ public class Table extends WidgetGroup{
         return tableMinHeight;
     }
 
-    /** The cell values that will be used as the defaults for all cells. */
+    /**
+     * The cell values that will be used as the defaults for all cells.
+     * 将用作所有单元格默认值的单元格属性值。
+     */
     public Cell defaults(){
         return cellDefaults;
     }
 
-    /** Sets the marginTop, marginLeft, marginBottom, and marginRight around the table to the specified value. */
+    /**
+     * Sets the marginTop, marginLeft, marginBottom, and marginRight around the table to the specified value.
+     * 将表格四周的 marginTop、marginLeft、marginBottom 和 marginRight 设置为指定值。
+     */
     public Table margin(float pad){
         margin(pad, pad, pad, pad);
         return this;
@@ -736,28 +792,40 @@ public class Table extends WidgetGroup{
         return this;
     }
 
-    /** Padding at the top edge of the table. */
+    /**
+     * Padding at the top edge of the table.
+     * 表格顶部的内边距。
+     */
     public Table marginTop(float padTop){
         this.marginTop = Scl.scl(padTop);
         sizeInvalid = true;
         return this;
     }
 
-    /** Padding at the left edge of the table. */
+    /**
+     * Padding at the left edge of the table.
+     * 表格左侧的内边距。
+     */
     public Table marginLeft(float padLeft){
         this.marginLeft = Scl.scl(padLeft);
         sizeInvalid = true;
         return this;
     }
 
-    /** Padding at the bottom edge of the table. */
+    /**
+     * Padding at the bottom edge of the table.
+     * 表格底部的内边距。
+     */
     public Table marginBottom(float padBottom){
         this.marginBot = Scl.scl(padBottom);
         sizeInvalid = true;
         return this;
     }
 
-    /** Padding at the right edge of the table. */
+    /**
+     * Padding at the right edge of the table.
+     * 表格右侧的内边距。
+     */
     public Table marginRight(float padRight){
         this.marginRight = Scl.scl(padRight);
         sizeInvalid = true;
@@ -767,40 +835,57 @@ public class Table extends WidgetGroup{
     /**
      * Alignment of the logical table within the table actor. Set to {@link Align#center}, {@link Align#top}, {@link Align#bottom}
      * , {@link Align#left}, {@link Align#right}, or any combination of those.
+     * <p>
+     * 逻辑表格在表格元素内的对齐方式。可设为 {@link Align#center}、{@link Align#top}、{@link Align#bottom}、{@link Align#left}、{@link Align#right} 或它们的任意组合。
      */
     public Table align(int align){
         this.align = align;
         return this;
     }
 
-    /** Sets the alignment of the logical table within the table actor to {@link Align#center}. This clears any other alignment. */
+    /**
+     * Sets the alignment of the logical table within the table actor to {@link Align#center}. This clears any other alignment.
+     * 将逻辑表格在表格元素内的对齐方式设为 {@link Align#center}。这会清除其他对齐设置。
+     */
     public Table center(){
         align = Align.center;
         return this;
     }
 
-    /** Adds {@link Align#top} and clears {@link Align#bottom} for the alignment of the logical table within the table actor. */
+    /**
+     * Adds {@link Align#top} and clears {@link Align#bottom} for the alignment of the logical table within the table actor.
+     * 为逻辑表格在表格元素内的对齐方式添加 {@link Align#top} 并清除 {@link Align#bottom}。
+     */
     public Table top(){
         align |= Align.top;
         align &= ~Align.bottom;
         return this;
     }
 
-    /** Adds {@link Align#left} and clears {@link Align#right} for the alignment of the logical table within the table actor. */
+    /**
+     * Adds {@link Align#left} and clears {@link Align#right} for the alignment of the logical table within the table actor.
+     * 为逻辑表格在表格元素内的对齐方式添加 {@link Align#left} 并清除 {@link Align#right}。
+     */
     public Table left(){
         align |= Align.left;
         align &= ~Align.right;
         return this;
     }
 
-    /** Adds {@link Align#bottom} and clears {@link Align#top} for the alignment of the logical table within the table actor. */
+    /**
+     * Adds {@link Align#bottom} and clears {@link Align#top} for the alignment of the logical table within the table actor.
+     * 为逻辑表格在表格元素内的对齐方式添加 {@link Align#bottom} 并清除 {@link Align#top}。
+     */
     public Table bottom(){
         align |= Align.bottom;
         align &= ~Align.top;
         return this;
     }
 
-    /** Adds {@link Align#right} and clears {@link Align#left} for the alignment of the logical table within the table actor. */
+    /**
+     * Adds {@link Align#right} and clears {@link Align#left} for the alignment of the logical table within the table actor.
+     * 为逻辑表格在表格元素内的对齐方式添加 {@link Align#right} 并清除 {@link Align#left}。
+     */
     public Table right(){
         align |= Align.right;
         align &= ~Align.left;
@@ -829,7 +914,9 @@ public class Table extends WidgetGroup{
 
     /**
      * Returns the row index for the y coordinate, or -1 if there are no cells.
-     * @param y The y coordinate, where 0 is the top of the table.
+     * <p>
+     * 返回 y 坐标对应的行索引,若没有单元格则返回 -1。
+     * @param y The y coordinate, where 0 is the top of the table. y 坐标,0 为表格顶部。
      */
     public int getRow(float y){
         Ar<Cell> cells = this.cells;
@@ -846,7 +933,10 @@ public class Table extends WidgetGroup{
         return row;
     }
 
-    /** If true (the default), positions and sizes are rounded to integers. */
+    /**
+     * If true (the default), positions and sizes are rounded to integers.
+     * 为 true(默认)时,位置和尺寸会四舍五入为整数。
+     */
     public void setRound(boolean round){
         this.round = round;
     }
@@ -859,12 +949,18 @@ public class Table extends WidgetGroup{
         return columns;
     }
 
-    /** Returns the height of the specified row. */
+    /**
+     * Returns the height of the specified row.
+     * 返回指定行的高度。
+     */
     public float getRowHeight(int rowIndex){
         return rowHeight[rowIndex];
     }
 
-    /** Returns the width of the specified column. */
+    /**
+     * Returns the width of the specified column.
+     * 返回指定列的宽度。
+     */
     public float getColumnWidth(int columnIndex){
         return columnWidth[columnIndex];
     }
@@ -891,6 +987,7 @@ public class Table extends WidgetGroup{
                 float actorHeight = Math.round(c.elementHeight);
                 float actorX = Math.round(c.elementX);
                 //the table's own height may be fractional (e.g. a ScrollPane widget sized to its pref height), so round the flipped y as a whole
+                // 表格自身的高度可能是小数(例如按首选高度设置大小的 ScrollPane 控件),因此将翻转后的 y 作为整体进行四舍五入
                 float actorY = Math.round(height - c.elementY - actorHeight);
                 c.setBounds(actorX, actorY, actorWidth, actorHeight);
                 Element actor = c.element;
@@ -907,6 +1004,7 @@ public class Table extends WidgetGroup{
             }
         }
         // Validate children separately from sizing actors to ensure actors without a cell are validated.
+        // 与设置元素大小分开单独验证子元素,以确保没有单元格的元素也会被验证。
         Ar<Element> children = getChildren();
         for(int i = 0, n = children.size; i < n; i++){
             Element child = children.get(i);
@@ -921,6 +1019,7 @@ public class Table extends WidgetGroup{
         int cellCount = cells.size;
 
         // Implicitly End the row for layout purposes.
+        // 为布局目的隐式结束当前行。
         if(cellCount > 0 && !cells.peek().endRow){
             endRow();
             implicitEndRow = true;
@@ -941,16 +1040,19 @@ public class Table extends WidgetGroup{
             int column = c.column, row = c.row, colspan = c.colspan;
 
             // Collect rows that expand and colspan=1 columns that expand.
+            // 收集需要扩展的行,以及需要扩展的 colspan=1 的列。
             if(c.expandY != 0 && expandHeight[row] == 0) expandHeight[row] = c.expandY;
             if(colspan == 1 && c.expandX != 0 && expandWidth[column] == 0) expandWidth[column] = c.expandX;
 
             // Compute padding for cells.
+            // 计算单元格的内边距。
             c.computedPadLeft = c.padLeft;
             c.computedPadTop = c.padTop;
             c.computedPadRight = c.padRight;
             c.computedPadBottom = c.padBottom;
 
             // Determine minimum and preferred cell sizes.
+            // 确定单元格的最小尺寸和首选尺寸。
             float prefWidth = c.prefWidth();
             float prefHeight = c.prefHeight();
             float minWidth = c.minWidth();
@@ -963,6 +1065,7 @@ public class Table extends WidgetGroup{
             if(maxHeight > 0 && prefHeight > maxHeight) prefHeight = maxHeight;
 
             if(colspan == 1){ // Spanned column min and pref width is added later.
+            // 被跨的列的最小宽度和首选宽度稍后添加。
                 float hpadding = c.computedPadLeft + c.computedPadRight;
                 columnPrefWidth[column] = Math.max(columnPrefWidth[column], prefWidth + hpadding);
                 columnMinWidth[column] = Math.max(columnMinWidth[column], minWidth + hpadding);
@@ -979,6 +1082,7 @@ public class Table extends WidgetGroup{
             int column = c.column;
 
             // Colspan with expand will expand all spanned columns if none of the spanned columns have expand.
+            // 若被跨的列都没有 expand,则带 expand 的跨列单元格会扩展所有被跨的列。
             int expandX = c.expandX;
             outer:
             if(expandX != 0){
@@ -990,6 +1094,7 @@ public class Table extends WidgetGroup{
             }
 
             // Collect uniform sizes.
+            // 收集等分尺寸。
             if(c.uniformX && c.colspan == 1){
                 float hpadding = c.computedPadLeft + c.computedPadRight;
                 uniformMinWidth = Math.max(uniformMinWidth, columnMinWidth[column] - hpadding);
@@ -1003,6 +1108,7 @@ public class Table extends WidgetGroup{
         }
 
         // Size uniform cells to the same width/height.
+        // 将等分单元格设为相同的宽度/高度。
         if(uniformPrefWidth > 0 || uniformPrefHeight > 0){
             for(int i = 0; i < cellCount; i++){
                 Cell c = cells.get(i);
@@ -1020,6 +1126,7 @@ public class Table extends WidgetGroup{
         }
 
         // Distribute any additional min and pref width added by colspanned cells to the columns spanned.
+        // 将跨列单元格额外增加的最小宽度和首选宽度分配到被跨的各列。
         for(int i = 0; i < cellCount; i++){
             Cell c = cells.get(i);
             int colspan = c.colspan;
@@ -1039,6 +1146,7 @@ public class Table extends WidgetGroup{
                 spannedMinWidth += columnMinWidth[ii];
                 spannedPrefWidth += columnPrefWidth[ii];
                 totalExpandWidth += expandWidth[ii]; // Distribute extra space using expand, if any columns have expand.
+                // 若有列设置了 expand,则使用 expand 分配多余空间。
             }
 
             float extraMinWidth = Math.max(0, minWidth - spannedMinWidth);
@@ -1051,6 +1159,7 @@ public class Table extends WidgetGroup{
         }
 
         // Determine table min and pref size.
+        // 确定表格的最小尺寸和首选尺寸。
         tableMinWidth = 0;
         tableMinHeight = 0;
         tablePrefWidth = 0;
@@ -1074,6 +1183,8 @@ public class Table extends WidgetGroup{
     /**
      * Positions and sizes children of the table using the cell associated with each child. The values given are the position
      * within the parent and size of the table.
+     * <p>
+     * 使用每个子元素关联的单元格来定位子元素并设置其大小。给定值为在父级中的位置和表格的大小。
      */
     protected void layout(float layoutX, float layoutY, float layoutWidth, float layoutHeight){
         Ar<Cell> cells = this.cells;
@@ -1097,6 +1208,7 @@ public class Table extends WidgetGroup{
             totalExpandHeight += expandHeight[i];
 
         // Size columns and rows between min and pref size using (preferred - min) size to weight distribution of extra space.
+        // 在最小尺寸和首选尺寸之间调整列和行的大小,使用(首选 - 最小)尺寸来加权分配多余空间。
         float[] columnWeightedWidth;
         float totalGrowWidth = tablePrefWidth - tableMinWidth;
         if(totalGrowWidth == 0)
@@ -1128,6 +1240,7 @@ public class Table extends WidgetGroup{
         }
 
         // Determine actor and cell sizes (before expand or fill).
+        // 确定元素和单元格的大小(在 expand 或 fill 之前)。
         for(int i = 0; i < cellCount; i++){
             Cell c = cells.get(i);
             int column = c.column, row = c.row;
@@ -1157,6 +1270,7 @@ public class Table extends WidgetGroup{
         }
 
         // Distribute remaining space to any expanding columns/rows.
+        // 将剩余空间分配给设置了扩展的列/行。
         if(totalExpandWidth > 0){
             float extra = layoutWidth - hpadding;
             for(int i = 0; i < columns; i++)
@@ -1189,6 +1303,7 @@ public class Table extends WidgetGroup{
         }
 
         // Distribute any additional width added by colspanned cells to the columns spanned.
+        // 将跨列单元格额外增加的宽度分配到被跨的各列。
         for(int i = 0; i < cellCount; i++){
             Cell c = cells.get(i);
             int colspan = c.colspan;
@@ -1207,6 +1322,7 @@ public class Table extends WidgetGroup{
         }
 
         // Determine table size.
+        // 确定表格大小。
         float tableWidth = hpadding, tableHeight = vpadding;
         for(int i = 0; i < columns; i++)
             tableWidth += columnWidth[i];
@@ -1214,20 +1330,24 @@ public class Table extends WidgetGroup{
             tableHeight += rowHeight[i];
 
         // Position table within the container.
+        // 在容器内定位表格。
         int align = this.align;
         float x = layoutX + padLeft;
         if((align & Align.right) != 0)
             x += layoutWidth - tableWidth;
         else if((align & Align.left) == 0) // Center
+        // 居中
             x += (layoutWidth - tableWidth) / 2;
 
         float y = layoutY + padTop;
         if((align & Align.bottom) != 0)
             y += layoutHeight - tableHeight;
         else if((align & Align.top) == 0) // Center
+        // 居中
             y += (layoutHeight - tableHeight) / 2;
 
         // Position actors within cells.
+        // 在单元格内定位元素。
         float currentX = x, currentY = y;
         for(int i = 0; i < cellCount; i++){
             Cell c = cells.get(i);

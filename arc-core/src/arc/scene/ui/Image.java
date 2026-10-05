@@ -11,6 +11,8 @@ import arc.util.*;
 /**
  * Displays a {@link Drawable}, scaled various way within the widgets bounds. The preferred size is the min size of the drawable.
  * Only when using a {@link TextureRegionDrawable} will the actor's scale, rotation, and origin be used when drawing.
+ * <p>
+ * 显示一个 {@link Drawable},在控件边界内以多种方式进行缩放。首选大小为可绘制对象的最小尺寸。只有使用 {@link TextureRegionDrawable} 时,绘制才会使用元素的缩放、旋转和原点。
  * @author Nathan Sweet
  */
 public class Image extends Element{
@@ -19,7 +21,10 @@ public class Image extends Element{
     protected int align;
     protected Drawable drawable;
 
-    /** Creates an image with no region or patch, stretched, and aligned center. */
+    /**
+     * Creates an image with no region or patch, stretched, and aligned center.
+     * 创建一个未设置区域或九宫格、拉伸显示且居中对齐的图像。
+     */
     public Image(){
         this(Core.atlas.has("whiteui") ? Core.atlas.find("whiteui") : Core.atlas.find("white"));
     }
@@ -32,7 +37,9 @@ public class Image extends Element{
 
     /**
      * Creates an image stretched, and aligned center.
-     * @param patch May be null.
+     * <p>
+     * 创建一个拉伸显示且居中对齐的图像。
+     * @param patch May be null. 可以为 null。
      */
     public Image(NinePatch patch){
         this(new NinePatchDrawable(patch), Scaling.stretch, Align.center);
@@ -40,20 +47,27 @@ public class Image extends Element{
 
     /**
      * Creates an image stretched, and aligned center.
-     * @param region May be null.
+     * <p>
+     * 创建一个拉伸显示且居中对齐的图像。
+     * @param region May be null. 可以为 null。
      */
     public Image(TextureRegion region){
         this(new TextureRegionDrawable(region), Scaling.stretch, Align.center);
     }
 
-    /** Creates an image stretched, and aligned center. */
+    /**
+     * Creates an image stretched, and aligned center.
+     * 创建一个拉伸显示且居中对齐的图像。
+     */
     public Image(Texture texture){
         this(new TextureRegionDrawable(new TextureRegion(texture)));
     }
 
     /**
      * Creates an image stretched, and aligned center.
-     * @param drawable May be null.
+     * <p>
+     * 创建一个拉伸显示且居中对齐的图像。
+     * @param drawable May be null. 可以为 null。
      */
     public Image(Drawable drawable){
         this(drawable, Scaling.stretch, Align.center);
@@ -61,13 +75,15 @@ public class Image extends Element{
 
     /**
      * Creates an image aligned center.
-     * @param drawable May be null.
+     * <p>
+     * 创建一个居中对齐的图像。
+     * @param drawable May be null. 可以为 null。
      */
     public Image(Drawable drawable, Scaling scaling){
         this(drawable, scaling, Align.center);
     }
 
-    /** @param drawable May be null. */
+    /** @param drawable May be null. 可以为 null。 */
     public Image(Drawable drawable, Scaling scaling, int align){
         setDrawable(drawable);
         this.scaling = scaling;
@@ -129,7 +145,7 @@ public class Image extends Element{
         return ((TextureRegionDrawable)drawable).getRegion();
     }
 
-    /** @return May be null. */
+    /** @return May be null. 可以为 null。 */
     public Drawable getDrawable(){
         return drawable;
     }
@@ -138,7 +154,7 @@ public class Image extends Element{
         setDrawable(new TextureRegionDrawable(region));
     }
 
-    /** @param drawable May be null. */
+    /** @param drawable May be null. 可以为 null。 */
     public void setDrawable(Drawable drawable){
         if(this.drawable == drawable) return;
         if(drawable != null){

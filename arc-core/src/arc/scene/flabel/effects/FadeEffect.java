@@ -6,13 +6,21 @@ import arc.scene.flabel.*;
 import arc.struct.*;
 import arc.util.*;
 
-/** Fades the text's color from between colors or alphas. Doesn't repeat itself. */
+/**
+ * Fades the text's color from between colors or alphas. Doesn't repeat itself.
+ * 在两种颜色或透明度之间对文本颜色进行淡入淡出。不会重复。
+ */
 public class FadeEffect extends FEffect{
     private Color color1 = null; // First color of the effect.
+    // 效果的第一种颜色。
     private Color color2 = null; // Second color of the effect.
+    // 效果的第二种颜色。
     public float alpha1 = 0; // First alpha of the effect, in case a color isn't provided.
+    // 效果的第一个透明度,在未提供颜色时使用。
     public float alpha2 = 1; // Second alpha of the effect, in case a color isn't provided.
+    // 效果的第二个透明度,在未提供颜色时使用。
     public float fadeDuration = 1; // Duration of the fade effect
+    // 淡入淡出效果的持续时间
 
     private IntFloatMap timePassedByGlyphIndex = new IntFloatMap();
 
@@ -28,6 +36,7 @@ public class FadeEffect extends FEffect{
     @Override
     protected void onApply(FLabel label, FGlyph glyph, int localIndex, float delta){
         // Calculate progress
+        // 计算进度
         float timePassed = timePassedByGlyphIndex.increment(localIndex, 0, delta);
         float progress = timePassed / fadeDuration;
         if(progress < 0 || progress > 1){
@@ -35,11 +44,13 @@ public class FadeEffect extends FEffect{
         }
 
         // Create glyph color if necessary
+        // 如有必要,创建字形颜色
         if(glyph.color == null){
             glyph.color = new Color(glyph.run.color);
         }
 
         // Calculate initial color
+        // 计算初始颜色
         if(this.color1 == null){
             glyph.color.a = Mathf.lerp(glyph.color.a, this.alpha1, 1f - progress);
         }else{
@@ -47,6 +58,7 @@ public class FadeEffect extends FEffect{
         }
 
         // Calculate final color
+        // 计算最终颜色
         if(this.color2 == null){
             glyph.color.a = Mathf.lerp(glyph.color.a, this.alpha2, progress);
         }else{

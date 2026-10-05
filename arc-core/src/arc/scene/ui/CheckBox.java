@@ -9,6 +9,8 @@ import static arc.Core.scene;
 
 /**
  * A checkbox is a button that contains an image indicating the checked or unchecked state and a label.
+ * <p>
+ * 复选框是一种按钮,包含一个指示选中或未选中状态的图像以及一个标签。
  * @author Nathan Sweet
  */
 public class CheckBox extends TextButton{
@@ -38,6 +40,8 @@ public class CheckBox extends TextButton{
     /**
      * Returns the checkbox's style. Modifying the returned style may not have an effect until {@link #setStyle(ButtonStyle)} is
      * called.
+     * <p>
+     * 返回复选框的样式。在调用 {@link #setStyle(ButtonStyle)} 之前,修改返回的样式可能不会生效。
      */
     @Override
     public CheckBoxStyle getStyle(){
@@ -84,11 +88,16 @@ public class CheckBox extends TextButton{
 
     /**
      * The style for a select box, see {@link CheckBox}.
+     * <p>
+     * 选择框的样式,见 {@link CheckBox}。
      * @author Nathan Sweet
      */
     public static class CheckBoxStyle extends TextButtonStyle{
         public Drawable checkboxOn, checkboxOff;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Drawable checkboxOver, checkboxOnDisabled, checkboxOffDisabled, checkboxOnOver;
     }
 }

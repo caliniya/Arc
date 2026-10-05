@@ -25,6 +25,8 @@ import static arc.Core.*;
  * <p>
  * The preferred size of a window is the preferred size of the title text and the children as laid out by the table. After adding
  * children to the window, it can be convenient to call {@link #pack()} to size the window to the size of the children.
+ * <p>
+ * 一个可以拖动并充当模态窗口的表格。顶部内边距被用作窗口标题的高度。 <p> 窗口的首选大小是标题文本以及按表格布局的子元素的首选大小。向窗口添加子元素后,可以方便地调用 {@link #pack()} 将窗口大小调整为子元素的大小。
  * @author Nathan Sweet
  */
 public class Dialog extends Table{
@@ -229,6 +231,7 @@ public class Dialog extends Table{
                 Scene stage = getScene();
                 if(isModal && stage != null && stage.root.getChildren().size > 0
                 && stage.root.getChildren().peek() == Dialog.this){ // Dialog is top most actor.
+                // 对话框是最顶层的元素。
                     Element newFocusedActor = event.relatedActor;
                     if(newFocusedActor != null && !newFocusedActor.isDescendantOf(Dialog.this) &&
                     !(newFocusedActor.equals(previousKeyboardFocus) || newFocusedActor.equals(previousScrollFocus)))
@@ -243,6 +246,8 @@ public class Dialog extends Table{
     /**
      * Returns the window's style. Modifying the returned style may not have an effect until {@link #setStyle(DialogStyle)} is
      * called.
+     * <p>
+     * 返回窗口的样式。在调用 {@link #setStyle(DialogStyle)} 之前,修改返回的样式可能不会生效。
      */
     public DialogStyle getStyle(){
         return style;
@@ -272,6 +277,7 @@ public class Dialog extends Table{
             }
 
             //fire resize events.
+            // 触发 resize 事件。
             if(lastWidth >= 0 && lastHeight >= 0){
                 if(!Mathf.equal(lastWidth, scene.root.getWidth()) || !Mathf.equal(lastHeight, scene.root.getHeight())){
                     SceneResizeEvent e = Pools.obtain(SceneResizeEvent.class, SceneResizeEvent::new);
@@ -291,6 +297,7 @@ public class Dialog extends Table{
 
         if(stage.getKeyboardFocus() == null){
             //get top dialog in the scene and focus keyboard on that
+            // 获取场景中最上层的对话框并让键盘聚焦于它
             int highestDialog = -1;
             Ar<Element> children = scene.root.getChildren();
             for(int i = children.size - 1; i >= 0; i--){
@@ -324,7 +331,10 @@ public class Dialog extends Table{
         return hit;
     }
 
-    /** Centers the dialog in the scene. */
+    /**
+     * Centers the dialog in the scene.
+     * 将对话框在场景中居中。
+     */
     public void centerWindow(){
         setPosition(Math.round(((Core.scene.getWidth() - scene.marginLeft - scene.marginRight) - getWidth()) / 2), Math.round(((Core.scene.getHeight() - scene.marginTop - scene.marginBottom) - getHeight()) / 2));
     }
@@ -403,7 +413,10 @@ public class Dialog extends Table{
         super.setScene(stage);
     }
 
-    /** Adds a show() listener. */
+    /**
+     * Adds a show() listener.
+     * 添加 show() 监听器。
+     */
     public void shown(Runnable run){
         addListener(new VisibilityListener(){
             @Override
@@ -414,7 +427,10 @@ public class Dialog extends Table{
         });
     }
 
-    /** Adds a hide() listener. */
+    /**
+     * Adds a hide() listener.
+     * 添加 hide() 监听器。
+     */
     public void hidden(Runnable run){
         addListener(new VisibilityListener(){
             @Override
@@ -425,18 +441,27 @@ public class Dialog extends Table{
         });
     }
 
-    /** Runs the callback when this dialog is resized or hidden. */
+    /**
+     * Runs the callback when this dialog is resized or hidden.
+     * 当此对话框被调整大小或隐藏时执行回调。
+     */
     public void resizedShown(Runnable run){
         resized(run);
         shown(run);
     }
 
-    /** Adds a scene resize listener. */
+    /**
+     * Adds a scene resize listener.
+     * 添加场景大小调整监听器。
+     */
     public void resized(Runnable run){
         resized(false, run);
     }
 
-    /** Adds a scene resize listener, optionally invoking it immediately. */
+    /**
+     * Adds a scene resize listener, optionally invoking it immediately.
+     * 添加场景大小调整监听器,可选择立即调用一次。
+     */
     public void resized(boolean invoke, Runnable run){
         if(invoke){
             run.run();
@@ -446,6 +471,7 @@ public class Dialog extends Table{
             public void resized(){
                 run.run();
                 //refocus scrollpanes automatically after a rebuild
+                // 重建后自动重新聚焦滚动面板
                 updateScrollFocus();
             }
         });
@@ -453,9 +479,13 @@ public class Dialog extends Table{
 
     public void addCloseButton(){
         //no default implementation; should be implemented by subclasses
+        // 无默认实现;应由子类实现
     }
 
-    /** Adds a listener for back/escape keys to hide this dialog. */
+    /**
+     * Adds a listener for back/escape keys to hide this dialog.
+     * 添加返回/Escape 键监听器以隐藏此对话框。
+     */
     public void closeOnBack(){
         closeOnBack(() -> {});
     }
@@ -473,7 +503,10 @@ public class Dialog extends Table{
         return getScene() != null;
     }
 
-    /** {@link #pack() Packs} the dialog and adds it to the stage with custom action which can be null for instant show */
+    /**
+     * {@link #pack() Packs} the dialog and adds it to the stage with custom action which can be null for instant show
+     * {@link #pack() 打包} 对话框并使用自定义动作将其添加到舞台上,该动作可为 null 以立即显示
+     */
     public Dialog show(Scene stage, Action action){
         setOrigin(Align.center);
         setClip(false);
@@ -503,7 +536,10 @@ public class Dialog extends Table{
         return this;
     }
 
-    /** Shows this dialog if it was hidden, and vice versa. */
+    /**
+     * Shows this dialog if it was hidden, and vice versa.
+     * 若此对话框处于隐藏状态则显示它,反之亦然。
+     */
     public void toggle(){
         if(isShown()){
             hide();
@@ -516,14 +552,20 @@ public class Dialog extends Table{
         return show(Core.scene);
     }
 
-    /** {@link #pack() Packs} the dialog and adds it to the stage, centered with default fadeIn action */
+    /**
+     * {@link #pack() Packs} the dialog and adds it to the stage, centered with default fadeIn action
+     * {@link #pack() 打包} 对话框并居中添加到舞台上,使用默认的 fadeIn 动作
+     */
     public Dialog show(Scene stage){
         show(stage, defaultShowAction.get());
         centerWindow();
         return this;
     }
 
-    /** Hides the dialog with the given action and then removes it from the stage. */
+    /**
+     * Hides the dialog with the given action and then removes it from the stage.
+     * 使用给定动作隐藏对话框,然后将其从舞台上移除。
+     */
     public void hide(Action action){
         this.fire(new VisibilityEvent(true));
 
@@ -548,6 +590,8 @@ public class Dialog extends Table{
     /**
      * Hides the dialog. Called automatically when a button is clicked. The default implementation fades out the dialog over 400
      * milliseconds.
+     * <p>
+     * 隐藏对话框。当按钮被点击时自动调用。默认实现在 400 毫秒内将对话框淡出。
      */
     public void hide(){
         if(!isShown()) return;
@@ -559,12 +603,21 @@ public class Dialog extends Table{
     }
 
     public static class DialogStyle extends Style{
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Drawable background;
         public Font titleFont;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Color titleFontColor = new Color(1, 1, 1, 1);
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Drawable stageBackground;
     }
 }

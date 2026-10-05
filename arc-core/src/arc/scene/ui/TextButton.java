@@ -12,6 +12,8 @@ import static arc.Core.scene;
 
 /**
  * A button with a child {@link Label} to display text.
+ * <p>
+ * 带有一个子 {@link Label} 来显示文本的按钮。
  * @author Nathan Sweet
  */
 public class TextButton extends Button{
@@ -87,11 +89,16 @@ public class TextButton extends Button{
 
     /**
      * The style for a text button, see {@link TextButton}.
+     * <p>
+     * 文本按钮的样式,见 {@link TextButton}。
      * @author Nathan Sweet
      */
     public static class TextButtonStyle extends ButtonStyle{
         public Font font;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Color fontColor, downFontColor, overFontColor, checkedFontColor, checkedOverFontColor, disabledFontColor;
 
         public TextButtonStyle(){

@@ -15,6 +15,8 @@ import static arc.Core.scene;
  * image centered on the button. If the image is the size of the button, a {@link Button} without any children can be used, where
  * the {@link Button.ButtonStyle#up}, {@link Button.ButtonStyle#down}, and {@link Button.ButtonStyle#checked} nine patches define
  * the image.
+ * <p>
+ * 带有一个子 {@link Image} 来显示图像的按钮。当按钮需要比图像大且图像在按钮中居中时,这很有用。若图像与按钮大小相同,则可以使用不带任何子元素的 {@link Button},由 {@link Button.ButtonStyle#up}、{@link Button.ButtonStyle#down} 和 {@link Button.ButtonStyle#checked} 九宫格来定义图像。
  * @author Nathan Sweet
  */
 public class ImageButton extends Button{
@@ -94,7 +96,10 @@ public class ImageButton extends Button{
         image.remove();
     }
 
-    /** Updates the Image with the appropriate Drawable from the style before it is drawn. */
+    /**
+     * Updates the Image with the appropriate Drawable from the style before it is drawn.
+     * 在绘制之前,用样式中合适的 Drawable 更新图像。
+     */
     protected void updateImage(){
         Drawable drawable = null;
         if(isDisabled() && style.imageDisabled != null)
@@ -145,10 +150,15 @@ public class ImageButton extends Button{
 
     /**
      * The style for an image button, see {@link ImageButton}.
+     * <p>
+     * 图像按钮的样式,见 {@link ImageButton}。
      * @author Nathan Sweet
      */
     public static class ImageButtonStyle extends ButtonStyle{
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Drawable imageUp, imageDown, imageOver, imageChecked, imageCheckedOver, imageDisabled;
         public Color imageUpColor, imageCheckedColor, imageDownColor, imageOverColor, imageDisabledColor;
 

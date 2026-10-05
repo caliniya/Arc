@@ -20,6 +20,8 @@ import arc.util.pooling.*;
  * <p>
  * For a horizontal progress bar, its preferred height is determined by the larger of the knob and background, and the preferred width
  * is 140, a relatively arbitrary size. These parameters are reversed for a vertical progress bar.
+ * <p>
+ * 进度条是一种以可视化方式显示某项活动的进度或某个给定范围内取值的控件。进度条有一个范围(min、max)以及每个值之间的步长。完成百分比通常从空进度条开始,随着任务或变量值的推进逐渐填满。 <p> 移动进度条旋钮时会触发 {@link ChangeEvent}。取消该事件会将旋钮移回之前的位置。 <p> 对于水平进度条,其首选高度由旋钮和背景中较大者决定,首选宽度为 140(相对随意的一个值)。垂直进度条的这些参数正好相反。
  * @author mzechner
  * @author Nathan Sweet
  */
@@ -42,10 +44,12 @@ public class ProgressBar extends Element implements Disableable{
      * between individual values.
      * <p>
      * E.g. min could be 4, max could be 10 and stepSize could be 0.2, giving you a total of 30 values, 4.0 4.2, 4.4 and so on.
-     * @param min the minimum value
-     * @param max the maximum value
-     * @param stepSize the step size between values
-     * @param style the {@link ProgressBarStyle}
+     * <p>
+     * 创建一个新的进度条。若为水平方向,其宽度由 prefWidth 参数决定,高度由进度条 {@link NinePatch} 和进度条旋钮 {@link TextureRegion} 二者高度的较大值决定。min 和 max 值决定此进度条可取值的范围,stepSize 参数指定各个值之间的间隔。 <p> 例如,min 可为 4,max 可为 10,stepSize 可为 0.2,总共得到 30 个值:4.0、4.2、4.4 等等。
+     * @param min the minimum value 最小值。
+     * @param max the maximum value 最大值。
+     * @param stepSize the step size between values 各值之间的步长。
+     * @param style the {@link ProgressBarStyle} 进度条样式。
      */
     public ProgressBar(float min, float max, float stepSize, boolean vertical, ProgressBarStyle style){
         if(min > max) throw new IllegalArgumentException("max must be > min. min,max: " + min + ", " + max);
@@ -62,6 +66,8 @@ public class ProgressBar extends Element implements Disableable{
     /**
      * Returns the progress bar's style. Modifying the returned style may not have an effect until
      * {@link #setStyle(ProgressBarStyle)} is called.
+     * <p>
+     * 返回进度条的样式。在调用 {@link #setStyle(ProgressBarStyle)} 之前,修改返回的样式可能不会生效。
      */
     public ProgressBarStyle getStyle(){
         return style;
@@ -160,6 +166,7 @@ public class ProgressBar extends Element implements Disableable{
 
             if(bg != null){
                 //currently draws background under *everything*, not limited by bg height
+                // 当前将背景绘制在所有内容之下,不受背景高度限制
                 bg.draw(x, y, width, height);
             }
 
@@ -208,7 +215,10 @@ public class ProgressBar extends Element implements Disableable{
         return value;
     }
 
-    /** If {@link #setAnimateDuration(float) animating} the progress bar value, this returns the value current displayed. */
+    /**
+     * If {@link #setAnimateDuration(float) animating} the progress bar value, this returns the value current displayed.
+     * 若正在 {@link #setAnimateDuration(float) 动画} 进度条数值,则返回当前显示的值。
+     */
     public float getVisualValue(){
         if(animateTime > 0 && animateDuration > 0)
             return animateInterpolation.apply(animateFromValue, value, 1 - animateTime / animateDuration);
@@ -233,7 +243,10 @@ public class ProgressBar extends Element implements Disableable{
         return (disabled && style.disabledKnob != null) ? style.disabledKnob : style.knob;
     }
 
-    /** Returns progress bar visual position within the range. */
+    /**
+     * Returns progress bar visual position within the range.
+     * 返回进度条在范围内的可视化位置。
+     */
     protected float getKnobPosition(){
         return this.position;
     }
@@ -241,14 +254,19 @@ public class ProgressBar extends Element implements Disableable{
     /**
      * Sets the progress bar position, rounded to the nearest step size and clamped to the minimum and maximum values.
      * {@link #clamp(float)} can be overridden to allow values outside of the progress bar's min/max range.
-     * @return false if the value was not changed because the progress bar already had the value or it was canceled by a
-     * listener.
+     * <p>
+     * 设置进度条位置,四舍五入到最近的步长并钳制在最小值和最大值之间。可以重写 {@link #clamp(float)} 以允许超出进度条 min/max 范围的值。
+     * @return false if the value was not changed because the progress bar already had the value or it was canceled by a 若值未更改则返回 false,因为进度条已是该值,或该变更被
+     * listener. 监听器取消。
      */
     public boolean setValue(float value){
         return setValue(value, true);
     }
 
-    /** Sets the value, optionally skipping the changed event. */
+    /**
+     * Sets the value, optionally skipping the changed event.
+     * 设置值,可选择跳过变更事件。
+     */
     public boolean setValue(float value, boolean fireChanged){
         if(Float.isNaN(value)) return false;
         if(stepSize > 0 && !Float.isInfinite(value)) value = Math.round(value / stepSize) * stepSize;
@@ -272,12 +290,17 @@ public class ProgressBar extends Element implements Disableable{
     /**
      * Clamps the value to the progress bar's min/max range. This can be overridden to allow a range different from the progress
      * bar knob's range.
+     * <p>
+     * 将值钳制在进度条的 min/max 范围内。可以重写此方法以允许与进度条旋钮范围不同的范围。
      */
     protected float clamp(float value){
         return Mathf.clamp(value, min, max);
     }
 
-    /** Sets the range of this progress bar. The progress bar's current value is clamped to the range. */
+    /**
+     * Sets the range of this progress bar. The progress bar's current value is clamped to the range.
+     * 设置此进度条的范围。进度条当前值会被钳制在该范围内。
+     */
     public void setRange(float min, float max){
         if(min > max) throw new IllegalArgumentException("min must be <= max");
         this.min = min;
@@ -325,23 +348,35 @@ public class ProgressBar extends Element implements Disableable{
         this.stepSize = stepSize;
     }
 
-    /** If > 0, changes to the progress bar value via {@link #setValue(float)} will happen over this duration in seconds. */
+    /**
+     * If > 0, changes to the progress bar value via {@link #setValue(float)} will happen over this duration in seconds.
+     * 若 > 0,通过 {@link #setValue(float)} 改变进度条值时,将在该时长(秒)内过渡完成。
+     */
     public void setAnimateDuration(float duration){
         this.animateDuration = duration;
     }
 
-    /** Sets the interpolation to use for {@link #setAnimateDuration(float)}. */
+    /**
+     * Sets the interpolation to use for {@link #setAnimateDuration(float)}.
+     * 设置 {@link #setAnimateDuration(float)} 使用的插值。
+     */
     public void setAnimateInterpolation(Interp animateInterpolation){
         if(animateInterpolation == null) throw new IllegalArgumentException("animateInterpolation cannot be null.");
         this.animateInterpolation = animateInterpolation;
     }
 
-    /** Sets the interpolation to use for display. */
+    /**
+     * Sets the interpolation to use for display.
+     * 设置显示时使用的插值。
+     */
     public void setVisualInterpolation(Interp interpolation){
         this.visualInterpolation = interpolation;
     }
 
-    /** If true (the default), inner Drawable positions and sizes are rounded to integers. */
+    /**
+     * If true (the default), inner Drawable positions and sizes are rounded to integers.
+     * 为 true(默认)时,内部 Drawable 的位置和尺寸会四舍五入为整数。
+     */
     public void setRound(boolean round){
         this.round = round;
     }
@@ -356,24 +391,41 @@ public class ProgressBar extends Element implements Disableable{
         this.disabled = disabled;
     }
 
-    /** True if the progress bar is vertical, false if it is horizontal. **/
+    /**
+     * True if the progress bar is vertical, false if it is horizontal.
+     * 进度条为垂直方向时为 true,水平方向时为 false。
+     */
     public boolean isVertical(){
         return vertical;
     }
 
     /**
      * The style for a progress bar, see {@link ProgressBar}.
+     * <p>
+     * 进度条的样式,见 {@link ProgressBar}。
      * @author mzechner
      * @author Nathan Sweet
      */
     public static class ProgressBarStyle extends Style{
-        /** The progress bar background, stretched only in one direction. Optional. */
+        /**
+         * The progress bar background, stretched only in one direction. Optional.
+         * 进度条背景,仅沿一个方向拉伸。可选。
+         */
         public Drawable background;
-        /** Optional. **/
+        /**
+         * Optional.
+         * 可选。
+         */
         public Drawable disabledBackground;
-        /** Optional, centered on the background. */
+        /**
+         * Optional, centered on the background.
+         * 可选,居中于背景之上。
+         */
         public Drawable knob, disabledKnob;
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Drawable knobBefore, knobAfter, disabledKnobBefore, disabledKnobAfter;
 
         public ProgressBarStyle(){

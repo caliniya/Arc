@@ -20,6 +20,8 @@ import arc.util.pooling.Pools;
  * <p>
  * {@link ChangeEvent} is fired when the touchpad knob is moved. Cancelling the event will move the knob to where it was
  * previously.
+ * <p>
+ * 屏幕上的虚拟摇杆。摇杆的移动区域是圆形的,以触控板为中心,大小由触控板较小的一边决定。 <p> 触控板的首选大小由背景决定。 <p> 移动触控板旋钮时会触发 {@link ChangeEvent}。取消该事件会将旋钮移回之前的位置。
  * @author Josh Street
  */
 public class Touchpad extends Element{
@@ -33,11 +35,11 @@ public class Touchpad extends Element{
     private TouchpadStyle style;
     private float deadzoneRadius;
 
-    /** @param deadzoneRadius The distance in pixels from the center of the touchpad required for the knob to be moved. */
+    /** @param deadzoneRadius The distance in pixels from the center of the touchpad required for the knob to be moved. 旋钮开始移动所需的、距触控板中心的距离(像素)。 */
     public Touchpad(float deadzoneRadius){
         this(deadzoneRadius, Core.scene.getStyle(TouchpadStyle.class));
     }
-    /** @param deadzoneRadius The distance in pixels from the center of the touchpad required for the knob to be moved. */
+    /** @param deadzoneRadius The distance in pixels from the center of the touchpad required for the knob to be moved. 旋钮开始移动所需的、距触控板中心的距离(像素)。 */
     public Touchpad(float deadzoneRadius, TouchpadStyle style){
         if(deadzoneRadius < 0) throw new IllegalArgumentException("deadzoneRadius must be > 0");
         this.deadzoneRadius = deadzoneRadius;
@@ -103,6 +105,8 @@ public class Touchpad extends Element{
     /**
      * Returns the touchpad's style. Modifying the returned style may not have an effect until {@link #setStyle(TouchpadStyle)} is
      * called.
+     * <p>
+     * 返回触控板的样式。在调用 {@link #setStyle(TouchpadStyle)} 之前,修改返回的样式可能不会生效。
      */
     public TouchpadStyle getStyle(){
         return style;
@@ -122,6 +126,7 @@ public class Touchpad extends Element{
     @Override
     public void layout(){
         // Recalc margin and deadzone bounds
+        // 重新计算外边距和死区边界
         float halfWidth = getWidth() / 2;
         float halfHeight = getHeight() / 2;
         float radius = Math.min(halfWidth, halfHeight);
@@ -130,6 +135,7 @@ public class Touchpad extends Element{
         knobBounds.set(halfWidth, halfHeight, radius);
         deadzoneBounds.set(halfWidth, halfHeight, deadzoneRadius);
         // Recalc margin values and knob position
+        // 重新计算外边距值和旋钮位置
         knobPosition.set(halfWidth, halfHeight);
         knobPercent.set(0, 0);
     }
@@ -175,24 +181,30 @@ public class Touchpad extends Element{
         return resetOnTouchUp;
     }
 
-    /** @param reset Whether to reset the knob to the center on touch up. */
+    /** @param reset Whether to reset the knob to the center on touch up. 是否在触摸抬起时将旋钮重置到中心。 */
     public void setResetOnTouchUp(boolean reset){
         this.resetOnTouchUp = reset;
     }
 
-    /** @param deadzoneRadius The distance in pixels from the center of the touchpad required for the knob to be moved. */
+    /** @param deadzoneRadius The distance in pixels from the center of the touchpad required for the knob to be moved. 旋钮开始移动所需的、距触控板中心的距离(像素)。 */
     public void setDeadzone(float deadzoneRadius){
         if(deadzoneRadius < 0) throw new IllegalArgumentException("deadzoneRadius must be > 0");
         this.deadzoneRadius = deadzoneRadius;
         invalidate();
     }
 
-    /** Returns the x-position of the knob relative to the center of the widget. The positive direction is right. */
+    /**
+     * Returns the x-position of the knob relative to the center of the widget. The positive direction is right.
+     * 返回旋钮相对于控件中心的 x 位置。正方向为右。
+     */
     public float getKnobX(){
         return knobPosition.x;
     }
 
-    /** Returns the y-position of the knob relative to the center of the widget. The positive direction is up. */
+    /**
+     * Returns the y-position of the knob relative to the center of the widget. The positive direction is up.
+     * 返回旋钮相对于控件中心的 y 位置。正方向为上。
+     */
     public float getKnobY(){
         return knobPosition.y;
     }
@@ -200,6 +212,8 @@ public class Touchpad extends Element{
     /**
      * Returns the x-position of the knob as a percentage from the center of the touchpad to the edge of the circular movement
      * area. The positive direction is right.
+     * <p>
+     * 以百分比形式返回旋钮的 x 位置,范围是从触控板中心到圆形移动区域边缘。正方向为右。
      */
     public float getKnobPercentX(){
         return knobPercent.x;
@@ -208,6 +222,8 @@ public class Touchpad extends Element{
     /**
      * Returns the y-position of the knob as a percentage from the center of the touchpad to the edge of the circular movement
      * area. The positive direction is up.
+     * <p>
+     * 以百分比形式返回旋钮的 y 位置,范围是从触控板中心到圆形移动区域边缘。正方向为上。
      */
     public float getKnobPercentY(){
         return knobPercent.y;
@@ -215,13 +231,21 @@ public class Touchpad extends Element{
 
     /**
      * The style for a {@link Touchpad}.
+     * <p>
+     * {@link Touchpad} 的样式。
      * @author Josh Street
      */
     public static class TouchpadStyle{
-        /** Stretched in both directions. Optional. */
+        /**
+         * Stretched in both directions. Optional.
+         * 在两个方向上拉伸。可选。
+         */
         public Drawable background;
 
-        /** Optional. */
+        /**
+         * Optional.
+         * 可选。
+         */
         public Drawable knob;
 
         public TouchpadStyle(){

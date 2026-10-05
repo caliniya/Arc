@@ -12,6 +12,8 @@ import java.util.Iterator;
 /**
  * Manages selected objects. Optionally fires a {@link ChangeEvent} on an element. Selection changes can be vetoed via
  * {@link ChangeEvent#cancel()}.
+ * <p>
+ * 管理被选中的对象。可选择在一个元素上触发 {@link ChangeEvent}。可以通过 {@link ChangeEvent#cancel()} 否决选择变更。
  * @author Nathan Sweet
  */
 public class Selection<T> implements Disableable, Iterable<T>{
@@ -25,7 +27,7 @@ public class Selection<T> implements Disableable, Iterable<T>{
     private boolean toggle;
     private boolean programmaticChangeEvents = true;
 
-    /** @param element An element to fire {@link ChangeEvent} on when the selection changes, or null. */
+    /** @param element An element to fire {@link ChangeEvent} on when the selection changes, or null. 选择变更时在其上触发 {@link ChangeEvent} 的元素,可为 null。 */
     public void setActor(Element element){
         this.element = element;
     }
@@ -33,6 +35,8 @@ public class Selection<T> implements Disableable, Iterable<T>{
     /**
      * Selects or deselects the specified item based on how the selection is configured, whether ctrl is currently pressed, etc.
      * This is typically invoked by user interaction.
+     * <p>
+     * 根据选择的配置方式、当前是否按下 ctrl 键等,选择或取消选择指定条目。通常由用户交互触发。
      */
     public void choose(T item){
         if(item == null) throw new IllegalArgumentException("item cannot be null.");
@@ -78,7 +82,10 @@ public class Selection<T> implements Disableable, Iterable<T>{
         return selected;
     }
 
-    /** Returns the first selected item, or null. */
+    /**
+     * Returns the first selected item, or null.
+     * 返回第一个被选中的条目,若无则返回 null。
+     */
     public T first(){
         return selected.size == 0 ? null : selected.first();
     }
@@ -97,7 +104,10 @@ public class Selection<T> implements Disableable, Iterable<T>{
         old.clear(32);
     }
 
-    /** Sets the selection to only the specified item. */
+    /**
+     * Sets the selection to only the specified item.
+     * 将选择设置为仅包含指定条目。
+     */
     public void set(T item){
         if(item == null) throw new IllegalArgumentException("item cannot be null.");
         if(selected.size == 1 && selected.first() == item) return;
@@ -134,7 +144,10 @@ public class Selection<T> implements Disableable, Iterable<T>{
         cleanup();
     }
 
-    /** Adds the item to the selection. */
+    /**
+     * Adds the item to the selection.
+     * 将该条目加入选择。
+     */
     public void add(T item){
         if(item == null) throw new IllegalArgumentException("item cannot be null.");
         if(!selected.add(item)) return;
@@ -208,14 +221,19 @@ public class Selection<T> implements Disableable, Iterable<T>{
         cleanup();
     }
 
-    /** Called after the selection changes. The default implementation does nothing. */
+    /**
+     * Called after the selection changes. The default implementation does nothing.
+     * 选择变化后调用。默认实现不做任何操作。
+     */
     protected void changed(){
     }
 
     /**
      * Fires a change event on the selection's element, if any. Called internally when the selection changes, depending on
      * {@link #setProgrammaticChangeEvents(boolean)}.
-     * @return true if the change should be undone.
+     * <p>
+     * 在选择所关联的元素上触发变更事件(如有)。当选择变化时由内部调用,取决于 {@link #setProgrammaticChangeEvents(boolean)}。
+     * @return true if the change should be undone. 若应撤销该变更则返回 true。
      */
     public boolean fireChangeEvent(){
         if(element == null) return false;
@@ -231,7 +249,10 @@ public class Selection<T> implements Disableable, Iterable<T>{
         return item != null && selected.contains(item);
     }
 
-    /** Makes a best effort to return the last item selected, else returns an arbitrary item or null if the selection is empty. */
+    /**
+     * Makes a best effort to return the last item selected, else returns an arbitrary item or null if the selection is empty.
+     * 尽力返回最后选择的条目,否则返回任一条目;若选择为空则返回 null。
+     */
     public T getLastSelected(){
         if(lastSelected != null){
             return lastSelected;
@@ -259,7 +280,10 @@ public class Selection<T> implements Disableable, Iterable<T>{
         return isDisabled;
     }
 
-    /** If true, prevents {@link #choose(Object)} from changing the selection. Default is false. */
+    /**
+     * If true, prevents {@link #choose(Object)} from changing the selection. Default is false.
+     * 为 true 时,阻止 {@link #choose(Object)} 更改选择。默认为 false。
+     */
     @Override
     public void setDisabled(boolean isDisabled){
         this.isDisabled = isDisabled;
@@ -269,7 +293,10 @@ public class Selection<T> implements Disableable, Iterable<T>{
         return toggle;
     }
 
-    /** If true, prevents {@link #choose(Object)} from clearing the selection. Default is false. */
+    /**
+     * If true, prevents {@link #choose(Object)} from clearing the selection. Default is false.
+     * 为 true 时,阻止 {@link #choose(Object)} 清除选择。默认为 false。
+     */
     public void setToggle(boolean toggle){
         this.toggle = toggle;
     }
@@ -278,7 +305,10 @@ public class Selection<T> implements Disableable, Iterable<T>{
         return multiple;
     }
 
-    /** If true, allows {@link #choose(Object)} to select multiple items. Default is false. */
+    /**
+     * If true, allows {@link #choose(Object)} to select multiple items. Default is false.
+     * 为 true 时,允许 {@link #choose(Object)} 选择多个条目。默认为 false。
+     */
     public void setMultiple(boolean multiple){
         this.multiple = multiple;
     }
@@ -287,12 +317,18 @@ public class Selection<T> implements Disableable, Iterable<T>{
         return required;
     }
 
-    /** If true, prevents {@link #choose(Object)} from selecting none. Default is false. */
+    /**
+     * If true, prevents {@link #choose(Object)} from selecting none. Default is false.
+     * 为 true 时,阻止 {@link #choose(Object)} 清空选择。默认为 false。
+     */
     public void setRequired(boolean required){
         this.required = required;
     }
 
-    /** If false, only {@link #choose(Object)} will fire a change event. Default is true. */
+    /**
+     * If false, only {@link #choose(Object)} will fire a change event. Default is true.
+     * 为 false 时,只有 {@link #choose(Object)} 会触发变更事件。默认为 true。
+     */
     public void setProgrammaticChangeEvents(boolean programmaticChangeEvents){
         this.programmaticChangeEvents = programmaticChangeEvents;
     }
