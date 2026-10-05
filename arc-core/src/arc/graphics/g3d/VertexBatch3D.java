@@ -110,7 +110,10 @@ public class VertexBatch3D{
         return shader.toString();
     }
 
-    /** Returns a new instance of the default shader used by SpriteBatch for GL2 when no shader is specified. */
+    /**
+     * Returns a new instance of the default shader used by SpriteBatch for GL2 when no shader is specified.
+     * 返回未指定着色器时 SpriteBatch 在 GL2 下使用的默认着色器的新实例。
+     */
     public static Shader createDefaultShader(boolean hasNormals, boolean hasColors, boolean hasTexCoords){
         return new Shader(createVertexShader(hasNormals, hasColors, hasTexCoords), createFragmentShader(hasNormals, hasColors, hasTexCoords));
     }

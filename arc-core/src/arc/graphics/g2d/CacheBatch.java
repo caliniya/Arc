@@ -18,6 +18,7 @@ public class CacheBatch extends Batch{
     @Override
     public void flush(){
         //does nothing, since flushing like this isn't needed
+        // 不做任何事,因为不需要这种刷新
     }
 
     @Override
@@ -46,6 +47,7 @@ public class CacheBatch extends Batch{
     @Override
     protected void draw(Texture texture, float[] spriteVertices, int offset, int count){
         //this creates a new array, but considering it's being cached garbage probably isn't important anyway
+        // 这会创建一个新数组,但考虑到是缓存场景,产生的垃圾应该无关紧要
         float[] vertices = count / 6 * 5 == tmpVertices.length ? tmpVertices : new float[count / 6 * 5];
         for(int i = 0; i < count / 6; i++){
             int index = i * 6;
@@ -58,6 +60,7 @@ public class CacheBatch extends Batch{
         }
 
         //TODO do some copying to fix this for non-indexed batches
+        // TODO 通过一些复制操作来修复非索引批处理的情况
         cache.add(texture, vertices, 0, vertices.length);
     }
 

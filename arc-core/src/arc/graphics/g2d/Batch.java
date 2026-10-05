@@ -4,7 +4,10 @@ import arc.graphics.*;
 import arc.math.*;
 import arc.util.*;
 
-/** Base batch class. Provides a mesh, texture, shader, and other state. */
+/**
+ * Base batch class. Provides a mesh, texture, shader, and other state.
+ * 批处理基类。提供网格、纹理、着色器及其他状态。
+ */
 public abstract class Batch implements Disposable{
     protected float z;
     protected int idx = 0;
@@ -27,7 +30,10 @@ public abstract class Batch implements Disposable{
         this.z = z;
     }
 
-    /** Enables or disables Z-sorting. Flushes the batch. Only does something on supported batches. */
+    /**
+     * Enables or disables Z-sorting. Flushes the batch. Only does something on supported batches.
+     * 启用或禁用 Z 排序。会刷新批处理。仅在支持的批处理上有效。
+     */
     protected void setSort(boolean sort){
 
     }
@@ -58,7 +64,10 @@ public abstract class Batch implements Disposable{
 
     protected abstract void flush();
 
-    /** Discards any pending sprites. */
+    /**
+     * Discards any pending sprites.
+     * 丢弃所有待处理的精灵。
+     */
     protected void discard(){
         idx = 0;
     }

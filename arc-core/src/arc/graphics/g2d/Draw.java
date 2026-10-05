@@ -28,6 +28,8 @@ public class Draw{
     }
 
     /** Blits an already-bound texture onto the screen with a shader.
+     * <p>
+     * 使用着色器将已绑定的纹理位块传输(blit)到屏幕上。 这不使用精灵批处理!
      * This does not use a spritebatch! */
     public static void blit(Shader shader){
         shader.bind();
@@ -36,6 +38,8 @@ public class Draw{
     }
 
     /** Blits a texture onto the screen with a shader.
+     * <p>
+     * 使用着色器将纹理位块传输(blit)到屏幕上。 这不使用精灵批处理!
      * This does not use a spritebatch! */
     public static void blit(Texture texture, Shader shader){
         texture.bind(0);
@@ -45,6 +49,8 @@ public class Draw{
     }
 
     /** Blits a framebuffer onto the screen with a shader.
+     * <p>
+     * 使用着色器将帧缓冲位块传输(blit)到屏幕上。 这不使用精灵批处理!
      * This does not use a spritebatch! */
     public static void blit(FrameBuffer buffer, Shader shader){
         blit(buffer.texture, shader);
@@ -133,12 +139,18 @@ public class Draw{
         Core.batch.setShader(null);
     }
 
-    /** Note that sorting is disabled by default, even if it is supported. */
+    /**
+     * Note that sorting is disabled by default, even if it is supported.
+     * 注意,即使支持排序,默认也是禁用的。
+     */
     public static void sort(boolean sort){
         batch.setSort(sort);
     }
 
-    /** Sets a Z-transformer function that will modify subsequent calls to Draw.z. Yep, this is as terrible as it sounds. */
+    /**
+     * Sets a Z-transformer function that will modify subsequent calls to Draw.z. Yep, this is as terrible as it sounds.
+     * 设置一个 Z 变换函数,它将修改后续对 Draw.z 的调用。是的,正如听起来的那样糟糕。
+     */
     public static void zTransform(FloatFloatf f){
         zTransformer = f;
     }
@@ -151,7 +163,10 @@ public class Draw{
         return actualZ;
     }
 
-    /** Note that this does nothing on most Batch implementations. */
+    /**
+     * Note that this does nothing on most Batch implementations.
+     * 注意,这在大多数 Batch 实现上不起作用。
+     */
     public static void z(float z){
         Core.batch.z(zTransformer == null ? actualZ = z : zTransformer.get(actualZ = z));
     }
@@ -230,7 +245,10 @@ public class Draw{
         color(Tmp.c1.lerp(carr, progress));
     }
 
-    /** Automatically mixes colors. */
+    /**
+     * Automatically mixes colors.
+     * 自动混合颜色。
+     */
     public static void color(Color a, Color b, float s){
         Core.batch.setPackedColor(Tmp.c1.set(a).lerp(b, s).toFloatBits());
     }
@@ -247,12 +265,18 @@ public class Draw{
         Core.batch.setPackedColor(Color.toFloatBits(r, g, b, Mathf.clamp(a)));
     }
 
-    /** Lightness color. */
+    /**
+     * Lightness color.
+     * 亮度颜色。
+     */
     public static void colorl(float l){
         color(l, l, l);
     }
 
-    /** Lightness color, alpha. */
+    /**
+     * Lightness color, alpha.
+     * 亮度颜色,含 alpha。
+     */
     public static void colorl(float l, float a){
         color(l, l, l, a);
     }
@@ -283,17 +307,26 @@ public class Draw{
         batch.setPackedColor(Color.intToFloatColor((abgr & 0x00ffffff) | (rawAlpha << 24)));
     }
 
-    /** Draws a portion of a world-sized texture. */
+    /**
+     * Draws a portion of a world-sized texture.
+     * 绘制世界尺寸纹理的一部分。
+     */
     public static void fbo(FrameBuffer buffer, int worldWidth, int worldHeight, int tilesize){
         fbo(buffer.texture, worldWidth, worldHeight, tilesize);
     }
 
-    /** Draws a portion of a world-sized texture. */
+    /**
+     * Draws a portion of a world-sized texture.
+     * 绘制世界尺寸纹理的一部分。
+     */
     public static void fbo(Texture texture, int worldWidth, int worldHeight, int tilesize){
         fbo(texture, worldWidth, worldHeight, tilesize, 0f);
     }
 
-    /** Draws a portion of a world-sized texture. */
+    /**
+     * Draws a portion of a world-sized texture.
+     * 绘制世界尺寸纹理的一部分。
+     */
     public static void fbo(Texture texture, int worldWidth, int worldHeight, int tilesize, float offset){
         float ww = worldWidth * tilesize, wh = worldHeight * tilesize;
         float x = camera.position.x + offset, y = camera.position.y + offset;
@@ -309,6 +342,8 @@ public class Draw{
     }
 
     /** On a sorting or queued batch implementation, this treats everything inside the runnable as one unit.
+     * <p>
+     * 在排序或排队批处理实现上,这会将 runnable 内的所有内容视为一个单元。因此可用于设置着色器及其他特殊状态。
      * Thus, it can be used to set shaders and do other special state. */
     public static void draw(float z, Runnable run){
         z(z);
@@ -316,12 +351,16 @@ public class Draw{
     }
 
     /** Applies runnables for the begin and end of a specific Z value.
+     * <p>
+     * 为特定 Z 值的开始和结束应用 runnable。可用于帧缓冲或批处理着色器的开始/结束。
      * Useful for framebuffers or batched shader begin/ends. */
     public static void drawRange(float z, Runnable begin, Runnable end){
         drawRange(z, 0.001f, begin, end);
     }
 
     /** Applies runnables for the begin and end of a specific Z value.
+     * <p>
+     * 为特定 Z 值的开始和结束应用 runnable。可用于帧缓冲或批处理着色器的开始/结束。
      * Useful for framebuffers or batched shader begin/ends. */
     public static void drawRange(float z, float range, Runnable begin, Runnable end){
         draw(z - range, begin);
@@ -371,7 +410,10 @@ public class Draw{
         Draw.vert(region.texture, vertices, 0, vertices.length);
     }
 
-    /** Fill a white quad to the camera. */
+    /**
+     * Fill a white quad to the camera.
+     * 向相机填充一个白色四边形。
+     */
     public static void rect(){
         Fill.rect(camera.position.x, camera.position.y, camera.width, camera.height);
     }
@@ -436,7 +478,10 @@ public class Draw{
         if(batch != null) batch.flush();
     }
 
-    /** Discards any pending batched sprites. */
+    /**
+     * Discards any pending batched sprites.
+     * 丢弃所有待批处理的精灵。
+     */
     public static void discard(){
         batch.discard();
     }
@@ -484,6 +529,7 @@ public class Draw{
         y -= height/2f;
 
         //bottom left and top right corner points relative to origin
+        // 相对于原点的左下角和右上角顶点
         float worldOriginX = x + originX;
         float worldOriginY = y + originY;
         float fx = -originX;
@@ -492,6 +538,7 @@ public class Draw{
         float fy2 = height - originY;
 
         // rotate
+        // 旋转
         float cos = Mathf.cosDeg(rotation);
         float sin = Mathf.sinDeg(rotation);
 

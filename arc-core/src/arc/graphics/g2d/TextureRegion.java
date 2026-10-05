@@ -7,24 +7,38 @@ import arc.graphics.g2d.TextureAtlas.*;
 /**
  * Defines a rectangular area of a texture. The coordinate system used has its origin in the upper left corner with the x-axis
  * pointing to the right and the y axis pointing downwards.
+ * <p>
+ * 定义纹理中的一个矩形区域。所用坐标系原点位于左上角,x 轴向右,y 轴向下。
  * @author mzechner
  * @author Nathan Sweet
  */
 public class TextureRegion{
     public Texture texture;
 
-    /** Read-only. Use setters to change. */
+    /**
+     * Read-only. Use setters to change.
+     * 只读。请使用 setter 修改。
+     */
     public float u, v, u2, v2;
-    /** Read-only. Use setters to change. */
+    /**
+     * Read-only. Use setters to change.
+     * 只读。请使用 setter 修改。
+     */
     public int width, height;
 
     public float scale = 1.0f;
 
-    /** Constructs a region with no texture and no coordinates defined. */
+    /**
+     * Constructs a region with no texture and no coordinates defined.
+     * 构造未定义纹理和坐标的区域。
+     */
     public TextureRegion(){
     }
 
-    /** Constructs a region the size of the specified texture. */
+    /**
+     * Constructs a region the size of the specified texture.
+     * 构造与指定纹理等大的区域。
+     */
     public TextureRegion(Texture texture){
         if(texture == null) throw new IllegalArgumentException("texture cannot be null.");
         this.texture = texture;
@@ -32,8 +46,8 @@ public class TextureRegion{
     }
 
     /**
-     * @param width The width of the texture region. May be negative to flip the sprite when drawn.
-     * @param height The height of the texture region. May be negative to flip the sprite when drawn.
+     * @param width The width of the texture region. May be negative to flip the sprite when drawn. 纹理区域的宽度。可为负,绘制时精灵将翻转。
+     * @param height The height of the texture region. May be negative to flip the sprite when drawn. 纹理区域的高度。可为负,绘制时精灵将翻转。
      */
     public TextureRegion(Texture texture, int width, int height){
         this.texture = texture;
@@ -41,8 +55,8 @@ public class TextureRegion{
     }
 
     /**
-     * @param width The width of the texture region. May be negative to flip the sprite when drawn.
-     * @param height The height of the texture region. May be negative to flip the sprite when drawn.
+     * @param width The width of the texture region. May be negative to flip the sprite when drawn. 纹理区域的宽度。可为负,绘制时精灵将翻转。
+     * @param height The height of the texture region. May be negative to flip the sprite when drawn. 纹理区域的高度。可为负,绘制时精灵将翻转。
      */
     public TextureRegion(Texture texture, int x, int y, int width, int height){
         this.texture = texture;
@@ -54,15 +68,20 @@ public class TextureRegion{
         set(u, v, u2, v2);
     }
 
-    /** Constructs a region with the same texture and coordinates of the specified region. */
+    /**
+     * Constructs a region with the same texture and coordinates of the specified region.
+     * 构造与指定区域具有相同纹理和坐标的区域。
+     */
     public TextureRegion(TextureRegion region){
         set(region);
     }
 
     /**
      * Constructs a region with the same texture as the specified region and sets the coordinates relative to the specified region.
-     * @param width The width of the texture region. May be negative to flip the sprite when drawn.
-     * @param height The height of the texture region. May be negative to flip the sprite when drawn.
+     * <p>
+     * 构造与指定区域纹理相同的区域,并设置相对于该区域的坐标。
+     * @param width The width of the texture region. May be negative to flip the sprite when drawn. 纹理区域的宽度。可为负,绘制时精灵将翻转。
+     * @param height The height of the texture region. May be negative to flip the sprite when drawn. 纹理区域的高度。可为负,绘制时精灵将翻转。
      */
     public TextureRegion(TextureRegion region, int x, int y, int width, int height){
         set(region, x, y, width, height);
@@ -72,10 +91,12 @@ public class TextureRegion{
      * Helper function to create tiles out of the given {@link Texture} starting from the top left corner going to the right and
      * ending at the bottom right corner. Only complete tiles will be returned so if the texture's width or height are not a
      * multiple of the tile width and height not all of the texture will be used.
-     * @param texture the Texture
-     * @param tileWidth a tile's width in pixels
-     * @param tileHeight a tile's height in pixels
-     * @return a 2D array of TextureRegions indexed by [row][column].
+     * <p>
+     * 辅助函数,从给定 {@link Texture} 的左上角开始向右、直到右下角切分出图块。只返回完整的图块,因此若纹理的宽或高不是图块宽高的整数倍,纹理不会被全部使用。
+     * @param texture the Texture 纹理
+     * @param tileWidth a tile's width in pixels 图块宽度(像素)
+     * @param tileHeight a tile's height in pixels 图块高度(像素)
+     * @return a 2D array of TextureRegions indexed by [row][column]. 按 [row][column] 索引的 TextureRegion 二维数组。
      */
     public static TextureRegion[][] split(Texture texture, int tileWidth, int tileHeight){
         TextureRegion region = new TextureRegion(texture);
@@ -90,15 +111,18 @@ public class TextureRegion{
         return Core.atlas != null && Core.atlas.error != this;
     }
 
-    /** Sets the texture and sets the coordinates to the size of the specified texture. */
+    /**
+     * Sets the texture and sets the coordinates to the size of the specified texture.
+     * 设置纹理,并将坐标设为该纹理的大小。
+     */
     public void set(Texture texture){
         this.texture = texture;
         set(0, 0, texture.width, texture.height);
     }
 
     /**
-     * @param width The width of the texture region. May be negative to flip the sprite when drawn.
-     * @param height The height of the texture region. May be negative to flip the sprite when drawn.
+     * @param width The width of the texture region. May be negative to flip the sprite when drawn. 纹理区域的宽度。可为负,绘制时精灵将翻转。
+     * @param height The height of the texture region. May be negative to flip the sprite when drawn. 纹理区域的高度。可为负,绘制时精灵将翻转。
      */
     public TextureRegion set(int x, int y, int width, int height){
         float invTexWidth = 1f / texture.width;
@@ -116,6 +140,7 @@ public class TextureRegion{
         height = Math.round(Math.abs(v2 - v) * texHeight);
 
         // For a 1x1 region, adjust UVs toward pixel center to avoid filtering artifacts on AMD GPUs when drawing very stretched.
+        // 对于 1x1 区域,将 UV 调整到像素中心,以避免在 AMD GPU 上极度拉伸绘制时出现过滤瑕疵。
         if(width == 1 && height == 1){
             float adjustX = 0.25f / texWidth;
             u += adjustX;
@@ -131,7 +156,10 @@ public class TextureRegion{
         this.v2 = v2;
     }
 
-    /** Sets the texture and coordinates to the specified region. */
+    /**
+     * Sets the texture and coordinates to the specified region.
+     * 将纹理和坐标设置为指定区域。
+     */
     public void set(TextureRegion region){
         texture = region.texture;
         scale = region.scale;
@@ -143,14 +171,20 @@ public class TextureRegion{
         height = region.height;
     }
 
-    /** Sets the texture to that of the specified region and sets the coordinates relative to the specified region. */
+    /**
+     * Sets the texture to that of the specified region and sets the coordinates relative to the specified region.
+     * 将纹理设为指定区域的纹理,并设置相对于该区域的坐标。
+     */
     public void set(TextureRegion region, int x, int y, int width, int height){
         texture = region.texture;
         scale = region.scale;
         set(region.getX() + x, region.getY() + y, width, height);
     }
 
-    /** Sets the texture to that of the specified region and sets the coordinates relative to the specified region. */
+    /**
+     * Sets the texture to that of the specified region and sets the coordinates relative to the specified region.
+     * 将纹理设为指定区域的纹理,并设置相对于该区域的坐标。
+     */
     public void set(Texture texture, int x, int y, int width, int height){
         this.texture = texture;
         set(x, y, width, height);
@@ -245,7 +279,10 @@ public class TextureRegion{
         }
     }
 
-    /** @return x/y aspect ratio */
+    /**
+     * @return x/y aspect ratio
+     * @return x/y aspect ratio x/y 宽高比
+     */
     public float ratio(){
         return (float)width / height;
     }
@@ -261,8 +298,10 @@ public class TextureRegion{
     /**
      * Offsets the region relative to the current region. Generally the region's size should be the entire size of the texture in
      * the direction(s) it is scrolled.
-     * @param xAmount The percentage to offset horizontally.
-     * @param yAmount The percentage to offset vertically. This is done in texture space, so up is negative.
+     * <p>
+     * 相对于当前区域偏移该区域。通常,在滚动的方向上区域大小应为整个纹理的大小。
+     * @param xAmount The percentage to offset horizontally. 水平偏移的百分比。
+     * @param yAmount The percentage to offset vertically. This is done in texture space, so up is negative. 垂直偏移的百分比。在纹理空间中进行,因此向上为负。
      */
     public void scroll(float xAmount, float yAmount){
         if(xAmount != 0){
@@ -282,9 +321,11 @@ public class TextureRegion{
      * the bottom right corner. Only complete tiles will be returned so if the region's width or height are not a multiple of the
      * tile width and height not all of the region will be used. This will not work on texture regions returned form a TextureAtlas
      * that either have whitespace removed or where flipped before the region is split.
-     * @param tileWidth a tile's width in pixels
-     * @param tileHeight a tile's height in pixels
-     * @return a 2D array of TextureRegions indexed by [row][column].
+     * <p>
+     * 辅助函数,从此 TextureRegion 的左上角开始向右、直到右下角切分出图块。只返回完整的图块,因此若区域的宽或高不是图块宽高的整数倍,区域不会被全部使用。对来自 TextureAtlas、已去除空白或在切分前翻转过的纹理区域无效。
+     * @param tileWidth a tile's width in pixels 图块宽度(像素)
+     * @param tileHeight a tile's height in pixels 图块高度(像素)
+     * @return a 2D array of TextureRegions indexed by [row][column]. 按 [row][column] 索引的 TextureRegion 二维数组。
      */
     public TextureRegion[][] split(int tileWidth, int tileHeight){
         if(texture == null) return null;

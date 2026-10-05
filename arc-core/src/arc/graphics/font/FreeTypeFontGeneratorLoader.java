@@ -12,6 +12,8 @@ import arc.struct.*;
  * {@code assetManager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(new InternalFileHandleResolver()))}
  * to register it.
  * </p>
+ * <p>
+ * 使 {@link FreeTypeFontGenerator} 可通过 {@link AssetManager} 管理。 <p> 调用 {@code assetManager.setLoader(FreeTypeFontGenerator.class, new FreeTypeFontGeneratorLoader(new InternalFileHandleResolver()))} 注册。 </p>
  * @author Daniel Holderbaum
  */
 public class FreeTypeFontGeneratorLoader extends SynchronousAssetLoader<FreeTypeFontGenerator, FreeTypeFontGeneratorLoader.FreeTypeFontGeneratorParameters>{

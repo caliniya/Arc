@@ -6,11 +6,15 @@ import arc.graphics.gl.*;
 import arc.math.*;
 import arc.math.geom.*;
 
-/** A SpriteBatch that projects sprites onto a plane in 3D space. */
+/**
+ * A SpriteBatch that projects sprites onto a plane in 3D space.
+ * 将精灵投影到 3D 空间中某平面上的 SpriteBatch。
+ */
 public class PlaneBatch3D extends Batch{
     protected final Vec3 up = new Vec3(), right = new Vec3(), origin = new Vec3(), vec = new Vec3();
     protected final VertexBatch3D batch;
     protected final float[] vertex = new float[7]; //format: xyzcuvd
+    // 格式:xyzcuvd
     protected float scaling = 1f;
 
     public PlaneBatch3D(){
@@ -21,12 +25,18 @@ public class PlaneBatch3D extends Batch{
         batch = new VertexBatch3D(vertices, false, true, true);
     }
 
-    /** Sets scaling of sprite units. */
+    /**
+     * Sets scaling of sprite units.
+     * 设置精灵单位的缩放。
+     */
     public void setScaling(float scaling){
         this.scaling = scaling;
     }
 
-    /** Sets the plane that this batch projects sprites onto. */
+    /**
+     * Sets the plane that this batch projects sprites onto.
+     * 设置此批处理投影精灵的目标平面。
+     */
     public void setPlane(Vec3 origin, Vec3 up, Vec3 right){
         this.origin.set(origin);
         this.up.set(up).nor();
@@ -44,6 +54,7 @@ public class PlaneBatch3D extends Batch{
         }
 
         //disable depth mask when flushing to prevent Z fighting
+        // 刷新时禁用深度掩码以防止 Z 冲突
         Gl.depthMask(false);
 
         lastTexture.bind();
@@ -82,6 +93,7 @@ public class PlaneBatch3D extends Batch{
         float y4;
 
         // rotate
+        // 旋转
         final float cos = Mathf.cosDeg(rotation);
         final float sin = Mathf.sinDeg(rotation);
 

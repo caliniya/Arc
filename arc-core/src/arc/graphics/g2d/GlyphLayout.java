@@ -14,6 +14,8 @@ import arc.util.pooling.Pools;
 
 /**
  * Stores {@link GlyphRun runs} of glyphs for a piece of text. The text may contain newlines and color markup tags.
+ * <p>
+ * 存储一段文本的 {@link GlyphRun run} 字形序列。文本可包含换行符和颜色标记标签。
  * @author Nathan Sweet
  * @author davebaol
  * @author Alexander Dorokhov
@@ -24,7 +26,10 @@ public class GlyphLayout implements Poolable{
     public boolean ignoreMarkup = false;
     public float width, height;
 
-    /** Creates an empty GlyphLayout. */
+    /**
+     * Creates an empty GlyphLayout.
+     * 创建空的 GlyphLayout。
+     */
     public GlyphLayout(){
     }
 
@@ -64,12 +69,12 @@ public class GlyphLayout implements Poolable{
     /**
      * @param color The default color to use for the text (the BitmapFont {@link Font#getColor() color} is not used). If
      * {@link FontData#markupEnabled} is true, color markup tags in the specified string may change the color for
-     * portions of the text.
-     * @param halign Horizontal alignment of the text, see {@link Align}.
-     * @param targetWidth The width used for alignment, line wrapping, and truncation. May be zero if those features are not used.
+     * portions of the text. 文本使用的默认颜色(不使用 BitmapFont 的 {@link Font#getColor() 颜色})。若 {@link FontData#markupEnabled} 为 true,指定字符串中的颜色标记标签可能改变部分文本的颜色。
+     * @param halign Horizontal alignment of the text, see {@link Align}. 文本的水平对齐方式,见 {@link Align}。
+     * @param targetWidth The width used for alignment, line wrapping, and truncation. May be zero if those features are not used. 用于对齐、换行和截断的宽度。若不使用这些功能可为 0。
      * @param truncate If not null and the width of the glyphs exceed targetWidth, the glyphs are truncated and the glyphs for the
      * specified truncate string are placed at the end. Empty string can be used to truncate without adding glyphs.
-     * Truncate should not be used with text that contains multiple lines. Wrap is ignored if truncate is not null.
+     * Truncate should not be used with text that contains multiple lines. Wrap is ignored if truncate is not null. 若不为 null 且字形宽度超过 targetWidth,则截断字形,并将指定截断字符串的字形放在末尾。可用空字符串截断而不添加字形。截断不应用于多行文本。若 truncate 不为 null,则忽略换行。
      */
     public void setText(Font font, CharSequence str, int start, int end, Color color, float targetWidth, int halign,
                         boolean wrap, String truncate){
@@ -78,8 +83,10 @@ public class GlyphLayout implements Poolable{
 
         if(truncate != null)
             wrap = true; // Causes truncate code to run, doesn't actually cause wrapping.
+            // 使截断代码执行,并不会真正引起换行。
         else if(targetWidth <= fontData.spaceXadvance * 3) //
             wrap = false; // Avoid one line per character, which is very inefficient.
+            // 避免每个字符占一行,那样效率极低。
 
         boolean markupEnabled = fontData.markupEnabled && !ignoreMarkup;
 
@@ -101,20 +108,25 @@ public class GlyphLayout implements Poolable{
         outer:
         while(true){
             // Each run is delimited by newline or left square bracket.
+            // 每个 run 由换行符或左方括号分隔。
             int runEnd = -1;
             boolean newline = false;
             if(start == end){
                 if(runStart == end) break; // End of string with no run to process, we're done.
+                // 字符串结束且没有待处理的 run,完成。
                 runEnd = end; // End of string, process last run.
+                // 字符串结束,处理最后一个 run。
             }else{
                 switch(str.charAt(start++)){
                     case '\n':
                         // End of line.
+                        // 行结束。
                         runEnd = start - 1;
                         newline = true;
                         break;
                     case '[':
                         // Possible color tag.
+                        // 可能是颜色标签。
                         if(markupEnabled){
                             int length = parseColorMarkup(str, start, end, colorPool);
                             if(length >= 0){
@@ -123,6 +135,7 @@ public class GlyphLayout implements Poolable{
                                 nextColor = colorStack.peek();
                             }else if(length == -2){
                                 start++; // Skip first of "[[" escape sequence.
+                                // 跳过 "[[" 转义序列的第一个字符。
                                 continue outer;
                             }
                         }
@@ -133,7 +146,9 @@ public class GlyphLayout implements Poolable{
             if(runEnd != -1){
                 runEnded:
                 if(runEnd != runStart){ // Eg, when a color tag is at text start or a line is "\n".
+                // 例如,颜色标签位于文本开头或某行为 "\n" 时。
                     // Store the run that has ended.
+                    // 保存已结束的 run。
                     GlyphRun run = glyphRunPool.obtain();
                     run.color.set(color);
                     boolean had = fontData.markupEnabled;
@@ -146,6 +161,7 @@ public class GlyphLayout implements Poolable{
                         break runEnded;
                     }
                     if(lastGlyph != null){ // Move back the width of the last glyph from the previous run.
+                    // 回退上一个 run 最后一个字形的宽度。
                         x -= lastGlyph.fixedWidth ? lastGlyph.xadvance * fontData.scaleX
                         : (lastGlyph.width + lastGlyph.xoffset) * fontData.scaleX - fontData.padRight;
                     }
@@ -158,6 +174,7 @@ public class GlyphLayout implements Poolable{
                     float[] xAdvances = run.xAdvances.items;
                     int n = run.xAdvances.size;
                     if(!wrap){ // No wrap or truncate.
+                    // 无换行也无截断。
                         float runWidth = 0;
                         for(int i = 0; i < n; i++)
                             runWidth += xAdvances[i];
@@ -167,6 +184,7 @@ public class GlyphLayout implements Poolable{
                     }
 
                     // Wrap or truncate.
+                    // 换行或截断。
                     x += xAdvances[0];
                     run.width = xAdvances[0];
                     if(n < 1) break runEnded;
@@ -177,6 +195,7 @@ public class GlyphLayout implements Poolable{
                         float glyphWidth = (glyph.width + glyph.xoffset) * fontData.scaleX - fontData.padRight;
                         if(x + glyphWidth <= targetWidth){
                             // Glyph fits.
+                            // 字形放得下。
                             x += xAdvances[i];
                             run.width += xAdvances[i];
                             continue;
@@ -184,23 +203,29 @@ public class GlyphLayout implements Poolable{
 
                         if(truncate != null){
                             // Truncate.
+                            // 截断。
                             truncate(fontData, run, targetWidth, truncate, i, glyphRunPool);
                             x = run.x + run.width;
                             break outer;
                         }
 
                         // Wrap.
+                        // 换行。
                         int wrapIndex = fontData.getWrapIndex(run.glyphs, i);
                         if((run.x == 0 && wrapIndex == 0) // Require at least one glyph per line.
+                        // 每行至少需要一个字形。
                         || wrapIndex >= run.glyphs.size){ // Wrap at least the glyph that didn't fit.
+                        // 至少将放不下的那个字形换到下一行。
                             wrapIndex = i - 1;
                         }
                         GlyphRun next;
                         if(wrapIndex == 0){ // Move entire run to next line.
+                        // 将整个 run 移到下一行。
                             next = run;
                             run.width = 0;
 
                             // Remove leading whitespace.
+                            // 移除行首空白。
                             for(int glyphCount = run.glyphs.size; wrapIndex < glyphCount; wrapIndex++)
                                 if(!fontData.isWhitespace((char)run.glyphs.get(wrapIndex).id)) break;
                             if(wrapIndex > 0){
@@ -210,7 +235,9 @@ public class GlyphLayout implements Poolable{
                             run.xAdvances.set(0, -run.glyphs.first().xoffset * fontData.scaleX - fontData.padLeft);
 
                             if(runs.size > 1){ // Previous run is now at the end of a line.
+                            // 上一个 run 现在位于行尾。
                                 // Remove trailing whitespace and adjust last glyph.
+                                // 移除行尾空白并调整最后一个字形。
                                 GlyphRun previous = runs.get(runs.size - 2);
                                 int lastIndex = previous.glyphs.size - 1;
                                 for(; lastIndex > 0; lastIndex--){
@@ -227,6 +254,7 @@ public class GlyphLayout implements Poolable{
                             next = wrap(fontData, run, glyphRunPool, wrapIndex, i);
                             width = Math.max(width, run.x + run.width);
                             if(next == null){ // All wrapped glyphs were whitespace.
+                            // 所有换行的字形都是空白字符。
                                 x = 0;
                                 y += fontData.down;
                                 lines++;
@@ -237,6 +265,7 @@ public class GlyphLayout implements Poolable{
                         }
 
                         // Start the loop over with the new run on the next line.
+                        // 让新 run 从下一行开始重新循环。
                         n = next.xAdvances.size;
                         xAdvances = next.xAdvances.items;
                         x = xAdvances[0];
@@ -254,10 +283,12 @@ public class GlyphLayout implements Poolable{
 
                 if(newline){
                     // Next run will be on the next line.
+                    // 下一个 run 将位于下一行。
                     width = Math.max(width, x);
                     x = 0;
                     float down = fontData.down;
                     if(runEnd == runStart){ // Blank line.
+                    // 空行。
                         down *= fontData.blankLineScale;
                         blankLines++;
                     }else
@@ -277,7 +308,9 @@ public class GlyphLayout implements Poolable{
         colorStack.clear();
 
         // Align runs to center or right of targetWidth.
+        // 将 run 对齐到 targetWidth 的中部或右侧。
         if((halign & Align.left) == 0){ // Not left aligned, so must be center or right aligned.
+        // 非左对齐,因此必然是居中或右对齐。
             boolean center = (halign & Align.center) != 0;
             float lineWidth = 0, lineY = Integer.MIN_VALUE;
             int lineStart = 0, n = runs.size;
@@ -303,11 +336,15 @@ public class GlyphLayout implements Poolable{
         this.height = fontData.capHeight - lines * fontData.down - blankLines * fontData.down * fontData.blankLineScale;
     }
 
-    /** @param truncate May be empty string. */
+    /**
+     * @param truncate May be empty string.
+     * @param truncate May be empty string. 可为空字符串。
+     */
     private void truncate(FontData fontData, GlyphRun run, float targetWidth, String truncate, int widthIndex,
                           Pool<GlyphRun> glyphRunPool){
 
         // Determine truncate string size.
+        // 确定截断字符串的大小。
         GlyphRun truncateRun = glyphRunPool.obtain();
         boolean had = fontData.markupEnabled;
         if(ignoreMarkup) fontData.markupEnabled = false;
@@ -317,11 +354,13 @@ public class GlyphLayout implements Poolable{
         if(truncateRun.xAdvances.size > 0){
             adjustLastGlyph(fontData, truncateRun);
             for(int i = 1, n = truncateRun.xAdvances.size; i < n; i++) // Skip first for tight bounds.
+            // 为获得紧凑边界跳过第一个字形。
                 truncateWidth += truncateRun.xAdvances.get(i);
         }
         targetWidth -= truncateWidth;
 
         // Determine visible glyphs.
+        // 确定可见字形。
         int count = 0;
         float width = run.x;
         while(count < run.xAdvances.size){
@@ -336,6 +375,7 @@ public class GlyphLayout implements Poolable{
 
         if(count > 1){
             // Some run glyphs fit, append truncate glyphs.
+            // run 中部分字形放得下,追加截断字形。
             run.glyphs.truncate(count - 1);
             run.xAdvances.truncate(count);
             adjustLastGlyph(fontData, run);
@@ -343,6 +383,7 @@ public class GlyphLayout implements Poolable{
                 run.xAdvances.addAll(truncateRun.xAdvances, 1, truncateRun.xAdvances.size - 1);
         }else{
             // No run glyphs fit, use only truncate glyphs.
+            // run 中没有字形放得下,仅使用截断字形。
             run.glyphs.clear();
             run.xAdvances.clear();
             run.xAdvances.addAll(truncateRun.xAdvances);
@@ -356,58 +397,73 @@ public class GlyphLayout implements Poolable{
 
     /**
      * Breaks a run into two runs at the specified wrapIndex.
-     * @return May be null if second run is all whitespace.
+     * <p>
+     * 在指定 wrapIndex 处将一个 run 拆分为两个。
+     * @return May be null if second run is all whitespace. 若第二个 run 全为空白则可能为 null。
      */
     private GlyphRun wrap(FontData fontData, GlyphRun first, Pool<GlyphRun> glyphRunPool, int wrapIndex, int widthIndex){
         Ar<Glyph> glyphs2 = first.glyphs; // Starts with all the glyphs.
+        // 以全部字形开始。
         int glyphCount = first.glyphs.size;
         FloatAr xAdvances2 = first.xAdvances; // Starts with all the xAdvances.
+        // 以全部 xAdvance 开始。
 
         // Skip whitespace before the wrap index.
+        // 跳过换行索引之前的空白。
         int firstEnd = wrapIndex;
         for(; firstEnd > 0; firstEnd--)
             if(!fontData.isWhitespace((char)glyphs2.get(firstEnd - 1).id)) break;
 
         // Skip whitespace after the wrap index.
+        // 跳过换行索引之后的空白。
         int secondStart = wrapIndex;
         for(; secondStart < glyphCount; secondStart++)
             if(!fontData.isWhitespace((char)glyphs2.get(secondStart).id)) break;
 
         // Increase first run width up to the end index.
+        // 将第一个 run 的宽度增加到 end 索引处。
         while(widthIndex < firstEnd)
             first.width += xAdvances2.get(widthIndex++);
 
         // Reduce first run width by the wrapped glyphs that have contributed to the width.
+        // 从第一个 run 的宽度中减去已计入宽度的换行字形。
         for(int n = firstEnd + 1; widthIndex > n; )
             first.width -= xAdvances2.get(--widthIndex);
 
         // Copy wrapped glyphs and xAdvances to second run.
+        // 将换行的字形和 xAdvance 复制到第二个 run。
         // The second run will contain the remaining glyph data, so swap instances rather than copying.
+        // 第二个 run 将包含剩余的字形数据,因此交换实例而非复制。
         GlyphRun second = null;
         if(secondStart < glyphCount){
             second = glyphRunPool.obtain();
             second.color.set(first.color);
 
             Ar<Glyph> glyphs1 = second.glyphs; // Starts empty.
+            // 初始为空。
             glyphs1.addAll(glyphs2, 0, firstEnd);
             glyphs2.removeRange(0, secondStart - 1);
             first.glyphs = glyphs1;
             second.glyphs = glyphs2;
 
             FloatAr xAdvances1 = second.xAdvances; // Starts empty.
+            // 初始为空。
             xAdvances1.addAll(xAdvances2, 0, firstEnd + 1);
             xAdvances2.removeRange(1, secondStart); // Leave first entry to be overwritten by next line.
+            // 保留第一个条目,留给下一行覆盖。
             xAdvances2.set(0, -glyphs2.first().xoffset * fontData.scaleX - fontData.padLeft);
             first.xAdvances = xAdvances1;
             second.xAdvances = xAdvances2;
         }else{
             // Second run is empty, just trim whitespace glyphs from end of first run.
+            // 第二个 run 为空,只需修剪第一个 run 末尾的空白字形。
             glyphs2.truncate(firstEnd);
             xAdvances2.truncate(firstEnd + 1);
         }
 
         if(firstEnd == 0){
             // If the first run is now empty, remove it.
+            // 若第一个 run 现在为空,则移除它。
             glyphRunPool.free(first);
             runs.pop();
         }else
@@ -416,26 +472,34 @@ public class GlyphLayout implements Poolable{
         return second;
     }
 
-    /** Adjusts the xadvance of the last glyph to use its width instead of xadvance. */
+    /**
+     * Adjusts the xadvance of the last glyph to use its width instead of xadvance.
+     * 调整最后一个字形的 xadvance,改用其宽度而非 xadvance。
+     */
     private void adjustLastGlyph(FontData fontData, GlyphRun run){
         Glyph last = run.glyphs.peek();
         if(last.fixedWidth) return;
         float width = (last.width + last.xoffset) * fontData.scaleX - fontData.padRight;
         run.width += width - run.xAdvances.peek(); // Can cause the run width to be > targetWidth, but the problem is minimal.
+        // 可能导致 run 宽度 > targetWidth,但问题很小。
         run.xAdvances.set(run.xAdvances.size - 1, width);
     }
 
     private int parseColorMarkup(CharSequence str, int start, int end, Pool<Color> colorPool){
         if(start == end) return -1; // String ended with "[".
+        // 字符串以 "[" 结尾。
         switch(str.charAt(start)){
             case '#':
                 // Parse hex color RRGGBBAA where AA is optional and defaults to 0xFF if less than 6 chars are used.
+                // 解析十六进制颜色 RRGGBBAA,其中 AA 可选,少于 6 个字符时默认为 0xFF。
                 int colorInt = 0;
                 for(int i = start + 1; i < end; i++){
                     char ch = str.charAt(i);
                     if(ch == ']'){
                         if(i < start + 2 || i > start + 9 || i == start + 8) break; // Illegal number of hex digits.
+                        // 十六进制位数非法。
                         if(i - start <= 7){ // RRGGBB or fewer chars.
+                        // RRGGBB 或更少字符。
                             for(int ii = 0, nn = 9 - (i - start); ii < nn; ii++)
                                 colorInt = colorInt << 4;
                             colorInt |= 0xff;
@@ -449,26 +513,32 @@ public class GlyphLayout implements Poolable{
                     else if(ch >= 'a' && ch <= 'f') colorInt = colorInt * 16 + (ch - ('a' - 10));
                     else if(ch >= 'A' && ch <= 'F') colorInt = colorInt * 16 + (ch - ('A' - 10));
                     else break; // Unexpected character in hex color.
+                    // 十六进制颜色中出现意外字符。
                 }
                 return -1;
             case '[': // "[[" is an escaped left square bracket.
+            // "[[" 是转义的左方括号。
                 return -2;
             case ']': // "[]" is a "pop" color tag.
+            // "[]" 是“弹出”(pop)颜色标签。
                 if(colorStack.size > 1) colorPool.free(colorStack.pop());
                 return 0;
         }
         // Parse named color.
+        // 解析命名颜色。
         for(int i = start + 1; i < end; i++){
             char ch = str.charAt(i);
             if(ch != ']') continue;
             Color namedColor = Colors.get(str.subSequence(start, i).toString());
             if(namedColor == null) return -1; // Unknown color name.
+            // 未知的颜色名称。
             Color color = colorPool.obtain();
             colorStack.add(color);
             color.set(namedColor);
             return i - start;
         }
         return -1; // Unclosed color tag.
+        // 未闭合的颜色标签。
     }
 
     @Override
@@ -498,6 +568,8 @@ public class GlyphLayout implements Poolable{
 
     /**
      * Stores glyphs and positions for a piece of text which is a single color and does not span multiple lines.
+     * <p>
+     * 存储单一颜色、不跨多行的文本的字形和位置。
      * @author Nathan Sweet
      */
     public static class GlyphRun implements Poolable{
@@ -506,6 +578,8 @@ public class GlyphLayout implements Poolable{
         /**
          * Contains glyphs.size+1 entries: First entry is X offset relative to the drawing position. Subsequent entries are the X
          * advance relative to previous glyph position. Last entry is the width of the last glyph.
+         * <p>
+         * 包含 glyphs.size+1 个条目:第一个条目是相对于绘制位置的 X 偏移;后续条目是相对前一个字形位置的 X 步进;最后一个条目是最后一个字形的宽度。
          */
         public FloatAr xAdvances = new FloatAr();
         public float x, y, width;

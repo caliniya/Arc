@@ -18,6 +18,8 @@ import arc.util.*;
  *
  * <p>
  * A correctly created {@link TextureAtlas} is one way to generate a post-processed nine-patch from a ".9.png" file.
+ * <p>
+ * 3x3 的纹理区域网格。任何区域都可省略。可设置内边距作为在九宫格上方嵌入内容的提示(默认由九宫格的八个“边缘”纹理定义内边距)。绘制时八个“边缘”块不会缩放,只有内部块会缩放。 <p> <b>注意</b>:此类期望“后处理”过的九宫格,而非原始的 ".9.png" 纹理。也就是说,提供给此类的纹理 <em>不应</em> 包含 ".9.png" 中描述九宫格布局的元数据像素。该信息应隐式地以各块纹理的尺寸传入构造函数,或通过 {@link #NinePatch(Texture, int, int, int, int)} 或 {@link #NinePatch(TextureRegion, int, int, int, int)} 的 <code>left, right, top, bottom</code> 参数传入。 <p> 正确创建的 {@link TextureAtlas} 是从 ".9.png" 文件生成后处理九宫格的一种方式。
  */
 public class NinePatch{
     public static final int TOP_LEFT = 0;
@@ -27,14 +29,21 @@ public class NinePatch{
     public static final int MIDDLE_CENTER = 4;
     public static final int MIDDLE_RIGHT = 5;
     public static final int BOTTOM_LEFT = 6;
-    /** Indices for {@link #NinePatch(TextureRegion...)} constructor */
+    /**
+     * Indices for {@link #NinePatch(TextureRegion...)} constructor
+     * {@link #NinePatch(TextureRegion...)} 构造函数的索引
+     */
     // alphabetically first in javadoc
+    // 按字母序排在 javadoc 最前
     public static final int BOTTOM_CENTER = 7;
     public static final int BOTTOM_RIGHT = 8;
 
     private static final Color tmpDrawColor = new Color();
     private final Color color = new Color(Color.white);
-    /** Bottom tint for a top-to-bottom gradient; equal to {@link #color} unless a gradient is set. */
+    /**
+     * Bottom tint for a top-to-bottom gradient; equal to {@link #color} unless a gradient is set.
+     * 自上而下渐变的底部色调;未设置渐变时等于 {@link #color}。
+     */
     private final Color color2 = new Color(Color.white);
     private Texture texture;
     private int bottomLeft = -1, bottomCenter = -1, bottomRight = -1;
@@ -48,10 +57,12 @@ public class NinePatch{
     /**
      * Create a ninepatch by cutting up the given texture into nine patches. The subsequent parameters define the 4 lines that
      * will cut the texture region into 9 pieces.
-     * @param left Pixels from left edge.
-     * @param right Pixels from right edge.
-     * @param top Pixels from top edge.
-     * @param bottom Pixels from bottom edge.
+     * <p>
+     * 将给定纹理切分为九块以创建九宫格。后续参数定义将纹理区域切成 9 块的 4 条线。
+     * @param left Pixels from left edge. 距左边缘的像素数。
+     * @param right Pixels from right edge. 距右边缘的像素数。
+     * @param top Pixels from top edge. 距顶边缘的像素数。
+     * @param bottom Pixels from bottom edge. 距底边缘的像素数。
      */
     public NinePatch(Texture texture, int left, int right, int top, int bottom){
         this(new TextureRegion(texture), left, right, top, bottom);
@@ -60,10 +71,12 @@ public class NinePatch{
     /**
      * Create a ninepatch by cutting up the given texture region into nine patches. The subsequent parameters define the 4 lines
      * that will cut the texture region into 9 pieces.
-     * @param left Pixels from left edge.
-     * @param right Pixels from right edge.
-     * @param top Pixels from top edge.
-     * @param bottom Pixels from bottom edge.
+     * <p>
+     * 将给定纹理区域切分为九块以创建九宫格。后续参数定义将纹理区域切成 9 块的 4 条线。
+     * @param left Pixels from left edge. 距左边缘的像素数。
+     * @param right Pixels from right edge. 距右边缘的像素数。
+     * @param top Pixels from top edge. 距顶边缘的像素数。
+     * @param bottom Pixels from bottom edge. 距底边缘的像素数。
      */
     public NinePatch(TextureRegion region, int left, int right, int top, int bottom){
         if(region == null) throw new IllegalArgumentException("region cannot be null.");
@@ -92,6 +105,7 @@ public class NinePatch{
         }
 
         // If split only vertical, move splits from right to center.
+        // 若仅垂直分割,则将右分割值移到中心。
         if(left == 0 && middleWidth == 0){
             patches[TOP_CENTER] = patches[TOP_RIGHT];
             patches[MIDDLE_CENTER] = patches[MIDDLE_RIGHT];
@@ -101,6 +115,7 @@ public class NinePatch{
             patches[BOTTOM_RIGHT] = null;
         }
         // If split only horizontal, move splits from bottom to center.
+        // 若仅水平分割,则将下分割值移到中心。
         if(top == 0 && middleHeight == 0){
             patches[MIDDLE_LEFT] = patches[BOTTOM_LEFT];
             patches[MIDDLE_CENTER] = patches[BOTTOM_CENTER];
@@ -113,24 +128,36 @@ public class NinePatch{
         load(patches);
     }
 
-    /** Construct a degenerate "nine" patch with only a center component. */
+    /**
+     * Construct a degenerate "nine" patch with only a center component.
+     * 构造只含中心部分的退化“九”宫格。
+     */
     public NinePatch(Texture texture, Color color){
         this(texture);
         setColor(color);
     }
 
-    /** Construct a degenerate "nine" patch with only a center component. */
+    /**
+     * Construct a degenerate "nine" patch with only a center component.
+     * 构造只含中心部分的退化“九”宫格。
+     */
     public NinePatch(Texture texture){
         this(new TextureRegion(texture));
     }
 
-    /** Construct a degenerate "nine" patch with only a center component. */
+    /**
+     * Construct a degenerate "nine" patch with only a center component.
+     * 构造只含中心部分的退化“九”宫格。
+     */
     public NinePatch(TextureRegion region, Color color){
         this(region);
         setColor(color);
     }
 
-    /** Construct a degenerate "nine" patch with only a center component. */
+    /**
+     * Construct a degenerate "nine" patch with only a center component.
+     * 构造只含中心部分的退化“九”宫格。
+     */
     public NinePatch(TextureRegion region){
         load(new TextureRegion[]{
         //
@@ -144,6 +171,8 @@ public class NinePatch{
      * Construct a nine patch from the given nine texture regions. The provided patches must be consistently sized (e.g., any left
      * edge textures must have the same width, etc). Patches may be <code>null</code>. Patch indices are specified via the public
      * members {@link #TOP_LEFT}, {@link #TOP_CENTER}, etc.
+     * <p>
+     * 由给定的九个纹理区域构造九宫格。提供的各块必须尺寸一致(例如,所有左边缘纹理宽度必须相同)。各块可为 <code>null</code>。块索引通过公共成员 {@link #TOP_LEFT}、{@link #TOP_CENTER} 等指定。
      */
     public NinePatch(TextureRegion... patches){
         if(patches == null || patches.length != 9)
@@ -188,7 +217,10 @@ public class NinePatch{
         this(ninePatch, color, color);
     }
 
-    /** Copies {@code ninePatch}, gradient-tinted from {@code top} to {@code bottom}. */
+    /**
+     * Copies {@code ninePatch}, gradient-tinted from {@code top} to {@code bottom}.
+     * 复制 {@code ninePatch},并施加从 {@code top} 到 {@code bottom} 的渐变着色。
+     */
     public NinePatch(NinePatch ninePatch, Color top, Color bottom){
         texture = ninePatch.texture;
 
@@ -223,6 +255,7 @@ public class NinePatch{
 
     private void load(TextureRegion[] patches){
         final float color = Color.whiteFloatBits; // placeholder color, overwritten at draw time
+        // 占位颜色,绘制时会被覆盖
 
         if(patches[BOTTOM_LEFT] != null){
             bottomLeft = add(patches[BOTTOM_LEFT], color, false, false);
@@ -289,9 +322,13 @@ public class NinePatch{
         float depth = region.getDepth();
 
         // Add half pixel offsets on stretchable dimensions to avoid color bleeding when GL_LINEAR
+        // 在可拉伸维度上添加半像素偏移,以避免使用 GL_LINEAR
         // filtering is used for the texture. This nudges the texture coordinate to the center
+        // 过滤纹理时出现颜色渗色。这将纹理坐标微调到纹素中心,
         // of the texel where the neighboring pixel has 0% contribution in Linear blending mode.
+        // 在该模式下相邻像素的贡献为 0%。
         //NOTE: This is now unconditional. If you are using this for pixel art, you will have a bad time, but Mindustry isn't, so good luck.
+        // 注意:此行为现在是无条件的。如果你将其用于像素画,那会有麻烦,但 Mindustry 并非如此,祝你好运。
         if(isStretchW){
             float halfTexelWidth = 0.5f / texture.width;
             u += halfTexelWidth;
@@ -329,7 +366,10 @@ public class NinePatch{
         return idx - SpriteBatch.spriteSize;
     }
 
-    /** Set the coordinates of a ninth of the patch, with separate bottom/top edge vertex colors. */
+    /**
+     * Set the coordinates of a ninth of the patch, with separate bottom/top edge vertex colors.
+     * 设置九宫格中一块的坐标,底/顶边缘顶点颜色可分别指定。
+     */
     private void set(int idx, float x, float y, float width, float height, float colorBottom, float colorTop){
         final float fx2 = x + width;
         final float fy2 = y + height;
@@ -351,7 +391,10 @@ public class NinePatch{
         vertices[idx + 26] = colorBottom;
     }
 
-    /** @return the vertex color at absolute height {@code rowY}, lerped from {@link #color2} to {@link #color}. */
+    /**
+     * @return the vertex color at absolute height {@code rowY}, lerped from {@link #color2} to {@link #color}.
+     * @return the vertex color at absolute height {@code rowY}, lerped from {@link #color2} to {@link #color}. 绝对高度 {@code rowY} 处的顶点颜色,由 {@link #color2} 到 {@link #color} 插值。
+     */
     private float rowColor(float rowY, float baseY, float totalHeight){
         float t = totalHeight > 0.0001f ? (rowY - baseY) / totalHeight : 1f;
         return tmpDrawColor.set(color2).lerp(color, t).mul(Draw.getColor()).toFloatBits();
@@ -410,7 +453,10 @@ public class NinePatch{
         return color;
     }
 
-    /** @return the bottom tint of a top-to-bottom gradient, same as {@link #getColor()} if none is set. */
+    /**
+     * @return the bottom tint of a top-to-bottom gradient, same as {@link #getColor()} if none is set.
+     * @return the bottom tint of a top-to-bottom gradient, same as {@link #getColor()} if none is set. 自上而下渐变的底部色调,未设置时与 {@link #getColor()} 相同。
+     */
     public Color getColor2(){
         return color2;
     }
@@ -418,13 +464,18 @@ public class NinePatch{
     /**
      * Copy given color. The color will be blended with the batch color, then combined with the texture colors at draw time.
      * Default is {@link Color#white}.
+     * <p>
+     * 复制给定颜色。该颜色会与批处理颜色混合,并在绘制时与纹理颜色合成。默认为 {@link Color#white}。
      */
     public void setColor(Color color){
         this.color.set(color);
         this.color2.set(color);
     }
 
-    /** Sets a top-to-bottom gradient tint from {@code top} to {@code bottom}. */
+    /**
+     * Sets a top-to-bottom gradient tint from {@code top} to {@code bottom}.
+     * 设置从 {@code top} 到 {@code bottom} 的自上而下渐变着色。
+     */
     public void setColor(Color top, Color bottom){
         this.color.set(top);
         this.color2.set(bottom);
@@ -434,7 +485,10 @@ public class NinePatch{
         return leftWidth;
     }
 
-    /** Set the draw-time width of the three left edge patches */
+    /**
+     * Set the draw-time width of the three left edge patches
+     * 设置左侧三块绘制时的宽度
+     */
     public void setLeftWidth(float leftWidth){
         this.leftWidth = leftWidth;
     }
@@ -443,7 +497,10 @@ public class NinePatch{
         return rightWidth;
     }
 
-    /** Set the draw-time width of the three right edge patches */
+    /**
+     * Set the draw-time width of the three right edge patches
+     * 设置右侧三块绘制时的宽度
+     */
     public void setRightWidth(float rightWidth){
         this.rightWidth = rightWidth;
     }
@@ -452,7 +509,10 @@ public class NinePatch{
         return topHeight;
     }
 
-    /** Set the draw-time height of the three top edge patches */
+    /**
+     * Set the draw-time height of the three top edge patches
+     * 设置顶部三块绘制时的高度
+     */
     public void setTopHeight(float topHeight){
         this.topHeight = topHeight;
     }
@@ -461,7 +521,10 @@ public class NinePatch{
         return bottomHeight;
     }
 
-    /** Set the draw-time height of the three bottom edge patches */
+    /**
+     * Set the draw-time height of the three bottom edge patches
+     * 设置底部三块绘制时的高度
+     */
     public void setBottomHeight(float bottomHeight){
         this.bottomHeight = bottomHeight;
     }
@@ -474,6 +537,8 @@ public class NinePatch{
      * Set the width of the middle column of the patch. At render time, this is implicitly the requested render-width of the
      * entire nine patch, minus the left and right width. This value is only used for computing the {@link #getTotalWidth() default
      * total width}.
+     * <p>
+     * 设置九宫格中间列的宽度。渲染时,它隐式等于整个九宫格请求的渲染宽度减去左右宽度。此值仅用于计算 {@link #getTotalWidth() 默认总宽度}。
      */
     public void setMiddleWidth(float middleWidth){
         this.middleWidth = middleWidth;
@@ -487,6 +552,8 @@ public class NinePatch{
      * Set the height of the middle row of the patch. At render time, this is implicitly the requested render-height of the entire
      * nine patch, minus the top and bottom height. This value is only used for computing the {@link #getTotalHeight() default
      * total height}.
+     * <p>
+     * 设置九宫格中间行的高度。渲染时,它隐式等于整个九宫格请求的渲染高度减去上下高度。此值仅用于计算 {@link #getTotalHeight() 默认总高度}。
      */
     public void setMiddleHeight(float middleHeight){
         this.middleHeight = middleHeight;
@@ -503,6 +570,8 @@ public class NinePatch{
     /**
      * Set the padding for content inside this ninepatch. By default the padding is set to match the exterior of the ninepatch, so
      * the content should fit exactly within the middle patch.
+     * <p>
+     * 设置此九宫格内部内容的内边距。默认内边距与九宫格外围匹配,因此内容应恰好适配中间块。
      */
     public void setPadding(float left, float right, float top, float bottom){
         this.padLeft = left;
@@ -511,51 +580,78 @@ public class NinePatch{
         this.padBottom = bottom;
     }
 
-    /** Returns the left padding if set, else returns {@link #getLeftWidth()}. */
+    /**
+     * Returns the left padding if set, else returns {@link #getLeftWidth()}.
+     * 返回左内边距(若已设置),否则返回 {@link #getLeftWidth()}。
+     */
     public float getPadLeft(){
         if(padLeft == -1) return getLeftWidth();
         return padLeft;
     }
 
-    /** See {@link #setPadding(float, float, float, float)} */
+    /**
+     * See {@link #setPadding(float, float, float, float)}
+     * 见 {@link #setPadding(float, float, float, float)}
+     */
     public void setPadLeft(float left){
         this.padLeft = left;
     }
 
-    /** Returns the right padding if set, else returns {@link #getRightWidth()}. */
+    /**
+     * Returns the right padding if set, else returns {@link #getRightWidth()}.
+     * 返回右内边距(若已设置),否则返回 {@link #getRightWidth()}。
+     */
     public float getPadRight(){
         if(padRight == -1) return getRightWidth();
         return padRight;
     }
 
-    /** See {@link #setPadding(float, float, float, float)} */
+    /**
+     * See {@link #setPadding(float, float, float, float)}
+     * 见 {@link #setPadding(float, float, float, float)}
+     */
     public void setPadRight(float right){
         this.padRight = right;
     }
 
-    /** Returns the top padding if set, else returns {@link #getTopHeight()}. */
+    /**
+     * Returns the top padding if set, else returns {@link #getTopHeight()}.
+     * 返回顶部内边距(若已设置),否则返回 {@link #getTopHeight()}。
+     */
     public float getPadTop(){
         if(padTop == -1) return getTopHeight();
         return padTop;
     }
 
-    /** See {@link #setPadding(float, float, float, float)} */
+    /**
+     * See {@link #setPadding(float, float, float, float)}
+     * 见 {@link #setPadding(float, float, float, float)}
+     */
     public void setPadTop(float top){
         this.padTop = top;
     }
 
-    /** Returns the bottom padding if set, else returns {@link #getBottomHeight()}. */
+    /**
+     * Returns the bottom padding if set, else returns {@link #getBottomHeight()}.
+     * 返回底部内边距(若已设置),否则返回 {@link #getBottomHeight()}。
+     */
     public float getPadBottom(){
         if(padBottom == -1) return getBottomHeight();
         return padBottom;
     }
 
-    /** See {@link #setPadding(float, float, float, float)} */
+    /**
+     * See {@link #setPadding(float, float, float, float)}
+     * 见 {@link #setPadding(float, float, float, float)}
+     */
     public void setPadBottom(float bottom){
         this.padBottom = bottom;
     }
 
-    /** Multiplies the top/left/bottom/right sizes and padding by the specified amount. */
+    /**
+     * Multiplies the top/left/bottom/right sizes and padding by the specified amount.
+     * 将上/左/下/右尺寸和内边距乘以指定量。
+     */
     public void scale(float scaleX, float scaleY){
         leftWidth *= scaleX;
         rightWidth *= scaleX;

@@ -93,7 +93,7 @@ public class FreeType{
     public static int FT_STROKER_LINEJOIN_MITER_FIXED = 3;
 
     /**
-     * @return returns the last error code FreeType reported
+     * @return returns the last error code FreeType reported FreeType 上一次报告的错误码
      */
     static native int getLastErrorCode(); /*
 		return lastError;
@@ -704,10 +704,15 @@ public class FreeType{
         public ByteBuffer getBuffer(){
             if(getRows() == 0)
                 // Issue #768 - CheckJNI frowns upon env->NewDirectByteBuffer with NULL buffer or capacity 0
+                // Issue #768 - CheckJNI 不允许 env->NewDirectByteBuffer 使用 NULL 缓冲区或容量为 0
                 //                  "JNI WARNING: invalid values for address (0x0) or capacity (0)"
+                // "JNI WARNING: address (0x0) 或 capacity (0) 的值无效"
                 //              FreeType sets FT_Bitmap::buffer to NULL when the bitmap is empty (e.g. for ' ')
+                // FreeType 在位图为空时(例如空格字符)会将 FT_Bitmap::buffer 置为 NULL
                 //              JNICheck is on by default on emulators and might have a point anyway...
+                // 模拟器上默认启用 JNICheck,而且它也许确实有道理……
                 //              So let's avoid this and just return a dummy non-null non-zero buffer
+                // 所以避开这种情况,直接返回一个非 null、非零的占位缓冲区
                 return Buffers.newByteBuffer(1);
             return getBuffer(address);
         }
@@ -719,6 +724,7 @@ public class FreeType{
             Pixmap pixmap;
             int pixelMode = getPixelMode();
             int rowBytes = Math.abs(getPitch()); // We currently ignore negative pitch.
+            // 目前我们忽略负的 pitch。
 
             pixmap = new Pixmap(width, rows);
             int rgba = color.rgba8888();
@@ -727,6 +733,7 @@ public class FreeType{
             IntBuffer dst = pixmap.pixels.asIntBuffer();
             if(pixelMode == FT_PIXEL_MODE_MONO){
                 // Use the specified color for each set bit.
+                // 对每个置位的像素使用指定颜色。
                 for(int y = 0; y < rows; y++){
                     src.get(srcRow);
                     for(int i = 0, x = 0; x < width; i++, x += 8){
@@ -742,14 +749,18 @@ public class FreeType{
                 }
             }else{
                 // Use the specified color for RGB, blend the FreeType bitmap with alpha.
+                // RGB 使用指定颜色,并用 alpha 混合 FreeType 位图。
                 int rgb = rgba & 0xffffff00;
                 int a = rgba & 0xff;
                 for(int y = 0; y < rows; y++){
                     src.get(srcRow);
                     for(int x = 0; x < width; x++){
                         // Zero raised to any power is always zero.
+                        // 0 的任意次幂始终为 0。
                         // 255 (=one) raised to any power is always one.
+                        // 255(即 1)的任意次幂始终为 1。
                         // We only need Math.pow() when alpha is NOT zero and NOT one.
+                        // 只有当 alpha 既不为 0 也不为 1 时才需要 Math.pow()。
                         int alpha = srcRow[x] & 0xff;
                         if(alpha == 0)
                             dstRow[x] = rgb;
@@ -757,6 +768,7 @@ public class FreeType{
                             dstRow[x] = rgb | a;
                         else
                             dstRow[x] = rgb | (int)(a * (float)Math.pow(alpha / 255f, gamma)); // Inverse gamma.
+                            // 逆伽马。
                     }
                     dst.put(dstRow);
                 }

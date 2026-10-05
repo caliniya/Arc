@@ -16,7 +16,10 @@ public class Lines{
     private static boolean building;
     private static float circlePrecision = 0.4f;
 
-    /** Set the vertices used for drawing a line circle. */
+    /**
+     * Set the vertices used for drawing a line circle.
+     * 设置用于绘制线条圆形的顶点。
+     */
     public static void setCirclePrecision(float amount){
         circlePrecision = amount;
     }
@@ -176,6 +179,7 @@ public class Lines{
     }
 
     //implementation taken from https://github.com/earlygrey/shapedrawer/blob/master/drawer/src/space/earlygrey/shapedrawer/ShapeDrawer.java
+    // 实现取自 https://github.com/earlygrey/shapedrawer/blob/master/drawer/src/space/earlygrey/shapedrawer/ShapeDrawer.java
     public static void polyline(float[] points, int length, boolean wrap, boolean flatEnd){
         if(length < 4) return;
 
@@ -189,6 +193,7 @@ public class Lines{
             preparePointyJoin(A, B, C, D, E, D2, E2, halfWidth, flatEnd);
 
             //D2/E2 are the points to be reused as the start of the NEXT quad (may differ from D/E if beveled)
+            // D2/E2 是将作为下一个四边形起点复用的点(若使用斜角则可能与 D/E 不同)
             float x3 = D2.x, y3 = D2.y;
             float x4 = E2.x, y4 = E2.y;
 
@@ -216,12 +221,14 @@ public class Lines{
 
         if(!wrap){
             //draw last link on path
+            // 绘制路径上的最后一段连线
             prepareFlatEndpoint(B, C, D, E, halfWidth);
             q3.set(E);
             q4.set(D);
             pushQuad();
         }else{
             //draw last link on path
+            // 绘制路径上的最后一段连线
             A.set(points[0], points[1]);
             preparePointyJoin(B, C, A, D, E, D2, E2, halfWidth, flatEnd);
             q3.set(D);
@@ -229,6 +236,7 @@ public class Lines{
             pushQuad();
 
             //draw connection back to first vertex
+            // 绘制回到第一个顶点的连线
             q1.set(D2);
             q2.set(E2);
             q3.set(E0);
@@ -430,6 +438,7 @@ public class Lines{
     public static void curve(float x1, float y1, float cx1, float cy1, float cx2, float cy2, float x2, float y2, int segments){
 
         // Algorithm shamelessly stolen from shaperenderer class
+        // 算法无耻地借用自 shaperenderer 类
         float subdiv_step = 1f / segments;
         float subdiv_step2 = subdiv_step * subdiv_step;
         float subdiv_step3 = subdiv_step * subdiv_step * subdiv_step;

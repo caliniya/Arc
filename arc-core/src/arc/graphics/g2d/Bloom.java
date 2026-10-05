@@ -6,6 +6,8 @@ import arc.graphics.gl.*;
 
 /**
  * Requires bloom shaders in 'bloomshaders' folder.
+ * <p>
+ * 需要 bloomshaders 文件夹中的泛光着色器。
  * @author kalle_h
  * @author Anuke
  */
@@ -20,7 +22,10 @@ public class Bloom{
     private boolean capturing = false;
     private float r, g, b, a;
 
-    /** Rebinds the context. Necessary on Android/IOS. TODO or is it? */
+    /**
+     * Rebinds the context. Necessary on Android/IOS. TODO or is it?
+     * 重新绑定上下文。在 Android/IOS 上必需。TODO 真的吗?
+     */
     public void resume(){
         bloomShader.bind();
         bloomShader.setUniformi("u_texture1", 1);
@@ -31,7 +36,10 @@ public class Bloom{
         setOriginalIntensity(originalIntensity);
     }
 
-    /** Creates a bloom instance with no blending, no depth and 1/4 the screen size. */
+    /**
+     * Creates a bloom instance with no blending, no depth and 1/4 the screen size.
+     * 创建无混合、无深度、1/4 屏幕尺寸的泛光实例。
+     */
     public Bloom(){
         init(Core.graphics.getWidth() / 4, Core.graphics.getHeight() / 4, false, false);
     }
@@ -42,8 +50,10 @@ public class Bloom{
 
     /**
      * Initializes bloom class that encapsulates original scene capturate, thresholding, gaussian blurring and blending.
-     * @param hasDepth Enables depth buffer.
-     * @param useBlending Enables alpha blending, allowing combining background graphics and only doing blooming on certain objects.
+     * <p>
+     * 初始化泛光类,封装原始场景捕获、阈值处理、高斯模糊和混合。
+     * @param hasDepth Enables depth buffer. 启用深度缓冲区。
+     * @param useBlending Enables alpha blending, allowing combining background graphics and only doing blooming on certain objects. 启用 alpha 混合,允许合并背景图形,仅对特定对象做泛光。
      */
     public Bloom(int width, int height, boolean hasDepth, boolean useBlending){
         init(width, height, hasDepth, useBlending);
@@ -87,7 +97,10 @@ public class Bloom{
         bloomShader.setUniformi("u_texture1", 1);
     }
 
-    /** Set clearing color for capturing buffer. */
+    /**
+     * Set clearing color for capturing buffer.
+     * 设置捕获缓冲区的清屏颜色。
+     */
     public void setClearColor(float r, float g, float b, float a){
         this.r = r;
         this.g = g;
@@ -95,7 +108,10 @@ public class Bloom{
         this.a = a;
     }
 
-    /** Call this before rendering scene. */
+    /**
+     * Call this before rendering scene.
+     * 渲染场景前调用。
+     */
     public void capture(){
         if(!capturing){
             capturing = true;
@@ -105,7 +121,10 @@ public class Bloom{
         }
     }
 
-    /** Pause capturing to the buffer. */
+    /**
+     * Pause capturing to the buffer.
+     * 暂停捕获到缓冲区。
+     */
     public void capturePause(){
         if(capturing){
             capturing = false;
@@ -113,7 +132,10 @@ public class Bloom{
         }
     }
 
-    /** Start capturing again after pause, no clearing is done to the buffer. */
+    /**
+     * Start capturing again after pause, no clearing is done to the buffer.
+     * 暂停后重新开始捕获,不清空缓冲区。
+     */
     public void captureContinue(){
         if(!capturing){
             capturing = true;
@@ -121,7 +143,10 @@ public class Bloom{
         }
     }
 
-    /** Renders the bloomed scene. */
+    /**
+     * Renders the bloomed scene.
+     * 渲染泛光后的场景。
+     */
     public void render(){
         if(capturing){
             capturing = false;
@@ -133,14 +158,17 @@ public class Bloom{
         Gl.depthMask(false);
 
         //cut bright areas of the picture and blit to smaller fbo
+        // 截取画面中较亮的区域并位块传输到较小的 fbo
 
         pingPong1.begin();
         buffer.blit(thresholdShader);
         pingPong1.end();
 
         //blur
+        // 模糊
         for(int i = 0; i < blurPasses; i++){
             // horizontal
+            // 水平
             pingPong2.begin();
             blurShader.bind();
             blurShader.setUniformf("dir", 1f, 0f);
@@ -148,6 +176,7 @@ public class Bloom{
             pingPong2.end();
 
             // vertical
+            // 垂直
             pingPong1.begin();
             blurShader.bind();
             blurShader.setUniformf("dir", 0f, 1f);
@@ -166,7 +195,9 @@ public class Bloom{
 
     /**
      * Set intensity for bloom. Higher means more brightening for spots that are over threshold.
-     * @param intensity Multiplier for blurred texture in combining phase. Must be positive.
+     * <p>
+     * 设置泛光强度。越高则超过阈值的区域越亮。
+     * @param intensity Multiplier for blurred texture in combining phase. Must be positive. 合成阶段模糊纹理的乘数。必须为正。
      */
     public void setBloomIntensity(float intensity){
         bloomIntensity = intensity;
@@ -176,7 +207,9 @@ public class Bloom{
 
     /**
      * Set intensity for original scene. Under 1 means darkening and over 1 means lightening.
-     * @param intensity Multiplier for captured texture in combining phase. Must be positive.
+     * <p>
+     * 设置原始场景强度。小于 1 变暗,大于 1 变亮。
+     * @param intensity Multiplier for captured texture in combining phase. Must be positive. 合成阶段捕获纹理的乘数。必须为正。
      */
     public void setOriginalIntensity(float intensity){
         originalIntensity = intensity;
@@ -186,7 +219,9 @@ public class Bloom{
 
     /**
      * Threshold for bright parts. Everything under threshold is set to 0.
-     * @param threshold Must be in range [0..1].
+     * <p>
+     * 明亮部分的阈值。低于阈值的内容置为 0。
+     * @param threshold Must be in range [0..1]. 必须在 [0..1] 范围内。
      */
     public void setThreshold(float threshold){
         this.threshold = threshold;
@@ -199,12 +234,18 @@ public class Bloom{
         blurShader.setUniformf("size", width, height);
     }
 
-    /** @return The unprocessed frame buffer this bloom captures. Advanced uses only. */
+    /**
+     * @return The unprocessed frame buffer this bloom captures. Advanced uses only.
+     * @return The unprocessed frame buffer this bloom captures. Advanced uses only. 此泛光捕获的未处理帧缓冲区。仅供高级用法。
+     */
     public FrameBuffer buffer(){
         return buffer;
     }
 
-    /** Disposes all resources. */
+    /**
+     * Disposes all resources.
+     * 释放所有资源。
+     */
     public void dispose(){
         try{
             buffer.dispose();

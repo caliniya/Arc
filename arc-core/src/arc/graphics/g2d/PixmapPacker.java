@@ -67,6 +67,8 @@ import java.util.*;
  *
  * packer.dispose();
  * </pre>
+ * <p>
+ * 将 {@link Pixmap pixmap} 打包到一个或多个 {@link Page page} 中,生成 pixmap 实例的图集。提供将 pixmap 图集直接转换为 {@link TextureAtlas} 的途径。打包器支持在构造时指定的内边距与边框像素复制,并支持对本类生成的 TextureAtlas 进行增量插入和更新。装箱打包方式可通过 {@link PackStrategy} 自定义。 <p> 除非另有说明,所有方法都可从任意线程调用。 <p> 一次性用法:创建打包器并 pack 各 pixmap,再 generateTextureAtlas 生成图集,然后释放打包器。按此用法,释放打包器不会释放纹理图集使用的任何 pixmap,不再需要时也必须释放纹理图集。 <p> 增量纹理图集用法:可在单独线程(如下载缩略图)调用 pack,在渲染线程每帧调用 updateTextureAtlas 更新图集;图集不再需要后,最后再调用一次 updateTextureAtlas 以获取最终新增内容,然后释放图集。 <p> 仅 Pixmap 用法:打包后直接遍历 getPages() 处理生成的页面,最后释放打包器。
  * @author mzechner
  * @author Nathan Sweet
  * @author Rob Rendell
@@ -85,6 +87,8 @@ public class PixmapPacker implements Disposable{
 
     /**
      * Uses {@link GuillotineStrategy}.
+     * <p>
+     * 使用 {@link GuillotineStrategy}。
      * @see PixmapPacker#PixmapPacker(int, int, int, boolean, boolean, boolean, PackStrategy)
      */
     public PixmapPacker(int pageWidth, int pageHeight, int padding, boolean duplicateBorder){
@@ -93,6 +97,8 @@ public class PixmapPacker implements Disposable{
 
     /**
      * Uses {@link GuillotineStrategy}.
+     * <p>
+     * 使用 {@link GuillotineStrategy}。
      * @see PixmapPacker#PixmapPacker(int, int, int, boolean, boolean, boolean, PackStrategy)
      */
     public PixmapPacker(int pageWidth, int pageHeight, int padding, boolean duplicateBorder, PackStrategy packStrategy){
@@ -102,11 +108,13 @@ public class PixmapPacker implements Disposable{
     /**
      * Creates a new ImagePacker which will insert all supplied pixmaps into one or more <code>pageWidth</code> by
      * <code>pageHeight</code> pixmaps using the specified strategy.
-     * @param padding the number of blank pixels to insert between pixmaps.
+     * <p>
+     * 创建新的 ImagePacker,使用指定策略将所有提供的 pixmap 插入一个或多个 <code>pageWidth</code> x <code>pageHeight</code> 的 pixmap。
+     * @param padding the number of blank pixels to insert between pixmaps. pixmap 之间插入的空白像素数。
      * @param duplicateBorder duplicate the border pixels of the inserted images to avoid seams when rendering with bi-Linear
-     * filtering on.
-     * @param stripWhitespaceX strip whitespace in x axis
-     * @param stripWhitespaceY strip whitespace in y axis
+     * filtering on. 复制插入图像的边框像素,以避免开启双线性过滤渲染时出现接缝。
+     * @param stripWhitespaceX strip whitespace in x axis 去除 x 轴方向的空白
+     * @param stripWhitespaceY strip whitespace in y axis 去除 y 轴方向的空白
      */
     public PixmapPacker(int pageWidth, int pageHeight, int padding, boolean duplicateBorder, boolean stripWhitespaceX, boolean stripWhitespaceY, PackStrategy packStrategy){
         this.pageWidth = pageWidth;
@@ -129,6 +137,8 @@ public class PixmapPacker implements Disposable{
     /**
      * Sorts the images to the optimal order they should be packed. Some packing strategies rely heavily on the images being
      * sorted.
+     * <p>
+     * 将图像排序为最佳打包顺序。某些打包策略严重依赖图像已排序。
      */
     public void sort(Ar<PixmapRegion> images){
         packStrategy.sort(images);
@@ -136,6 +146,8 @@ public class PixmapPacker implements Disposable{
 
     /**
      * Inserts the pixmap without a name. It cannot be looked up by name.
+     * <p>
+     * 插入不带名称的 pixmap,无法按名称查找。
      * @see #pack(String, Pixmap)
      */
     public synchronized Rect pack(Pixmap image){
@@ -145,10 +157,12 @@ public class PixmapPacker implements Disposable{
     /**
      * Inserts the pixmap. If name was not null, you can later retrieve the image's position in the output image via
      * {@link #getRect(String)}. Duplicate names will replace older rects.
-     * @param name If null, the image cannot be looked up by name.
-     * @return Rectangle describing the area the pixmap was rendered to.
+     * <p>
+     * 插入 pixmap。若 name 不为 null,之后可通过 {@link #getRect(String)} 获取该图像在输出图像中的位置。重名将替换旧矩形。
+     * @param name If null, the image cannot be looked up by name. 若为 null,则无法按名称查找图像。
+     * @return Rectangle describing the area the pixmap was rendered to. 描述 pixmap 渲染区域的矩形。
      * @throws ArcRuntimeException in case the image did not fit due to the page size being too small or providing a duplicate
-     * name.
+     * name. ArcRuntimeException,若因页面尺寸过小导致图像放不下,或提供了重名。
      */
     public synchronized Rect pack(String name, Pixmap image){
         return pack(name, new PixmapRegion(image));
@@ -157,15 +171,20 @@ public class PixmapPacker implements Disposable{
     /**
      * Inserts the pixmap. If name was not null, you can later retrieve the image's position in the output image via
      * {@link #getRect(String)}. Duplicate names will replace older rects.
-     * @param name If null, the image cannot be looked up by name.
-     * @return Rectangle describing the area the pixmap was rendered to.
-     * @throws ArcRuntimeException in case the image did not fit due to the page size being too small.
+     * <p>
+     * 插入 pixmap。若 name 不为 null,之后可通过 {@link #getRect(String)} 获取该图像在输出图像中的位置。重名将替换旧矩形。
+     * @param name If null, the image cannot be looked up by name. 若为 null,则无法按名称查找图像。
+     * @return Rectangle describing the area the pixmap was rendered to. 描述 pixmap 渲染区域的矩形。
+     * @throws ArcRuntimeException in case the image did not fit due to the page size being too small. ArcRuntimeException,若因页面尺寸过小导致图像放不下。
      */
     public synchronized Rect pack(String name, PixmapRegion image){
         return pack(name, image, null, null);
     }
 
-    /** Inserts a named empty rectangle. */
+    /**
+     * Inserts a named empty rectangle.
+     * 插入一个命名的空矩形。
+     */
     public synchronized Rect pack(String name, int width, int height){
         if(disposed) return null;
 
@@ -211,6 +230,7 @@ public class PixmapPacker implements Disposable{
         if(disposed) return null;
 
         //store previous rect to replace it; this saves space
+        // 保存先前的矩形以供替换;这样可节省空间
         PixmapPackerRect prev = null;
         Page prevPage = null;
 
@@ -251,6 +271,7 @@ public class PixmapPacker implements Disposable{
         Page page;
 
         //try to use the old rect if possible
+        // 尽可能复用旧矩形
         if(prev != null && prevPage != null && !isPatch){
             page = prevPage;
             rect = prev;
@@ -266,6 +287,7 @@ public class PixmapPacker implements Disposable{
 
         if(packToTexture && !duplicateBorder && page.texture != null && !page.dirty){
             //TODO this will not work correctly since the pixmap is only a region!
+            // TODO 这无法正确工作,因为 pixmap 只是一个区域!
             page.texture.bind();
             Gl.texSubImage2D(page.texture.glTarget, 0, rectX, rectY, rectWidth, rectHeight, image.pixmap.getGLFormat(),
                 image.pixmap.getGLType(), image.pixmap.pixels);
@@ -277,11 +299,13 @@ public class PixmapPacker implements Disposable{
         if(duplicateBorder){
             int imageWidth = image.width, imageHeight = image.height;
             // Copy corner pixels to fill corners of the padding.
+            // 复制角部像素以填充内边距的角落。
             page.image.draw(image, 0, 0, 1, 1, rectX - 1, rectY - 1, 1, 1);
             page.image.draw(image, imageWidth - 1, 0, 1, 1, rectX + rectWidth, rectY - 1, 1, 1);
             page.image.draw(image, 0, imageHeight - 1, 1, 1, rectX - 1, rectY + rectHeight, 1, 1);
             page.image.draw(image, imageWidth - 1, imageHeight - 1, 1, 1, rectX + rectWidth, rectY + rectHeight, 1, 1);
             // Copy edge pixels into padding.
+            // 将边缘像素复制到内边距中。
             page.image.draw(image, 0, 0, imageWidth, 1, rectX, rectY - 1, rectWidth, 1);
             page.image.draw(image, 0, imageHeight - 1, imageWidth, 1, rectX, rectY + rectHeight, rectWidth, 1);
             page.image.draw(image, 0, 0, 1, imageHeight, rectX - 1, rectY, 1, rectHeight);
@@ -297,15 +321,15 @@ public class PixmapPacker implements Disposable{
 
     /**
      * @return the {@link Page} instances created so far. If multiple threads are accessing the packer, iterating over the pages
-     * must be done only after synchronizing on the packer.
+     * must be done only after synchronizing on the packer. 目前创建的 {@link Page} 实例。若多线程访问打包器,必须先同步于打包器才能遍历页面。
      */
     public Ar<Page> getPages(){
         return pages;
     }
 
     /**
-     * @param name the name of the image
-     * @return the rectangle for the image in the page it's stored in or null
+     * @param name the name of the image 图像名称
+     * @return the rectangle for the image in the page it's stored in or null 图像在其所在页中的矩形,或 null
      */
     public synchronized Rect getRect(String name){
         for(Page page : pages){
@@ -315,7 +339,10 @@ public class PixmapPacker implements Disposable{
         return null;
     }
 
-    /** @return the newly allocated region for this name, or null. */
+    /**
+     * @return the newly allocated region for this name, or null.
+     * @return the newly allocated region for this name, or null. 为此名称新分配的区域,或 null。
+     */
     public synchronized PixmapRegion getRegion(String name){
         for(Page page : pages){
             Rect rect = page.rects.get(name);
@@ -325,8 +352,8 @@ public class PixmapPacker implements Disposable{
     }
 
     /**
-     * @param name the name of the image
-     * @return the page the image is stored in or null
+     * @param name the name of the image 图像名称
+     * @return the page the image is stored in or null 图像所在的页,或 null
      */
     public synchronized Page getPage(String name){
         for(Page page : pages){
@@ -338,8 +365,10 @@ public class PixmapPacker implements Disposable{
 
     /**
      * Returns the index of the page containing the given packed rectangle.
-     * @param name the name of the image
-     * @return the index of the page the image is stored in or -1
+     * <p>
+     * 返回包含给定打包矩形的页面索引。
+     * @param name the name of the image 图像名称
+     * @return the index of the page the image is stored in or -1 图像所在页的索引,若无则为 -1
      */
     public synchronized int getPageIndex(String name){
         for(int i = 0; i < pages.size; i++){
@@ -351,6 +380,8 @@ public class PixmapPacker implements Disposable{
 
     /**
      * Disposes any pixmap pages which don't have a texture. Page pixmaps that have a texture will not be disposed until their texture is disposed.
+     * <p>
+     * 释放没有纹理的 pixmap 页。有纹理的页面 pixmap 在其纹理被释放之前不会释放。
      */
     @Override
     public synchronized void dispose(){
@@ -362,7 +393,10 @@ public class PixmapPacker implements Disposable{
         disposed = true;
     }
 
-    /** Disposes all images, regardless of whether they have a texture. */
+    /**
+     * Disposes all images, regardless of whether they have a texture.
+     * 释放所有图像,无论其是否有纹理。
+     */
     public void forceDispose(){
         for(Page page : pages){
             if(page.image != null){
@@ -377,6 +411,8 @@ public class PixmapPacker implements Disposable{
      * can be used to insert Pixmap instances on a separate thread via {@link #pack(String, Pixmap)} and update the TextureAtlas on
      * the rendering thread. This method must be called on the rendering thread. After calling this method, disposing the packer
      * will no longer dispose the page pixmaps.
+     * <p>
+     * 更新 {@link TextureAtlas},添加自上次调用此方法以来打包的所有新 {@link Pixmap} 实例。可用于在单独线程通过 {@link #pack(String, Pixmap)} 插入 Pixmap,并在渲染线程更新 TextureAtlas。此方法必须在渲染线程调用。调用此方法后,释放打包器将不再释放页面 pixmap。
      */
     public synchronized TextureAtlas generateTextureAtlas(TextureFilter minFilter, TextureFilter magFilter, boolean useMipMaps, boolean clearRects, int extraPages){
         TextureAtlas atlas = new TextureAtlas();
@@ -420,6 +456,8 @@ public class PixmapPacker implements Disposable{
     /**
      * Calls {@link Page#updateTexture(TextureFilter, TextureFilter, boolean) updateTexture} for each page and adds a region to
      * the specified array for each page texture.
+     * <p>
+     * 对每页调用 {@link Page#updateTexture(TextureFilter, TextureFilter, boolean) updateTexture},并为每个页面纹理向指定数组添加一个区域。
      */
     public synchronized void updateTextureRegions(Ar<TextureRegion> regions, TextureFilter minFilter, TextureFilter magFilter,
                                                   boolean useMipMaps){
@@ -428,7 +466,10 @@ public class PixmapPacker implements Disposable{
             regions.add(new TextureRegion(pages.get(regions.size).texture));
     }
 
-    /** Calls {@link Page#updateTexture(TextureFilter, TextureFilter, boolean) updateTexture} for each page. */
+    /**
+     * Calls {@link Page#updateTexture(TextureFilter, TextureFilter, boolean) updateTexture} for each page.
+     * 对每页调用 {@link Page#updateTexture(TextureFilter, TextureFilter, boolean) updateTexture}。
+     */
     public synchronized void updatePageTextures(TextureFilter minFilter, TextureFilter magFilter, boolean useMipMaps){
         for(Page page : pages)
             page.updateTexture(minFilter, magFilter, useMipMaps);
@@ -474,6 +515,8 @@ public class PixmapPacker implements Disposable{
      * If true, when a pixmap is packed to a page that has a texture, the portion of the texture where the pixmap was packed is
      * updated using glTexSubImage2D. Note if packing many pixmaps, this may be slower than reuploading the whole texture. This
      * setting is ignored if {@link #getDuplicateBorder()} is true.
+     * <p>
+     * 若为 true,当 pixmap 打包到已有纹理的页面时,使用 glTexSubImage2D 更新纹理中该 pixmap 所在部分。注意,打包大量 pixmap 时,这可能比重新上传整个纹理更慢。若 {@link #getDuplicateBorder()} 为 true,则忽略此设置。
      */
     public void setPackToTexture(boolean packToTexture){
         this.packToTexture = packToTexture;
@@ -487,6 +530,8 @@ public class PixmapPacker implements Disposable{
     /**
      * Sets the default <code>color</code> of the whole {@link PixmapPacker.Page} when a new one created. Helps to avoid texture
      * bleeding or to highlight the page for debugging.
+     * <p>
+     * 设置新建 {@link PixmapPacker.Page} 的默认 <code>color</code>。有助于避免纹理渗色,或用于调试时高亮页面。
      * @see Page#Page(PixmapPacker packer)
      */
     public void setTransparentColor(Color color){
@@ -501,18 +546,22 @@ public class PixmapPacker implements Disposable{
         int endY = getSplitPoint(raster, 0, startY, false, false);
 
         // Ensure pixels after the end are not invalid.
+        // 确保结尾之后的像素不是无效的。
         getSplitPoint(raster, endX + 1, 0, true, true);
         getSplitPoint(raster, 0, endY + 1, true, false);
 
         // No splits, or all splits.
+        // 无分割,或全部分割。
         if(startX == 0 && endX == 0 && startY == 0 && endY == 0) return null;
 
         // Subtraction here is because the coordinates were computed before the 1px border was stripped.
+        // 此处做减法是因为坐标是在去除 1px 边框之前计算的。
         if(startX != 0){
             startX--;
             endX = raster.width - 2 - (endX - 1);
         }else{
             // If no start point was ever found, we assume full stretch.
+            // 若从未找到起点,则假定完全拉伸。
             endX = raster.width - 2;
         }
         if(startY != 0){
@@ -520,6 +569,7 @@ public class PixmapPacker implements Disposable{
             endY = raster.height - 2 - (endY - 1);
         }else{
             // If no start point was ever found, we assume full stretch.
+            // 若从未找到起点,则假定完全拉伸。
             endY = raster.height - 2;
         }
 
@@ -535,21 +585,25 @@ public class PixmapPacker implements Disposable{
         int startY = getSplitPoint(raster, right, 1, true, false);
 
         // No need to hunt for the end if a start was never found.
+        // 若从未找到起点,则无需寻找终点。
         int endX = 0;
         int endY = 0;
         if(startX != 0) endX = getSplitPoint(raster, startX + 1, bottom, false, true);
         if(startY != 0) endY = getSplitPoint(raster, right, startY + 1, false, false);
 
         // Ensure pixels after the end are not invalid.
+        // 确保结尾之后的像素不是无效的。
         getSplitPoint(raster, endX + 1, bottom, true, true);
         getSplitPoint(raster, right, endY + 1, true, false);
 
         // No pads.
+        // 无内边距。
         if(startX == 0 && endX == 0 && startY == 0 && endY == 0){
             return null;
         }
 
         // -2 here is because the coordinates were computed before the 1px border was stripped.
+        // 此处 -2 是因为坐标是在去除 1px 边框之前计算的。
         if(startX == 0 && endX == 0){
             startX = -1;
             endX = -1;
@@ -559,6 +613,7 @@ public class PixmapPacker implements Disposable{
                 endX = raster.width - 2 - (endX - 1);
             }else{
                 // If no start point was ever found, we assume full stretch.
+                // 若从未找到起点,则假定完全拉伸。
                 endX = raster.width - 2;
             }
         }
@@ -571,6 +626,7 @@ public class PixmapPacker implements Disposable{
                 endY = raster.height- 2 - (endY - 1);
             }else{
                 // If no start point was ever found, we assume full stretch.
+                // 若从未找到起点,则假定完全拉伸。
                 endY = raster.height - 2;
             }
         }
@@ -608,12 +664,17 @@ public class PixmapPacker implements Disposable{
 
     /**
      * Choose the page and location for each rectangle.
+     * <p>
+     * 为每个矩形选择页面和位置。
      * @author Nathan Sweet
      */
     public interface PackStrategy{
         void sort(Ar<PixmapRegion> images);
 
-        /** Returns the page the rectangle should be placed in and modifies the specified rectangle position. */
+        /**
+         * Returns the page the rectangle should be placed in and modifies the specified rectangle position.
+         * 返回矩形应放入的页面,并修改指定矩形的位置。
+         */
         Page pack(PixmapPacker packer, String name, Rect rect);
     }
 
@@ -629,7 +690,10 @@ public class PixmapPacker implements Disposable{
         public Texture texture;
         boolean dirty;
 
-        /** Creates a new page filled with the color provided by the {@link PixmapPacker#getTransparentColor()} */
+        /**
+         * Creates a new page filled with the color provided by the {@link PixmapPacker#getTransparentColor()}
+         * 创建新页面,并以 {@link PixmapPacker#getTransparentColor()} 提供的颜色填充
+         */
         public Page(PixmapPacker packer){
             image = new Pixmap(packer.pageWidth, packer.pageHeight);
             Color transparentColor = packer.getTransparentColor();
@@ -656,6 +720,8 @@ public class PixmapPacker implements Disposable{
 
         /**
          * Returns the texture for this page, or null if the texture has not been created.
+         * <p>
+         * 返回此页面的纹理,若尚未创建则为 null。
          * @see #updateTexture(TextureFilter, TextureFilter, boolean)
          */
         public Texture getTexture(){
@@ -665,13 +731,16 @@ public class PixmapPacker implements Disposable{
         /**
          * Creates the texture if it has not been created, else reuploads the entire page pixmap to the texture if the pixmap has
          * changed since this method was last called.
-         * @return true if the texture was created or reuploaded.
+         * <p>
+         * 若纹理未创建则创建之;否则,若 pixmap 自上次调用此方法以来有变化,则将整个页面 pixmap 重新上传到纹理。
+         * @return true if the texture was created or reuploaded. 若纹理被创建或重新上传则为 true。
          */
         public boolean updateTexture(TextureFilter minFilter, TextureFilter magFilter, boolean useMipMaps){
             if(texture != null){
                 if(!dirty) return false;
 
                 //this doesn't update mipmaps, but for UI, I don't care
+                // 这不会更新 mipmap,但用于 UI 的话无所谓
                 texture.draw(image);
             }else{
                 texture = new Texture(image, useMipMaps);
@@ -685,6 +754,8 @@ public class PixmapPacker implements Disposable{
     /**
      * Does bin packing by inserting to the right or below previously packed rectangles. This is good at packing arbitrarily sized
      * images.
+     * <p>
+     * 通过插入到先前打包矩形的右侧或下方进行装箱打包。适合打包任意尺寸的图像。
      * @author mzechner
      * @author Nathan Sweet
      * @author Rob Rendell
@@ -701,10 +772,12 @@ public class PixmapPacker implements Disposable{
             GuillotinePage page;
             if(packer.pages.size == 0){
                 // Add a page if empty.
+                // 若为空则添加一页。
                 page = new GuillotinePage(packer);
                 packer.pages.add(page);
             }else{
                 // Always try to pack into the last page.
+                // 总是尝试打包进最后一页。
                 page = (GuillotinePage)packer.pages.peek();
             }
 
@@ -714,6 +787,7 @@ public class PixmapPacker implements Disposable{
             Node node = insert(page.root, rect);
             if(node == null){
                 // Didn't fit, pack into a new page.
+                // 放不下,打包到新页面。
                 page = new GuillotinePage(packer);
                 packer.pages.add(page);
                 node = insert(page.root, rect);
@@ -788,6 +862,8 @@ public class PixmapPacker implements Disposable{
 
     /**
      * Does bin packing by inserting in rows. This is good at packing images that have similar heights.
+     * <p>
+     * 通过按行插入进行装箱打包。适合打包高度相近的图像。
      * @author Nathan Sweet
      */
     public static class SkylineStrategy implements PackStrategy{
@@ -805,6 +881,7 @@ public class PixmapPacker implements Disposable{
                 SkylinePage page = (SkylinePage)packer.pages.get(i);
                 Row bestRow = null;
                 // Fit in any row before the last.
+                // 放入最后一行之前的任意一行。
                 for(int ii = 0, nn = page.rows.size - 1; ii < nn; ii++){
                     Row row = page.rows.get(ii);
                     if(row.x + rectWidth >= pageWidth) continue;
@@ -814,6 +891,7 @@ public class PixmapPacker implements Disposable{
                 }
                 if(bestRow == null){
                     // Fit in last row, increasing height.
+                    // 放入最后一行,增加高度。
                     Row row = page.rows.peek();
                     if(row.y + rectHeight >= pageHeight) continue;
                     if(row.x + rectWidth < pageWidth){
@@ -821,6 +899,7 @@ public class PixmapPacker implements Disposable{
                         bestRow = row;
                     }else if(row.y + row.height + rectHeight < pageHeight){
                         // Fit in new row.
+                        // 放入新行。
                         bestRow = new Row();
                         bestRow.y = row.y + row.height;
                         bestRow.height = rectHeight;
@@ -835,6 +914,7 @@ public class PixmapPacker implements Disposable{
                 }
             }
             // Fit in new page.
+            // 放入新页面。
             SkylinePage page = new SkylinePage(packer);
             packer.pages.add(page);
             Row row = new Row();

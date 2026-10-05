@@ -33,6 +33,8 @@ import arc.struct.*;
  * the SpriteBatch with the {@link #createDistanceFieldShader()} shader.
  * <p>
  * Attention: The batch is flushed before and after each string is rendered.
+ * <p>
+ * 使用距离场纹理渲染位图字体,用法参见 <a href="https://github.com/libgdx/libgdx/wiki/Distance-field-fonts">Distance Field Fonts wiki 文章</a>。请使用 {@link #createDistanceFieldShader()} 着色器初始化 SpriteBatch。 <p> 注意:每渲染一个字符串前后都会刷新批处理。
  * @author Florian Falkner
  */
 public class DistanceFieldFont extends Font{
@@ -73,6 +75,8 @@ public class DistanceFieldFont extends Font{
     /**
      * Returns a new instance of the distance field shader, see https://github.com/libgdx/libgdx/wiki/Distance-field-fonts if the
      * u_smoothing uniform > 0.0. Otherwise the same code as the default SpriteBatch shader is used.
+     * <p>
+     * 返回距离场着色器的新实例,当 u_smoothing uniform > 0.0 时参见 https://github.com/libgdx/libgdx/wiki/Distance-field-fonts。否则使用与默认 SpriteBatch 着色器相同的代码。
      */
     public static Shader createDistanceFieldShader(){
         String vertexShader =
@@ -113,6 +117,7 @@ public class DistanceFieldFont extends Font{
         super.load(data);
 
         // Distance field font rendering requires font texture to be filtered Linear.
+        // 距离场字体渲染要求字体纹理使用线性(Linear)过滤。
         final Ar<TextureRegion> regions = getRegions();
         for(TextureRegion region : regions)
             region.texture.setFilter(TextureFilter.linear, TextureFilter.linear);
@@ -123,14 +128,17 @@ public class DistanceFieldFont extends Font{
         return new DistanceFieldFontCache(this, integer);
     }
 
-    /** @return The distance field smoothing factor for this font. */
+    /**
+     * @return The distance field smoothing factor for this font.
+     * @return The distance field smoothing factor for this font. 该字体的距离场平滑系数。
+     */
     public float getDistanceFieldSmoothing(){
         return distanceFieldSmoothing;
     }
 
     /**
      * @param distanceFieldSmoothing Set the distance field smoothing factor for this font. SpriteBatch needs to have this shader
-     * set for rendering distance field fonts.
+     * set for rendering distance field fonts. 设置该字体的距离场平滑系数。渲染距离场字体时 SpriteBatch 需要设置此着色器。
      */
     public void setDistanceFieldSmoothing(float distanceFieldSmoothing){
         this.distanceFieldSmoothing = distanceFieldSmoothing;
@@ -139,6 +147,8 @@ public class DistanceFieldFont extends Font{
     /**
      * Provides a font cache that uses distance field shader for rendering fonts. Attention: breaks batching because uniform is
      * needed for smoothing factor, so a flush is performed before and after every font rendering.
+     * <p>
+     * 提供使用距离场着色器渲染字体的字体缓存。注意:由于平滑系数需要 uniform,会破坏批处理,因此每次字体渲染前后都会执行刷新。
      * @author Florian Falkner
      */
     private static class DistanceFieldFontCache extends FontCache{

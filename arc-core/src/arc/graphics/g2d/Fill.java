@@ -121,8 +121,10 @@ public class Fill{
 
     /**
      * Draws an uncentered drop shadow.
-     * @param x shadow bottom left X
-     * @param y shadow bottom left Y
+     * <p>
+     * 绘制非居中的投影。
+     * @param x shadow bottom left X 投影左下角 X
+     * @param y shadow bottom left Y 投影左下角 Y
      * */
     public static void dropShadowRect(float x, float y, float width, float height, float blur, float opacity){
         dropShadow(x + width/2f, y + height/2f, width, height, blur, opacity);
@@ -130,10 +132,12 @@ public class Fill{
 
     /**
      * Draws a centered drop shadow.
-     * @param blur shadow size in units
-     * @param opacity shadow opacity
-     * @param x shadow center X
-     * @param y shadow center Y
+     * <p>
+     * 绘制居中的投影。
+     * @param blur shadow size in units 投影大小(单位)
+     * @param opacity shadow opacity 投影不透明度
+     * @param x shadow center X 投影中心 X
+     * @param y shadow center Y 投影中心 Y
      * */
     public static void dropShadow(float x, float y, float width, float height, float blur, float opacity){
         float edge = Color.clearFloatBits;
@@ -144,9 +148,11 @@ public class Fill{
         float bx1 = x1 - outside, by1 = y1 - outside, bx2 = x2 + outside, by2 = y2 + outside;
 
         //center
+        // 中心
         quad(x1, y1, center, x2, y1, center, x2, y2, center, x1, y2, center);
 
         //bottom
+        // 底部
         quad(
         x1, y1, center,
         bx1, by1, edge,
@@ -155,6 +161,7 @@ public class Fill{
         );
 
         //right
+        // 右侧
         quad(
         x2, y1, center,
         bx2, by1, edge,
@@ -163,6 +170,7 @@ public class Fill{
         );
 
         //top
+        // 顶部
         quad(
         x1, y2, center,
         bx1, by2, edge,
@@ -171,6 +179,7 @@ public class Fill{
         );
 
         //left
+        // 左侧
         quad(
         x1, y1, center,
         bx1, by1, edge,
@@ -260,6 +269,7 @@ public class Fill{
     public static void poly(float x, float y, int sides, float radius, float rotation){
 
         //for 3 and 4 sides, a single quad will suffice, so an alternative optimized implementation is used
+        // 对于 3 边和 4 边,单个四边形即可满足,因此使用另一种优化实现
         if(sides == 3){
             tri(
                 x + Angles.trnsx(rotation, radius),

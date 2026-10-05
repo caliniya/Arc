@@ -17,17 +17,23 @@ import java.util.concurrent.*;
  *
  * Sorting optimizations written by zxtej.
  * Significant request optimizations done by way-zer.
+ *<p>
+ *用于高效批处理和排序精灵的类。排序优化由 zxtej 编写。请求方面的重大优化由 way-zer 完成。
  * */
 public class SpriteBatch extends Batch{
     private static final boolean validateDrawCalls = false;
     //xy + uv + depth + color + mix_color
+    // xy + uv + 深度 + 颜色 + mix_color
     public static final int vertexSize = 2 + 2 + 1 + 1 + 1;
     public static final int spriteSize = 4 * vertexSize;
 
     private static final int initialSize = 10000;
     private static final float[] emptyVertices = new float[0];
 
-    /** Counts up for every draw call. Only ever reset by the user. */
+    /**
+     * Counts up for every draw call. Only ever reset by the user.
+     * 每次绘制调用递增。仅由用户重置。
+     */
     public static long totalDrawCalls = 0;
 
     static ForkJoinHolder commonPool;
@@ -58,6 +64,8 @@ public class SpriteBatch extends Batch{
 
     /**
      * Constructs a new SpriteBatch with a size of 4096, one buffer, and the default shader.
+     * <p>
+     * 构造大小为 4096、单个缓冲区、默认着色器的新 SpriteBatch。
      */
     public SpriteBatch(){
         this(4096);
@@ -71,10 +79,13 @@ public class SpriteBatch extends Batch{
      * <p>
      * The defaultShader specifies the shader to use. Note that the names for uniforms for this default shader are different than
      * the ones expect for shaders set with {@link #setShader(Shader)}.
-     * @param size The max number of sprites in a single batch. Max of 8191.
+     * <p>
+     * 构造新的 SpriteBatch。将投影矩阵设为 y 轴向上、x 轴向右、原点位于屏幕左下角的正交投影。投影相对当前屏幕分辨率是像素精确的。 <p> defaultShader 指定要使用的着色器。注意,此默认着色器的 uniform 名称与通过 {@link #setShader(Shader)} 设置的着色器所期望的不同。
+     * @param size The max number of sprites in a single batch. Max of 8191. 单个批处理的最大精灵数。最大 8191。
      */
     public SpriteBatch(int size){
         // 32767 is max vertex index, so 32767 / 4 vertices per sprite = 8191 sprites max.
+        // 32767 是最大顶点索引,因此 32767 / 4(每个精灵 4 个顶点)= 最多 8191 个精灵。
         if(size > 8191) throw new IllegalArgumentException("Can't have more than 8191 sprites per batch: " + size);
 
         if(size > 0){
@@ -106,6 +117,7 @@ public class SpriteBatch extends Batch{
             arrayShader = createArrayShader();
 
             //mark indices as dirty once for GL30
+            // GL30 下将索引标记为脏一次即可
             mesh.getIndices();
             buffer = mesh.getVertices();
         }
@@ -237,6 +249,7 @@ public class SpriteBatch extends Batch{
     @Override
     protected void draw(Runnable request){
         totalDrawCalls ++; //not accurate since there can be multiple draws inside the runnable, but it's the best that can be done
+        // 不准确,因为 runnable 内可能有多次绘制,但已尽力而为
 
         if(sort && !flushing){
             if(numRequests >= requests.length) expandRequests();
@@ -289,6 +302,7 @@ public class SpriteBatch extends Batch{
         lastTexture.bind();
         Mesh mesh = this.mesh;
         //calling buffer() marks it as dirty, so it gets reuploaded upon render
+        // 调用 buffer() 会将其标记为脏,从而在渲染时重新上传
         mesh.getVertices();
 
         buffer.position(0);
@@ -322,6 +336,7 @@ public class SpriteBatch extends Batch{
             }else if(req.texture != null){
                 drawSuper(req.texture, vertices, req.verticesOffset, req.verticesLength);
             } // the request is invalid, but crashing wouldn't be very nice, so it is simply ignored
+            // 请求无效,但直接崩溃不太友好,因此直接忽略
         }
 
         colorPacked = preColor;
@@ -390,6 +405,7 @@ public class SpriteBatch extends Batch{
 
         if(!Mathf.zero(rotation)){
             //bottom left and top right corner points relative to origin
+            // 相对于原点的左下角和右上角顶点
             float worldOriginX = x + originX;
             float worldOriginY = y + originY;
             float fx = -originX;
@@ -398,6 +414,7 @@ public class SpriteBatch extends Batch{
             float fy2 = height - originY;
 
             // rotate
+            // 旋转
             float cos = Mathf.cosDeg(rotation);
             float sin = Mathf.sinDeg(rotation);
 
@@ -546,6 +563,7 @@ public class SpriteBatch extends Batch{
     }
 
     //region request sorting
+    // 区域请求排序
 
     protected void sortRequests(){
         if(multithreaded){
@@ -564,8 +582,10 @@ public class SpriteBatch extends Batch{
         int z = itemZ[0];
         int startI = 0;
         // Point3: <z, index, length>
+        // Point3:<z, 索引, 长度>
         for(int i = 1; i < numRequests; i++){
             if(itemZ[i] != z){ // if contiguous section should end
+            // 连续区段是否应结束
                 contiguous[ci] = z;
                 contiguous[ci + 1] = startI;
                 contiguous[ci + 2] = i - startI;
@@ -603,6 +623,7 @@ public class SpriteBatch extends Batch{
     }
 
     protected void sortRequestsStandard(){ // Non-threaded implementation for weak devices
+    // 面向性能较弱设备的非多线程实现
         final int numRequests = this.numRequests;
         final int[] itemZ = requestZ;
         int[] contiguous = this.contiguous;
@@ -610,8 +631,10 @@ public class SpriteBatch extends Batch{
         int z = itemZ[0];
         int startI = 0;
         // Point3: <z, index, length>
+        // Point3:<z, 索引, 长度>
         for(int i = 1; i < numRequests; i++){
             if(itemZ[i] != z){ // if contiguous section should end
+            // 连续区段是否应结束
                 contiguous[ci] = z;
                 contiguous[ci + 1] = startI;
                 contiguous[ci + 2] = i - startI;
@@ -659,6 +682,7 @@ public class SpriteBatch extends Batch{
         private static int[] entries3 = new int[300], entries3a = new int[300];
 
         //packed (key << 32 | payload) longs, used to order unique z-keys without boxing
+        // 打包为 (key << 32 | payload) 的 long,用于对唯一的 z 键排序而无需装箱
         private static long[] packedKeys = new long[100];
         private static long[] packedKeysMT = new long[100];
 
@@ -737,6 +761,7 @@ public class SpriteBatch extends Batch{
             final IntIntMap[] countses = CountingSort.countses;
             final int[][] locs = CountingSort.locses;
             final int threads = Math.min(processors, (end + 4095) / 4096); // 4096 Point3s to process per thread
+            // 每个线程处理 4096 个 Point3
             final int thread_size = end / threads + 1;
             final CountingSort.CountingSortTask[] tasks = CountingSort.tasks;
             final CountingSort.CountingSortTask2[] task2s = CountingSort.task2s;
@@ -792,6 +817,7 @@ public class SpriteBatch extends Batch{
             }
 
             //argsort the L unique entries by key: pack (key, original index) into one long
+            // 按键对 L 个唯一条目做参数排序:将 (key, 原始索引) 打包进一个 long
             for(int i = 0; i < L; i++){
                 packed[i] = (((long)entries[i * 3]) << 32) | (i & 0xFFFFFFFFL);
             }
@@ -848,16 +874,19 @@ public class SpriteBatch extends Batch{
             final long[] packed = CountingSort.packedKeys;
 
             //pack (key, compactIndex) for every unique z-key
+            // 为每个唯一 z 键打包 (key, compactIndex)
             final IntIntMap.Entries countEntries = counts.entries();
             final IntIntMap.Entry entry = countEntries.next();
             packed[0] = (((long)entry.key) << 32) | (entry.value & 0xFFFFFFFFL);
             int j = 1;
             while(countEntries.hasNext){
                 countEntries.next(); // it returns the same entry over and over again.
+                // 它会反复返回同一个条目。
                 packed[j++] = (((long)entry.key) << 32) | (entry.value & 0xFFFFFFFFL);
             }
 
             //primitive sort: high 32 bits (key) fully determine order since keys are unique
+            // 原始排序:高 32 位(key)完全决定顺序,因为键是唯一的
             Arrays.sort(packed, 0, unique);
 
             int prev = (int)packed[0], next;
