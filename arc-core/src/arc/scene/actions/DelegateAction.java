@@ -6,6 +6,8 @@ import arc.util.pooling.Pool;
 
 /**
  * Base class for an action that wraps another action.
+ * <p>
+ * 包装另一个动作的动作的基类。
  * @author Nathan Sweet
  */
 abstract public class DelegateAction extends Action{
@@ -15,7 +17,10 @@ abstract public class DelegateAction extends Action{
         return action;
     }
 
-    /** Sets the wrapped action. */
+    /**
+     * Sets the wrapped action.
+     * 设置被包装的动作。
+     */
     public void setAction(Action action){
         this.action = action;
     }
@@ -26,6 +31,7 @@ abstract public class DelegateAction extends Action{
     public final boolean act(float delta){
         Pool pool = getPool();
         setPool(null); // Ensure this action can't be returned to the pool inside the delegate action.
+        // 确保此动作在被包装动作执行期间不会被归还到池中。
         try{
             return delegate(delta);
         }finally{

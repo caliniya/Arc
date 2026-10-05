@@ -6,6 +6,8 @@ import arc.scene.Element;
 
 /**
  * Executes an action only after all other actions on the actor at the time this action's target was set have finished.
+ * <p>
+ * 仅当设置此动作目标时该元素上的所有其他动作都完成后,才执行该动作。
  * @author Nathan Sweet
  */
 public class AfterAction extends DelegateAction{

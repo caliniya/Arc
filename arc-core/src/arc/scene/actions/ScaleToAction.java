@@ -2,6 +2,8 @@ package arc.scene.actions;
 
 /**
  * Sets the actor's scale from its current value to a specific value.
+ * <p>
+ * 将元素的缩放从当前值设置为指定值。
  * @author Nathan Sweet
  */
 public class ScaleToAction extends TemporalAction{

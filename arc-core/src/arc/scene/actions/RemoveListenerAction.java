@@ -5,6 +5,8 @@ import arc.scene.event.EventListener;
 
 /**
  * Removes a listener from an actor.
+ * <p>
+ * 从元素移除一个监听器。
  * @author Nathan Sweet
  */
 public class RemoveListenerAction extends Action{

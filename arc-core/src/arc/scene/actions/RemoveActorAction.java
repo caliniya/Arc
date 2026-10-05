@@ -4,6 +4,8 @@ import arc.scene.Action;
 
 /**
  * Removes an actor from the stage.
+ * <p>
+ * 从舞台移除一个元素。
  * @author Nathan Sweet
  */
 public class RemoveActorAction extends Action{

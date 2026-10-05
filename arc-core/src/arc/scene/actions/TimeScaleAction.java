@@ -2,6 +2,8 @@ package arc.scene.actions;
 
 /**
  * Multiplies the delta of an action.
+ * <p>
+ * 将动作的时间增量乘以一个系数。
  * @author Nathan Sweet
  */
 public class TimeScaleAction extends DelegateAction{

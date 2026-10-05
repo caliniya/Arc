@@ -2,6 +2,8 @@ package arc.scene.actions;
 
 /**
  * Scales an actor's scale to a relative size.
+ * <p>
+ * 将元素的缩放值变为相对缩放值。
  * @author Nathan Sweet
  */
 public class ScaleByAction extends RelativeTemporalAction{

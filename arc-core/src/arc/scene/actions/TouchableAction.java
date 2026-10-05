@@ -5,6 +5,8 @@ import arc.scene.event.Touchable;
 
 /**
  * Sets the actor's {@link Element#touchable(Touchable) touchability}.
+ * <p>
+ * 设置元素的 {@link Element#touchable(Touchable) 可触碰性}。
  * @author Nathan Sweet
  */
 public class TouchableAction extends Action{

@@ -2,6 +2,8 @@ package arc.scene.actions;
 
 /**
  * Repeats an action a number of times or forever.
+ * <p>
+ * 将一个动作重复若干次或无限重复。
  * @author Nathan Sweet
  */
 public class RepeatAction extends DelegateAction{
@@ -22,7 +24,10 @@ public class RepeatAction extends DelegateAction{
         return false;
     }
 
-    /** Causes the action to not repeat again. */
+    /**
+     * Causes the action to not repeat again.
+     * 使动作不再重复。
+     */
     public void finish(){
         finished = true;
     }
@@ -38,7 +43,10 @@ public class RepeatAction extends DelegateAction{
         return repeatCount;
     }
 
-    /** Sets the number of times to repeat. Can be set to {@link #FOREVER}. */
+    /**
+     * Sets the number of times to repeat. Can be set to {@link #FOREVER}.
+     * 设置重复次数。可设为 {@link #FOREVER}。
+     */
     public void setCount(int count){
         this.repeatCount = count;
     }

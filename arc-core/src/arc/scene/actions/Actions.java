@@ -11,10 +11,15 @@ import arc.util.pooling.Pools;
 
 /**
  * Static convenience methods for using pooled actions, intended for static import.
+ * <p>
+ * 使用池化动作的静态便捷方法,适合静态导入。
  * @author Nathan Sweet
  */
 public class Actions{
-    /** Returns a new or pooled action of the specified type. */
+    /**
+     * Returns a new or pooled action of the specified type.
+     * 返回指定类型的一个新建或池化的动作。
+     */
     public static <T extends Action> T action(Class<T> type, Prov<T> sup){
         T action = Pools.obtain(type, sup);
         action.setPool(Pools.get(type, sup));
@@ -47,12 +52,18 @@ public class Actions{
         return removeAction;
     }
 
-    /** Sets the origin to the center. */
+    /**
+     * Sets the origin to the center.
+     * 将原点设置为中心。
+     */
     public static Action originCenter(){
         return new OriginAction();
     }
 
-    /** Moves the actor instantly. */
+    /**
+     * Moves the actor instantly.
+     * 立即移动该元素。
+     */
     public static MoveToAction moveTo(float x, float y){
         return moveTo(x, y, 0, null);
     }
@@ -85,7 +96,10 @@ public class Actions{
         return action;
     }
 
-    /** Moves the actor instantly. */
+    /**
+     * Moves the actor instantly.
+     * 立即移动该元素。
+     */
     public static MoveByAction moveBy(float amountX, float amountY){
         return moveBy(amountX, amountY, 0, null);
     }
@@ -124,7 +138,10 @@ public class Actions{
         return action;
     }
 
-    /** Sizes the actor instantly. */
+    /**
+     * Sizes the actor instantly.
+     * 立即设置元素的大小。
+     */
     public static SizeToAction sizeTo(float x, float y){
         return sizeTo(x, y, 0, null);
     }
@@ -141,7 +158,10 @@ public class Actions{
         return action;
     }
 
-    /** Sizes the actor instantly. */
+    /**
+     * Sizes the actor instantly.
+     * 立即设置元素的大小。
+     */
     public static SizeByAction sizeBy(float amountX, float amountY){
         return sizeBy(amountX, amountY, 0, null);
     }
@@ -158,7 +178,10 @@ public class Actions{
         return action;
     }
 
-    /** Scales the actor instantly. */
+    /**
+     * Scales the actor instantly.
+     * 立即缩放该元素。
+     */
     public static ScaleToAction scaleTo(float x, float y){
         return scaleTo(x, y, 0, null);
     }
@@ -175,7 +198,10 @@ public class Actions{
         return action;
     }
 
-    /** Scales the actor instantly. */
+    /**
+     * Scales the actor instantly.
+     * 立即缩放该元素。
+     */
     public static ScaleByAction scaleBy(float amountX, float amountY){
         return scaleBy(amountX, amountY, 0, null);
     }
@@ -192,7 +218,10 @@ public class Actions{
         return action;
     }
 
-    /** Rotates the actor instantly. */
+    /**
+     * Rotates the actor instantly.
+     * 立即旋转该元素。
+     */
     public static RotateToAction rotateTo(float rotation){
         return rotateTo(rotation, 0, null);
     }
@@ -209,7 +238,10 @@ public class Actions{
         return action;
     }
 
-    /** Rotates the actor instantly. */
+    /**
+     * Rotates the actor instantly.
+     * 立即旋转该元素。
+     */
     public static RotateByAction rotateBy(float rotationAmount){
         return rotateBy(rotationAmount, 0, null);
     }
@@ -226,17 +258,26 @@ public class Actions{
         return action;
     }
 
-    /** Sets the actor's color instantly. */
+    /**
+     * Sets the actor's color instantly.
+     * 立即设置元素的颜色。
+     */
     public static ColorAction color(Color color){
         return color(color, 0, null);
     }
 
-    /** Transitions from the color at the time this action starts to the specified color. */
+    /**
+     * Transitions from the color at the time this action starts to the specified color.
+     * 从此动作开始时的颜色过渡到指定的颜色。
+     */
     public static ColorAction color(Color color, float duration){
         return color(color, duration, null);
     }
 
-    /** Transitions from the color at the time this action starts to the specified color. */
+    /**
+     * Transitions from the color at the time this action starts to the specified color.
+     * 从此动作开始时的颜色过渡到指定的颜色。
+     */
     public static ColorAction color(Color color, float duration, Interp interpolation){
         ColorAction action = action(ColorAction.class, ColorAction::new);
         action.setEndColor(color);
@@ -245,17 +286,26 @@ public class Actions{
         return action;
     }
 
-    /** Sets the actor's alpha instantly. */
+    /**
+     * Sets the actor's alpha instantly.
+     * 立即设置元素的 alpha。
+     */
     public static AlphaAction alpha(float a){
         return alpha(a, 0, null);
     }
 
-    /** Transitions from the alpha at the time this action starts to the specified alpha. */
+    /**
+     * Transitions from the alpha at the time this action starts to the specified alpha.
+     * 从此动作开始时的 alpha 过渡到指定的 alpha。
+     */
     public static AlphaAction alpha(float a, float duration){
         return alpha(a, duration, null);
     }
 
-    /** Transitions from the alpha at the time this action starts to the specified alpha. */
+    /**
+     * Transitions from the alpha at the time this action starts to the specified alpha.
+     * 从此动作开始时的 alpha 过渡到指定的 alpha。
+     */
     public static AlphaAction alpha(float a, float duration, Interp interpolation){
         AlphaAction action = action(AlphaAction.class, AlphaAction::new);
         action.setAlpha(a);
@@ -264,12 +314,18 @@ public class Actions{
         return action;
     }
 
-    /** Transitions from the alpha at the time this action starts to an alpha of 0. */
+    /**
+     * Transitions from the alpha at the time this action starts to an alpha of 0.
+     * 从此动作开始时的 alpha 过渡到 alpha 0。
+     */
     public static AlphaAction fadeOut(float duration){
         return alpha(0, duration, null);
     }
 
-    /** Transitions from the alpha at the time this action starts to an alpha of 0. */
+    /**
+     * Transitions from the alpha at the time this action starts to an alpha of 0.
+     * 从此动作开始时的 alpha 过渡到 alpha 0。
+     */
     public static AlphaAction fadeOut(float duration, Interp interpolation){
         AlphaAction action = action(AlphaAction.class, AlphaAction::new);
         action.setAlpha(0);
@@ -278,12 +334,18 @@ public class Actions{
         return action;
     }
 
-    /** Transitions from the alpha at the time this action starts to an alpha of 1. */
+    /**
+     * Transitions from the alpha at the time this action starts to an alpha of 1.
+     * 从此动作开始时的 alpha 过渡到 alpha 1。
+     */
     public static AlphaAction fadeIn(float duration){
         return alpha(1, duration, null);
     }
 
-    /** Transitions from the alpha at the time this action starts to an alpha of 1. */
+    /**
+     * Transitions from the alpha at the time this action starts to an alpha of 1.
+     * 从此动作开始时的 alpha 过渡到 alpha 1。
+     */
     public static AlphaAction fadeIn(float duration, Interp interpolation){
         AlphaAction action = action(AlphaAction.class, AlphaAction::new);
         action.setAlpha(1);

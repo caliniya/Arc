@@ -2,6 +2,8 @@ package arc.scene.actions;
 
 /**
  * Base class for actions that transition over time using the percent complete since the last frame.
+ * <p>
+ * 基于自上一帧以来的完成百分比随时间过渡的动作的基类。
  * @author Nathan Sweet
  */
 abstract public class RelativeTemporalAction extends TemporalAction{

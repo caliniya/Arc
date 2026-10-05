@@ -2,6 +2,8 @@ package arc.scene.actions;
 
 /**
  * Moves an actor to a relative position.
+ * <p>
+ * 将元素移动到相对位置。
  * @author Nathan Sweet
  */
 public class MoveByAction extends RelativeTemporalAction{

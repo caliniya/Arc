@@ -2,6 +2,8 @@ package arc.scene.actions;
 
 /**
  * Moves an actor from its current size to a relative size.
+ * <p>
+ * 将元素从当前大小变为相对大小。
  * @author Nathan Sweet
  */
 public class SizeByAction extends RelativeTemporalAction{

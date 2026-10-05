@@ -4,6 +4,8 @@ import arc.scene.Action;
 
 /**
  * Adds an action to an actor.
+ * <p>
+ * 向元素添加一个动作。
  * @author Nathan Sweet
  */
 public class AddAction extends Action{

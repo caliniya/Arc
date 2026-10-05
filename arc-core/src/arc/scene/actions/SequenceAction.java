@@ -5,6 +5,8 @@ import arc.util.pooling.Pool;
 
 /**
  * Executes a number of actions one at a time.
+ * <p>
+ * 依次执行多个动作。
  * @author Nathan Sweet
  */
 public class SequenceAction extends ParallelAction{
@@ -48,9 +50,11 @@ public class SequenceAction extends ParallelAction{
         if(index >= actions.size) return true;
         Pool pool = getPool();
         setPool(null); // Ensure this action can't be returned to the pool while executings.
+        // 确保此动作在执行期间不会被归还到池中。
         try{
             if(actions.get(index).act(delta)){
                 if(actor == null) return true; // This action was removed.
+                // 此动作已被移除。
                 index++;
                 return index >= actions.size;
             }

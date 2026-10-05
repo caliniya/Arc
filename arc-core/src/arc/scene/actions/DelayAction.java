@@ -2,6 +2,8 @@ package arc.scene.actions;
 
 /**
  * Delays execution of an action or inserts a pause in a {@link SequenceAction}.
+ * <p>
+ * 延迟动作的执行,或在 {@link SequenceAction} 中插入一段停顿。
  * @author Nathan Sweet
  */
 public class DelayAction extends DelegateAction{
@@ -24,7 +26,10 @@ public class DelayAction extends DelegateAction{
         return action == null || action.act(delta);
     }
 
-    /** Causes the delay to be complete. */
+    /**
+     * Causes the delay to be complete.
+     * 使延迟立即完成。
+     */
     public void finish(){
         time = duration;
     }
@@ -35,12 +40,18 @@ public class DelayAction extends DelegateAction{
         time = 0;
     }
 
-    /** Gets the time spent waiting for the delay. */
+    /**
+     * Gets the time spent waiting for the delay.
+     * 获取等待延迟已花费的时间。
+     */
     public float getTime(){
         return time;
     }
 
-    /** Sets the time spent waiting for the delay. */
+    /**
+     * Sets the time spent waiting for the delay.
+     * 设置等待延迟已花费的时间。
+     */
     public void setTime(float time){
         this.time = time;
     }
@@ -49,7 +60,10 @@ public class DelayAction extends DelegateAction{
         return duration;
     }
 
-    /** Sets the length of the delay in seconds. */
+    /**
+     * Sets the length of the delay in seconds.
+     * 以秒为单位设置延迟时长。
+     */
     public void setDuration(float duration){
         this.duration = duration;
     }

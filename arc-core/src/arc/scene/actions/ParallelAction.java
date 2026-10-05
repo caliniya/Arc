@@ -7,6 +7,8 @@ import arc.util.pooling.Pool;
 
 /**
  * Executes a number of actions at the same time.
+ * <p>
+ * 同时执行多个动作。
  * @author Nathan Sweet
  */
 public class ParallelAction extends Action{
@@ -52,12 +54,14 @@ public class ParallelAction extends Action{
         complete = true;
         Pool pool = getPool();
         setPool(null); // Ensure this action can't be returned to the pool while executing.
+        // 确保此动作在执行期间不会被归还到池中。
         try{
             Ar<Action> actions = this.actions;
             for(int i = 0, n = actions.size; i < n && actor != null; i++){
                 Action currentAction = actions.get(i);
                 if(currentAction.getActor() != null && !currentAction.act(delta)) complete = false;
                 if(actor == null) return true; // This action was removed.
+                // 此动作已被移除。
             }
             return complete;
         }finally{

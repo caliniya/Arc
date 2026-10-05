@@ -5,6 +5,8 @@ import arc.scene.event.EventListener;
 
 /**
  * Adds a listener to an actor.
+ * <p>
+ * 向元素添加一个监听器。
  * @author Nathan Sweet
  */
 public class AddListenerAction extends Action{

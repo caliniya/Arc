@@ -4,6 +4,8 @@ import arc.util.Align;
 
 /**
  * Moves an actor from its current position to a specific position.
+ * <p>
+ * 将元素从当前位置移动到指定位置。
  * @author Nathan Sweet
  */
 public class MoveToAction extends TemporalAction{

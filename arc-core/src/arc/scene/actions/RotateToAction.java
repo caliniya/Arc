@@ -10,6 +10,8 @@ import arc.math.Mathf;
  * <p>
  * If the action is instead set to useShortestDirection instead, it will rotate straight to the target angle, regardless of where
  * the angle starts and stops. For example, starting at 350 and rotating to 10 will cause 20 degrees of rotation.
+ * <p>
+ * 将元素的旋转从当前值设置为指定值。 <p> 默认情况下,旋转会通过简单的减法从起始值转到指定值。例如,起始值设为 350、目标值设为 10,将产生 340 度的旋转。 <p> 若将动作改为设置 useShortestDirection,则会直接旋转到目标角度,而不论角度从何处开始和结束。例如,从 350 旋转到 10 将产生 20 度的旋转。
  * @author Nathan Sweet
  */
 public class RotateToAction extends TemporalAction{
@@ -20,7 +22,7 @@ public class RotateToAction extends TemporalAction{
     public RotateToAction(){
     }
 
-    /** @param useShortestDirection Set to true to move directly to the closest angle */
+    /** @param useShortestDirection Set to true to move directly to the closest angle 设为 true 则直接移动到最近的角度 */
     public RotateToAction(boolean useShortestDirection){
         this.useShortestDirection = useShortestDirection;
     }
