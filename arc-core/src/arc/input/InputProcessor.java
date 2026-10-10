@@ -46,8 +46,8 @@ public interface InputProcessor{
     }
 
     /**
-     * @param screenX The x coordinate, origin is in the upper left corner x 坐标,原点在左上角
-     * @param screenY The y coordinate, origin is in the upper left corner y 坐标,原点在左上角
+     * @param screenX The x coordinate, origin is in the lower left corner x 坐标,原点在左下角
+     * @param screenY The y coordinate, origin is in the lower left corner y 坐标,原点在左下角
      * @param pointer the pointer for the event. 事件的指针。
      * @param button the button 按钮
      * @return whether the input was processed 输入是否已被处理
