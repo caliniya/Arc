@@ -866,7 +866,7 @@ public class Strings {
 		for (int i = s.length(); i < width; i++) {
 			tmp2.append(c);
 		}
-		return tmp1.append(s).toString();
+		return tmp2.append(s).toString();
 	}
 
 	public static StringBuilder fixedBuilder(float d, int decimalPlaces) {
